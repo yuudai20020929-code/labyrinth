@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>プログラミングめいろ 🤖 | スクラッチ風ブロックでめざせゴール！</title>
+  <title>けやっきーの迷路だっしゅつ！🌳 | スクラッチ風ブロックでゴールをめざそう！</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800;900&display=swap" rel="stylesheet">
@@ -356,7 +356,7 @@
       100% { transform: rotate(360deg) scale(1); }
     }
 
-    /* ロボット */
+    /* けやっきーキャラクター */
     .robot-character {
       position: absolute;
       width: 48px;
@@ -376,88 +376,57 @@
       }
     }
 
-    .robot-body {
-      width: 36px;
-      height: 36px;
-      background: #38bdf8;
-      border: 2.5px solid #0369a1;
-      border-radius: 10px;
+    .keyakki-wrapper {
+      width: 44px;
+      height: 44px;
       position: relative;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.15s ease;
     }
 
     @media (max-width: 500px) {
-      .robot-body {
-        width: 30px;
-        height: 30px;
+      .keyakki-wrapper {
+        width: 34px;
+        height: 34px;
       }
     }
 
-    .robot-antenna {
+    .keyakki-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+    }
+
+    /* 進行方向を示すかわいい矢印マーカー */
+    .direction-pointer {
       position: absolute;
       top: -7px;
-      width: 3px;
-      height: 6px;
-      background: #0369a1;
-      border-radius: 2px;
-    }
-
-    .robot-antenna::before {
-      content: '';
-      position: absolute;
-      top: -5px;
-      left: -3px;
-      width: 8px;
-      height: 8px;
-      background: #f43f5e;
-      border-radius: 50%;
-      box-shadow: 0 0 5px #f43f5e;
-    }
-
-    .robot-face {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      margin-top: 1px;
-    }
-
-    .robot-eye {
-      width: 6px;
-      height: 6px;
-      background: #0f172a;
-      border-radius: 50%;
-      position: relative;
-    }
-
-    .robot-eye::after {
-      content: '';
-      position: absolute;
-      top: 1px;
-      right: 1px;
-      width: 2px;
-      height: 2px;
-      background: white;
-      border-radius: 50%;
-    }
-
-    .robot-mouth {
-      width: 10px;
-      height: 3px;
-      border-bottom: 2px solid #0369a1;
-      border-radius: 0 0 5px 5px;
-      margin-top: 2px;
-    }
-
-    .robot-pointer {
-      position: absolute;
-      top: 0px;
-      font-size: 0.55rem;
-      color: #ffffff;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.85rem;
+      color: #ef4444;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+      animation: pointer-bob 1s infinite alternate ease-in-out;
       font-weight: 900;
+      z-index: 15;
+    }
+
+    @keyframes pointer-bob {
+      0% { transform: translateX(-50%) translateY(0); }
+      100% { transform: translateX(-50%) translateY(-3px); }
+    }
+
+    /* 歩行中のピョコッとバウンス */
+    .keyakki-hop {
+      animation: hop 0.18s ease-in-out;
+    }
+
+    @keyframes hop {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15) translateY(-2px); }
     }
 
     .maze-stats {
@@ -1002,10 +971,10 @@
   <!-- ヘッダー -->
   <header>
     <div class="logo-area">
-      <div class="logo-icon">🤖</div>
+      <img src="images/keyakki.png" alt="けやっきー" style="width: 38px; height: 38px; object-fit: contain; animation: bounce 2s infinite ease-in-out;">
       <div>
         <h1>
-          <ruby>文法<rt>ぶんぽう</rt></ruby>ブロックで<ruby>迷路<rt>めいろ</rt></ruby>をクリア！
+          けやっきーの<ruby>迷路<rt>めいろ</rt></ruby>だっしゅつ！
         </h1>
       </div>
     </div>
@@ -1036,26 +1005,21 @@
           <div class="stage-goal-badge" id="stage-badge">🚩 1歩進むだけ</div>
         </div>
         <div class="stage-desc" id="stage-desc">
-          「1マスすすむ」ブロックをおいて、「うごかす」ボタンをおしてみよう！
+          「1マスすすむ」ブロックをおいて、けやっきーをゴールのお城🏰へみちびこう！
         </div>
       </div>
 
       <div class="maze-board-card">
         <div class="status-banner" id="status-banner">
-          🤖 ブロックをならべて「うごかす」ボタンをおしてね！
+          🌱 ブロックをならべて「うごかす」ボタンをおしてね！
         </div>
 
         <div class="maze-wrapper">
           <div class="maze-grid" id="maze-grid"></div>
           <div class="robot-character" id="robot">
-            <div class="robot-body">
-              <div class="robot-antenna"></div>
-              <div class="robot-face">
-                <div class="robot-eye"></div>
-                <div class="robot-eye"></div>
-              </div>
-              <div class="robot-mouth"></div>
-              <div class="robot-pointer">▲</div>
+            <div class="keyakki-wrapper">
+              <img src="images/keyakki.png" alt="けやっきー" class="keyakki-img">
+              <div class="direction-pointer">▲</div>
             </div>
           </div>
         </div>
@@ -1138,11 +1102,13 @@
   <!-- ゴールおめでとうモーダル -->
   <div class="modal-overlay" id="goal-modal">
     <div class="modal-card">
-      <div class="modal-icon">🎉</div>
-      <h2 class="modal-title">ゴールおめでとう！</h2>
+      <div class="modal-icon">
+        <img src="images/keyakki.png" alt="けやっきー" style="width: 88px; height: 88px; object-fit: contain; animation: tada 1s ease-in-out; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
+      </div>
+      <h2 class="modal-title">迷路だっしゅつ おめでとう！</h2>
       <div class="modal-stars" id="modal-stars">⭐⭐⭐</div>
       <p class="modal-desc" id="modal-desc">
-        すばらしい！迷路をクリアできたね！
+        やったー！けやっきーがゴールのお城🏰へ脱出できたよ！
       </p>
       <div class="modal-btn-row">
         <button class="btn-modal btn-modal-secondary" id="btn-modal-replay">もういちど</button>
@@ -1376,8 +1342,8 @@
       {
         id: 12,
         title: "ステージ 13: くりかえし ＋ もし！",
-        desc: "「くりかえし」の中に「もし」を入れると、ロボットが自分で考えて進むよ！",
-        badge: "🤖 ロボットの知能化",
+        desc: "「くりかえし」の中に「もし」を入れると、けやっきーが自分で考えて進むよ！",
+        badge: "🌳 かしこいけやっきー",
         gridWidth: 5,
         gridHeight: 4,
         map: [
@@ -2209,7 +2175,7 @@
       shouldStop = false;
       btnRun.disabled = true;
       totalExecutionSteps = 0;
-      setStatus('🏃 ロボットが動いているよ...', 'running');
+      setStatus('🏃 けやっきーが動いているよ...', 'running');
 
       resetRobot();
       await sleep(250);
@@ -2263,6 +2229,14 @@
       Sound.move();
       updateRobotDOM();
       updateStats();
+
+      // ピョコッとバウンスアニメーション
+      const wrapper = robotEl.querySelector('.keyakki-wrapper');
+      if (wrapper) {
+        wrapper.classList.remove('keyakki-hop');
+        void wrapper.offsetWidth;
+        wrapper.classList.add('keyakki-hop');
+      }
 
       // 星判定
       const starIdx = starsPositions.findIndex(p => p.x === nextX && p.y === nextY);
@@ -2456,25 +2430,25 @@
       let code = '';
       for (const node of nodes) {
         if (node.type === 'forward') {
-          code += `${indent}robot.move(); // 1マスすすむ\n`;
+          code += `${indent}keyakki.move(); // 1マスすすむ\n`;
         } else if (node.type === 'turn_right') {
-          code += `${indent}robot.turnRight(); // みぎをむく\n`;
+          code += `${indent}keyakki.turnRight(); // みぎをむく\n`;
         } else if (node.type === 'turn_left') {
-          code += `${indent}robot.turnLeft(); // ひだりをむく\n`;
+          code += `${indent}keyakki.turnLeft(); // ひだりをむく\n`;
         } else if (node.type === 'repeat') {
           code += `${indent}for (let i = 0; i < ${node.count}; i++) {\n`;
           code += generateJSFromAST(node.children, indent + '  ');
           code += `${indent}}\n`;
         } else if (node.type === 'if') {
-          let condStr = 'robot.isWallAhead()';
-          if (node.condition === 'path_ahead') condStr = 'robot.isPathAhead()';
-          if (node.condition === 'star_here') condStr = 'robot.hasStarHere()';
+          let condStr = 'keyakki.isWallAhead()';
+          if (node.condition === 'path_ahead') condStr = 'keyakki.isPathAhead()';
+          if (node.condition === 'star_here') condStr = 'keyakki.hasStarHere()';
           code += `${indent}if (${condStr}) {\n`;
           code += generateJSFromAST(node.children, indent + '  ');
           code += `${indent}}\n`;
         } else if (node.type === 'while') {
-          let condStr = '!robot.isAtGoal()';
-          if (node.condition === 'path_ahead') condStr = 'robot.isPathAhead()';
+          let condStr = '!keyakki.isAtGoal()';
+          if (node.condition === 'path_ahead') condStr = 'keyakki.isPathAhead()';
           code += `${indent}while (${condStr}) {\n`;
           code += generateJSFromAST(node.children, indent + '  ');
           code += `${indent}}\n`;
