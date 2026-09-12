@@ -401,9 +401,199 @@
       justify-content: center;
     }
 
+    /* 生成画像を使ったリッチなゴールアイテムグラフィック */
+    .goal-image-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: float-goal 2.2s infinite ease-in-out;
+      position: relative;
+    }
+
+    .goal-image-graphic {
+      width: 86%;
+      height: 86%;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+      transition: transform 0.2s ease;
+    }
+
+    .goal-image-wrapper:hover .goal-image-graphic {
+      transform: scale(1.15) rotate(4deg);
+    }
+
     @keyframes float-goal {
       0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-4px) scale(1.1); }
+      50% { transform: translateY(-5px) scale(1.08); }
+    }
+
+    /* スタイル切り替えバー */
+    .style-switcher-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: linear-gradient(135deg, #eff6ff 0%, #fdf2f8 100%);
+      border: 2px dashed #a855f7;
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(168, 85, 247, 0.12);
+    }
+
+    .style-switcher-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #6b21a8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .style-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-style {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border: 1.5px solid #d8b4fe;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #7e22ce;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-style:hover {
+      background: #f3e8ff;
+      border-color: #a855f7;
+      transform: translateY(-1px);
+    }
+
+    .btn-style.active {
+      background: #9333ea;
+      color: #ffffff;
+      border-color: #7e22ce;
+      box-shadow: 0 2px 6px rgba(147, 51, 234, 0.35);
+    }
+
+    /* 迷路盤面の背景画像表示コンテナ */
+    .maze-board-container {
+      position: relative;
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 280px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 0.4s ease-in-out;
+      overflow: hidden;
+    }
+
+    .maze-board-container.has-custom-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(1.5px);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .maze-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ========================================================
+       ステージ1 お試し3大スタイル特化CSS
+    ======================================================== */
+    /* ① 絵本・アニメ調 (storybook) */
+    .style-japan-storybook {
+      border: 3px solid #f472b6 !important;
+      box-shadow: 0 10px 25px rgba(244, 114, 182, 0.35) !important;
+    }
+    .style-japan-storybook .maze-grid {
+      background: rgba(254, 242, 242, 0.88);
+      border: 3px solid #fda4af;
+      box-shadow: 0 8px 20px rgba(225, 29, 72, 0.2);
+    }
+    .style-japan-storybook .maze-cell.path {
+      background: #fff5f5;
+      border: 2px solid #fecdd3;
+      border-radius: 8px;
+    }
+    .style-japan-storybook .maze-cell.wall {
+      background: linear-gradient(180deg, #d97706 0%, #b45309 60%, #78350f 100%);
+      border-top: 3px solid #fbbf24;
+      border-bottom: 3px solid #451a03;
+      border-left: 2px solid #b45309;
+      border-right: 2px solid #b45309;
+      border-radius: 8px;
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.35), 0 4px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    /* ② レトロドット絵 (pixel) */
+    .style-japan-pixel {
+      border: 4px solid #38bdf8 !important;
+      box-shadow: 0 0 0 2px #0f172a, 0 8px 0 rgba(0, 0, 0, 0.4) !important;
+      image-rendering: pixelated;
+    }
+    .style-japan-pixel .maze-grid {
+      background: #0f172a;
+      border: 4px solid #1e293b;
+      box-shadow: inset 0 0 0 2px #38bdf8;
+    }
+    .style-japan-pixel .maze-cell.path {
+      background: #1e293b;
+      border: 2px dashed #475569;
+      border-radius: 0;
+    }
+    .style-japan-pixel .maze-cell.wall {
+      background: #334155;
+      border-top: 3px solid #94a3b8;
+      border-left: 3px solid #64748b;
+      border-right: 3px solid #0f172a;
+      border-bottom: 3px solid #020617;
+      border-radius: 0;
+      box-shadow: inset 2px 2px 0 #cbd5e1;
+    }
+
+    /* ③ 3Dポップミニチュア (pop3d) */
+    .style-japan-pop3d {
+      border: 3px solid #fbbf24 !important;
+      box-shadow: 0 12px 30px rgba(251, 191, 36, 0.4) !important;
+    }
+    .style-japan-pop3d .maze-grid {
+      background: #15803d;
+      border: 3px solid #86efac;
+      box-shadow: 0 10px 24px rgba(21, 128, 61, 0.35);
+      border-radius: 16px;
+    }
+    .style-japan-pop3d .maze-cell.path {
+      background: #dcfce7;
+      border: 2px solid #bbf7d0;
+      border-radius: 10px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+    .style-japan-pop3d .maze-cell.wall {
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 6px 0 #0369a1, 0 8px 12px rgba(0, 0, 0, 0.28);
+      position: relative;
+      top: -2px;
     }
 
     /* ========================================================
@@ -411,8 +601,8 @@
     ======================================================== */
     /* 1. 日本 富士山: 桜と黒漆城壁 */
     .theme-japan {
-      background: linear-gradient(135deg, #fce7f3 0%, #cbd5e1 100%) !important;
-      border-color: #f472b6 !important;
+      background: linear-gradient(135deg, #fce7f3 0%, #cbd5e1 100%);
+      border-color: #f472b6;
     }
     .theme-japan .maze-grid { background: #334155; }
     .theme-japan .maze-cell.path { background: #fff1f2; border-color: #fecdd3; }
@@ -1387,7 +1577,17 @@
         </div>
       </div>
 
-      <div class="maze-board-card">
+      <div class="maze-board-card" id="maze-board-card">
+        <!-- ステージ1限定：3大デザインスタイルお試し切り替えバー -->
+        <div class="style-switcher-banner" id="style-switcher-banner">
+          <div class="style-switcher-title">🎨 <span>スタイルお試し（ステージ1）:</span></div>
+          <div class="style-buttons">
+            <button type="button" class="btn-style active" data-style="storybook" title="明るく親しみやすいイラスト調">📖 ① 絵本アニメ風</button>
+            <button type="button" class="btn-style" data-style="pixel" title="レトロゲーム・16bitドット絵">👾 ② レトロドット絵</button>
+            <button type="button" class="btn-style" data-style="pop3d" title="立体的でポップなミニチュア模型">🧸 ③ 3Dポップ</button>
+          </div>
+        </div>
+
         <div class="status-banner" id="status-banner">
           🌱 ブロックをならべて「うごかす！」をおしてね！
         </div>
@@ -2037,11 +2237,37 @@
 
     /* ========================================================
        4. ゼルダ風2D見下ろし迷路システム (Maze2D)
+        ステージ1 お試し3大スタイル定義（生成画像）
+     ======================================================== */
+    const STAGE1_STYLES = {
+      storybook: {
+        name: '① 絵本・アニメ風',
+        bg: 'images/styles/japan_storybook_bg.png',
+        goalImg: 'images/styles/japan_storybook_goal.png',
+        cssClass: 'style-japan-storybook'
+      },
+      pixel: {
+        name: '② レトロドット絵',
+        bg: 'images/styles/japan_pixel_bg.png',
+        goalImg: 'images/styles/japan_pixel_goal.png',
+        cssClass: 'style-japan-pixel'
+      },
+      pop3d: {
+        name: '③ 3Dポップミニチュア',
+        bg: 'images/styles/japan_3d_bg.png',
+        goalImg: 'images/styles/japan_3d_goal.png',
+        cssClass: 'style-japan-pop3d'
+      }
+    };
+    let currentStage1Style = 'storybook';
+
+    /* 2D迷路描画・アニメーションエンジン
        マスの中心に100%ピッタリ合わせる幾何学配置
     ======================================================== */
     const Maze2D = {
       gridEl: document.getElementById('maze-grid'),
       wrapperEl: document.getElementById('maze-wrapper'),
+      boardContainer: document.querySelector('.maze-board-container'),
       robotEl: document.getElementById('robot-character'),
       keyakkiImg: document.getElementById('keyakki-img'),
       dirMarker: document.getElementById('keyakki-dir-marker'),
@@ -2054,8 +2280,25 @@
       },
 
       buildStage(stage) {
-        // 国別テーマクラスをラッパーに適用
-        this.wrapperEl.className = `maze-wrapper theme-${stage.theme || 'japan'}`;
+        const isStage1 = (currentStageIndex === 0);
+        const switcherBanner = document.getElementById('style-switcher-banner');
+
+        if (isStage1) {
+          if (switcherBanner) switcherBanner.style.display = 'flex';
+          const styleData = STAGE1_STYLES[currentStage1Style] || STAGE1_STYLES.storybook;
+          this.wrapperEl.className = `maze-wrapper ${styleData.cssClass}`;
+          if (this.boardContainer) {
+            this.boardContainer.classList.add('has-custom-bg');
+            this.boardContainer.style.backgroundImage = `url('${styleData.bg}')`;
+          }
+        } else {
+          if (switcherBanner) switcherBanner.style.display = 'none';
+          this.wrapperEl.className = `maze-wrapper theme-${stage.theme || 'japan'}`;
+          if (this.boardContainer) {
+            this.boardContainer.classList.remove('has-custom-bg');
+            this.boardContainer.style.backgroundImage = 'none';
+          }
+        }
 
         // robotElを一旦保護
         if (this.robotEl.parentNode) {
@@ -2081,7 +2324,16 @@
                 cell.classList.add('start');
               } else if (cellType === 3) {
                 cell.classList.add('goal');
-                cell.innerHTML = `<span class="goal-icon-sprite" title="${stage.goalName}">${stage.goalIcon}</span>`;
+                if (isStage1) {
+                  const styleData = STAGE1_STYLES[currentStage1Style] || STAGE1_STYLES.storybook;
+                  cell.innerHTML = `
+                    <div class="goal-image-wrapper">
+                      <img src="${styleData.goalImg}" class="goal-image-graphic" alt="${stage.goalName}" title="${stage.goalName} (${styleData.name})">
+                    </div>
+                  `;
+                } else {
+                  cell.innerHTML = `<span class="goal-icon-sprite" title="${stage.goalName}">${stage.goalIcon}</span>`;
+                }
               }
             }
             this.gridEl.appendChild(cell);
@@ -2958,8 +3210,28 @@
       return code;
     }
 
+    function initStyleSwitcher() {
+      const buttons = document.querySelectorAll('.btn-style');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const styleKey = btn.dataset.style;
+          if (!STAGE1_STYLES[styleKey]) return;
+          if (typeof Sound !== 'undefined' && Sound.click) Sound.click();
+          currentStage1Style = styleKey;
+          buttons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          // ステージ1の見た目を即座に更新（ブロックプログラムは保持）
+          if (currentStageIndex === 0) {
+            Maze2D.buildStage(STAGES[0]);
+          }
+        });
+      });
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       initStageSelectOptions();
+      initStyleSwitcher();
       loadStage(0, false);
       addBlock('forward');
     });
