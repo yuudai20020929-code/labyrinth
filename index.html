@@ -148,15 +148,15 @@
       transform: translateY(-1px);
     }
 
-    /* メインコンテナ: 画面の残りをすべて使って収める */
+    /* メインコンテナ: 迷路エリアを広く拡大して収める */
     .app-container {
       flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-columns: minmax(320px, 38%) 1fr;
+      grid-template-columns: minmax(360px, 45%) 1fr;
       gap: 10px;
       padding: 8px 12px;
-      max-width: 1560px;
+      max-width: 1600px;
       margin: 0 auto;
       width: 100%;
       box-sizing: border-box;
@@ -278,7 +278,7 @@
       100% { transform: scale(1.02); }
     }
 
-    /* ゼルダ風2D見下ろし迷路ボード */
+    /* ゼルダ風2D見下ろし迷路ボード（大きく見やすく表示） */
     .maze-board-container {
       width: 100%;
       flex: 1;
@@ -293,60 +293,62 @@
     .maze-wrapper {
       position: relative;
       background: #e2e8f0;
-      padding: 6px;
-      border-radius: 14px;
-      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+      padding: 8px;
+      border-radius: 16px;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12), 0 6px 16px rgba(0, 0, 0, 0.08);
       display: inline-block;
-      border: 2.5px solid #cbd5e1;
+      border: 3px solid #cbd5e1;
+      transition: all 0.3s ease;
     }
 
     .maze-grid {
       display: grid;
-      gap: 3px;
+      gap: 4px;
       background: #94a3b8;
-      padding: 4px;
-      border-radius: 8px;
+      padding: 5px;
+      border-radius: 10px;
       position: relative;
+      transition: all 0.3s ease;
     }
 
-    /* ゼルダ風タイル */
+    /* ゼルダ風タイル（大型化） */
     .maze-cell {
-      width: 48px;
-      height: 48px;
-      border-radius: 6px;
+      width: 58px;
+      height: 58px;
+      border-radius: 7px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      font-size: 1.4rem;
-      transition: background-color 0.15s ease;
+      font-size: 1.75rem;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
       box-sizing: border-box;
     }
 
-    @media (max-height: 720px) {
+    @media (max-height: 760px) {
       .maze-cell {
-        width: 40px;
-        height: 40px;
-        font-size: 1.15rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
       }
     }
 
-    @media (max-height: 600px) {
+    @media (max-height: 640px) {
       .maze-cell {
-        width: 34px;
-        height: 34px;
-        font-size: 1rem;
+        width: 42px;
+        height: 42px;
+        font-size: 1.25rem;
       }
     }
 
-    /* 歩ける道 */
+    /* デフォルトの道 */
     .maze-cell.path {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9);
     }
 
-    /* 壁 */
+    /* デフォルトの壁 */
     .maze-cell.wall {
       background: linear-gradient(180deg, #64748b 0%, #475569 40%, #334155 100%);
       border-top: 2.5px solid #94a3b8;
@@ -390,8 +392,8 @@
     }
 
     .goal-icon-sprite {
-      font-size: 1.6rem;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+      font-size: 2.1rem;
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.3));
       animation: float-goal 2s infinite ease-in-out;
       line-height: 1;
       display: inline-flex;
@@ -401,7 +403,271 @@
 
     @keyframes float-goal {
       0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-3px) scale(1.08); }
+      50% { transform: translateY(-4px) scale(1.1); }
+    }
+
+    /* ========================================================
+       国別20ステージ テーマデザイン
+    ======================================================== */
+    /* 1. 日本 富士山: 桜と黒漆城壁 */
+    .theme-japan {
+      background: linear-gradient(135deg, #fce7f3 0%, #cbd5e1 100%) !important;
+      border-color: #f472b6 !important;
+    }
+    .theme-japan .maze-grid { background: #334155; }
+    .theme-japan .maze-cell.path { background: #fff1f2; border-color: #fecdd3; }
+    .theme-japan .maze-cell.wall {
+      background: linear-gradient(180deg, #334155 0%, #0f172a 100%);
+      border-top-color: #64748b;
+      border-bottom-color: #020617;
+    }
+
+    /* 2. アメリカ 自由の女神: マンハッタン赤レンガ */
+    .theme-usa {
+      background: linear-gradient(135deg, #dbeafe 0%, #fee2e2 100%) !important;
+      border-color: #3b82f6 !important;
+    }
+    .theme-usa .maze-grid { background: #1e293b; }
+    .theme-usa .maze-cell.path { background: #f8fafc; border-color: #cbd5e1; }
+    .theme-usa .maze-cell.wall {
+      background: linear-gradient(180deg, #b91c1c 0%, #7f1d1d 100%);
+      border-top-color: #ef4444;
+      border-bottom-color: #450a0a;
+    }
+
+    /* 3. フランス エッフェル塔: パリのエレガント石畳 */
+    .theme-france {
+      background: linear-gradient(135deg, #e0e7ff 0%, #fae8ff 100%) !important;
+      border-color: #818cf8 !important;
+    }
+    .theme-france .maze-grid { background: #475569; }
+    .theme-france .maze-cell.path { background: #fdf4ff; border-color: #f5d0fe; }
+    .theme-france .maze-cell.wall {
+      background: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
+      border-top-color: #a5b4fc;
+      border-bottom-color: #312e81;
+    }
+
+    /* 4. イギリス ビッグベン: ビクトリア調レンガ＆石 */
+    .theme-uk {
+      background: linear-gradient(135deg, #e2e8f0 0%, #fee2e2 100%) !important;
+      border-color: #b91c1c !important;
+    }
+    .theme-uk .maze-grid { background: #334155; }
+    .theme-uk .maze-cell.path { background: #f1f5f9; border-color: #cbd5e1; }
+    .theme-uk .maze-cell.wall {
+      background: linear-gradient(180deg, #7f1d1d 0%, #1e3a8a 100%);
+      border-top-color: #dc2626;
+      border-bottom-color: #172554;
+    }
+
+    /* 5. イタリア ピザ: トスカーナのテラコッタタイル */
+    .theme-italy {
+      background: linear-gradient(135deg, #ffedd5 0%, #dcfce7 100%) !important;
+      border-color: #f97316 !important;
+    }
+    .theme-italy .maze-grid { background: #7c2d12; }
+    .theme-italy .maze-cell.path { background: #fff7ed; border-color: #fed7aa; }
+    .theme-italy .maze-cell.wall {
+      background: linear-gradient(180deg, #ea580c 0%, #9a3412 100%);
+      border-top-color: #fb923c;
+      border-bottom-color: #431407;
+    }
+
+    /* 6. 中国 パンダ: 翡翠と朱色の宮殿壁 */
+    .theme-china {
+      background: linear-gradient(135deg, #fee2e2 0%, #dcfce7 100%) !important;
+      border-color: #dc2626 !important;
+    }
+    .theme-china .maze-grid { background: #064e3b; }
+    .theme-china .maze-cell.path { background: #f0fdf4; border-color: #86efac; }
+    .theme-china .maze-cell.wall {
+      background: linear-gradient(180deg, #dc2626 0%, #7f1d1d 100%);
+      border-top-color: #f87171;
+      border-bottom-color: #450a0a;
+    }
+
+    /* 7. エジプト ピラミッド: 黄金砂漠と砂岩巨石 */
+    .theme-egypt {
+      background: linear-gradient(135deg, #fef08a 0%, #fed7aa 100%) !important;
+      border-color: #d97706 !important;
+    }
+    .theme-egypt .maze-grid { background: #78350f; }
+    .theme-egypt .maze-cell.path { background: #fefce8; border-color: #fde047; }
+    .theme-egypt .maze-cell.wall {
+      background: linear-gradient(180deg, #d97706 0%, #92400e 100%);
+      border-top-color: #fbbf24;
+      border-bottom-color: #451a03;
+    }
+
+    /* 8. オーストラリア コアラ: 赤土大地とユーカリ */
+    .theme-australia {
+      background: linear-gradient(135deg, #ffedd5 0%, #dcfce7 100%) !important;
+      border-color: #c2410c !important;
+    }
+    .theme-australia .maze-grid { background: #7c2d12; }
+    .theme-australia .maze-cell.path { background: #f0fdf4; border-color: #a7f3d0; }
+    .theme-australia .maze-cell.wall {
+      background: linear-gradient(180deg, #c2410c 0%, #7c2d12 100%);
+      border-top-color: #f97316;
+      border-bottom-color: #431407;
+    }
+
+    /* 9. ブラジル サッカーボール: サンバスタジアム芝生 */
+    .theme-brazil {
+      background: linear-gradient(135deg, #fef08a 0%, #86efac 100%) !important;
+      border-color: #16a34a !important;
+    }
+    .theme-brazil .maze-grid { background: #14532d; }
+    .theme-brazil .maze-cell.path { background: #dcfce7; border-color: #4ade80; }
+    .theme-brazil .maze-cell.wall {
+      background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%);
+      border-top-color: #60a5fa;
+      border-bottom-color: #172554;
+    }
+
+    /* 10. カナダ カエデの葉っぱ: 紅葉メイプルフォレスト */
+    .theme-canada {
+      background: linear-gradient(135deg, #ffedd5 0%, #fecdd3 100%) !important;
+      border-color: #e11d48 !important;
+    }
+    .theme-canada .maze-grid { background: #881337; }
+    .theme-canada .maze-cell.path { background: #fff1f2; border-color: #fecdd3; }
+    .theme-canada .maze-cell.wall {
+      background: linear-gradient(180deg, #be123c 0%, #881337 100%);
+      border-top-color: #fb7185;
+      border-bottom-color: #4c0519;
+    }
+
+    /* 11. インド カレー: サフラン＆宮殿スパイス壁 */
+    .theme-india {
+      background: linear-gradient(135deg, #fef08a 0%, #fed7aa 100%) !important;
+      border-color: #f59e0b !important;
+    }
+    .theme-india .maze-grid { background: #78350f; }
+    .theme-india .maze-cell.path { background: #fffbeb; border-color: #fde68a; }
+    .theme-india .maze-cell.wall {
+      background: linear-gradient(180deg, #d97706 0%, #b45309 100%);
+      border-top-color: #fbbf24;
+      border-bottom-color: #451a03;
+    }
+
+    /* 12. ドイツ ソーセージ: 中世ヨーロッパの堅牢な石城 */
+    .theme-germany {
+      background: linear-gradient(135deg, #cbd5e1 0%, #fef08a 100%) !important;
+      border-color: #475569 !important;
+    }
+    .theme-germany .maze-grid { background: #1e293b; }
+    .theme-germany .maze-cell.path { background: #f8fafc; border-color: #e2e8f0; }
+    .theme-germany .maze-cell.wall {
+      background: linear-gradient(180deg, #475569 0%, #0f172a 100%);
+      border-top-color: #94a3b8;
+      border-bottom-color: #020617;
+    }
+
+    /* 13. スイス チーズ: 高原の緑と木造シャレー */
+    .theme-switzerland {
+      background: linear-gradient(135deg, #e0f2fe 0%, #fee2e2 100%) !important;
+      border-color: #dc2626 !important;
+    }
+    .theme-switzerland .maze-grid { background: #1e3a8a; }
+    .theme-switzerland .maze-cell.path { background: #f0fdf4; border-color: #a7f3d0; }
+    .theme-switzerland .maze-cell.wall {
+      background: linear-gradient(180deg, #854d0e 0%, #582f06 100%);
+      border-top-color: #a16207;
+      border-bottom-color: #291503;
+    }
+
+    /* 14. メキシコ タコス: 太陽とカラフルなパティオ */
+    .theme-mexico {
+      background: linear-gradient(135deg, #fbcfe8 0%, #fed7aa 100%) !important;
+      border-color: #db2777 !important;
+    }
+    .theme-mexico .maze-grid { background: #0f766e; }
+    .theme-mexico .maze-cell.path { background: #fff7ed; border-color: #fdba74; }
+    .theme-mexico .maze-cell.wall {
+      background: linear-gradient(180deg, #db2777 0%, #9d174d 100%);
+      border-top-color: #f472b6;
+      border-bottom-color: #500724;
+    }
+
+    /* 15. ロシア マトリョーシカ: 白銀と大聖堂ブルー */
+    .theme-russia {
+      background: linear-gradient(135deg, #e0e7ff 0%, #fed7aa 100%) !important;
+      border-color: #4f46e5 !important;
+    }
+    .theme-russia .maze-grid { background: #312e81; }
+    .theme-russia .maze-cell.path { background: #f5f3ff; border-color: #ddd6fe; }
+    .theme-russia .maze-cell.wall {
+      background: linear-gradient(180deg, #4338ca 0%, #1e1b4b 100%);
+      border-top-color: #818cf8;
+      border-bottom-color: #0f0e26;
+    }
+
+    /* 16. オランダ チューリップ: 運河沿いレンガ歩道 */
+    .theme-netherlands {
+      background: linear-gradient(135deg, #ffedd5 0%, #fbcfe8 100%) !important;
+      border-color: #ea580c !important;
+    }
+    .theme-netherlands .maze-grid { background: #831843; }
+    .theme-netherlands .maze-cell.path { background: #fdf2f8; border-color: #fbcfe8; }
+    .theme-netherlands .maze-cell.wall {
+      background: linear-gradient(180deg, #be185d 0%, #831843 100%);
+      border-top-color: #f472b6;
+      border-bottom-color: #500724;
+    }
+
+    /* 17. スペイン 闘牛: 闘牛場のサンドと情熱の赤 */
+    .theme-spain {
+      background: linear-gradient(135deg, #fef08a 0%, #fee2e2 100%) !important;
+      border-color: #dc2626 !important;
+    }
+    .theme-spain .maze-grid { background: #991b1b; }
+    .theme-spain .maze-cell.path { background: #fefce8; border-color: #fde047; }
+    .theme-spain .maze-cell.wall {
+      background: linear-gradient(180deg, #b91c1c 0%, #7f1d1d 100%);
+      border-top-color: #ef4444;
+      border-bottom-color: #450a0a;
+    }
+
+    /* 18. 南極/アイスランド ペンギン: 氷河と透き通る氷壁 */
+    .theme-antarctica {
+      background: linear-gradient(135deg, #cffafe 0%, #e0e7ff 100%) !important;
+      border-color: #06b6d4 !important;
+    }
+    .theme-antarctica .maze-grid { background: #0e7490; }
+    .theme-antarctica .maze-cell.path { background: #ecfeff; border-color: #a5f3fc; }
+    .theme-antarctica .maze-cell.wall {
+      background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+      border-top-color: #38bdf8;
+      border-bottom-color: #0c4a6e;
+    }
+
+    /* 19. ギリシャ 神殿の柱: パルテノンの白大理石 */
+    .theme-greece {
+      background: linear-gradient(135deg, #bae6fd 0%, #f8fafc 100%) !important;
+      border-color: #0284c7 !important;
+    }
+    .theme-greece .maze-grid { background: #0369a1; }
+    .theme-greece .maze-cell.path { background: #ffffff; border-color: #bae6fd; }
+    .theme-greece .maze-cell.wall {
+      background: linear-gradient(180deg, #0284c7 0%, #1e3a8a 100%);
+      border-top-color: #38bdf8;
+      border-bottom-color: #172554;
+    }
+
+    /* 20. 宇宙/月 ロケット: 漆黒の星空とサイバー防壁 */
+    .theme-space {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%) !important;
+      border-color: #38bdf8 !important;
+    }
+    .theme-space .maze-grid { background: #090d16; }
+    .theme-space .maze-cell.path { background: #1e293b; border-color: #38bdf8; box-shadow: inset 0 0 8px rgba(56, 189, 248, 0.4); }
+    .theme-space .maze-cell.wall {
+      background: linear-gradient(180deg, #312e81 0%, #0f172a 100%);
+      border-top-color: #818cf8;
+      border-bottom-color: #000000;
+      box-shadow: 0 0 8px rgba(129, 140, 248, 0.4);
     }
 
     /* けやっきーキャラクター（.maze-grid直下、マス完全中央配置） */
@@ -648,6 +914,13 @@
       cursor: pointer;
     }
 
+    /* 前へすすむ、右を向く、左を向くのパレット幅を完全統一 */
+    .palette-btn.block-motion,
+    .palette-btn.block-turn {
+      width: 148px;
+      justify-content: space-between;
+    }
+
     .palette-btn .palette-add-icon {
       background: rgba(255, 255, 255, 0.28);
       border-radius: 50%;
@@ -796,10 +1069,10 @@
       line-height: 1;
     }
 
-    /* ワークスペース内のブロック */
+    /* ワークスペース内のブロック（前へすすむ、右を向く、左を向くの幅を完全同一化） */
     .ws-block {
-      width: fit-content;
-      min-width: 165px;
+      width: 200px;
+      min-width: 200px;
       height: 32px;
       display: inline-flex;
       align-items: center;
@@ -1244,6 +1517,7 @@
       {
         id: 0,
         country: "🇯🇵 日本",
+        theme: "japan",
         title: "🇯🇵 ステージ 1: 日本（富士山）",
         desc: "「1マスすすむ」ブロックをおいて、富士山🗻をめざそう！",
         badge: "🗻 富士山をめざそう",
@@ -1263,6 +1537,7 @@
       {
         id: 1,
         country: "🇺🇸 アメリカ",
+        theme: "usa",
         title: "🇺🇸 ステージ 2: アメリカ（自由の女神）",
         desc: "「1マスすすむ」を2つつなげて、自由の女神🗽へ行こう！",
         badge: "🗽 自由の女神へ",
@@ -1282,6 +1557,7 @@
       {
         id: 2,
         country: "🇫🇷 フランス",
+        theme: "france",
         title: "🇫🇷 ステージ 3: フランス（エッフェル塔）",
         desc: "道がまがっているよ！「みぎをむく」をつかってエッフェル塔🗼へ行こう！",
         badge: "🗼 エッフェル塔へ",
@@ -1301,6 +1577,7 @@
       {
         id: 3,
         country: "🇬🇧 イギリス",
+        theme: "uk",
         title: "🇬🇧 ステージ 4: イギリス（ビッグベン）",
         desc: "「ひだりをむく」もつかって、時計台（ビッグベン）🕰️をめざそう！",
         badge: "🕰️ 時計台へ",
@@ -1321,6 +1598,7 @@
       {
         id: 4,
         country: "🇮🇹 イタリア",
+        theme: "italy",
         title: "🇮🇹 ステージ 5: イタリア（ピザ）",
         desc: "「🔁 くりかえす」ブロックの登場！すくないブロックでピザ🍕へ行こう！",
         badge: "🍕 おいしいピザへ",
@@ -1340,6 +1618,7 @@
       {
         id: 5,
         country: "🇨🇳 中国",
+        theme: "china",
         title: "🇨🇳 ステージ 6: 中国（パンダ）",
         desc: "「くりかえす」と「まがる」をくみあわせて、パンダ🐼に会いに行こう！",
         badge: "🐼 パンダに会おう",
@@ -1360,6 +1639,7 @@
       {
         id: 6,
         country: "🇪🇬 エジプト",
+        theme: "egypt",
         title: "🇪🇬 ステージ 7: エジプト（ピラミッド）",
         desc: "かいだんの道をトントンと登って、ピラミッド🔺をめざそう！",
         badge: "🔺 ピラミッドへ",
@@ -1380,6 +1660,7 @@
       {
         id: 7,
         country: "🇦🇺 オーストラリア",
+        theme: "australia",
         title: "🇦🇺 ステージ 8: オーストラリア（コアラ）",
         desc: "ジグザグに進んで、ユーカリの木の上にいるコアラ🐨をめざそう！",
         badge: "🐨 コアラの木へ",
@@ -1401,6 +1682,7 @@
       {
         id: 8,
         country: "🇧🇷 ブラジル",
+        theme: "brazil",
         title: "🇧🇷 ステージ 9: ブラジル（サッカーボール）",
         desc: "広いスタジアムを駆けぬけて、サッカーボール⚽にシュート！",
         badge: "⚽ サッカーボールへ",
@@ -1421,6 +1703,7 @@
       {
         id: 9,
         country: "🇨🇦 カナダ",
+        theme: "canada",
         title: "🇨🇦 ステージ 10: カナダ（カエデの葉っぱ）",
         desc: "もみじの森の小道を進んで、きれいなカエデの葉っぱ🍁を見つけよう！",
         badge: "🍁 カエデの森へ",
@@ -1442,6 +1725,7 @@
       {
         id: 10,
         country: "🇮🇳 インド",
+        theme: "india",
         title: "🇮🇳 ステージ 11: インド（カレー）",
         desc: "「❓ もし まえがカベなら」登場！センサーでカベをしらべながらカレー🍛へ！",
         badge: "🍛 カレーをめざそう",
@@ -1462,6 +1746,7 @@
       {
         id: 11,
         country: "🇩🇪 ドイツ",
+        theme: "germany",
         title: "🇩🇪 ステージ 12: ドイツ（ソーセージ）",
         desc: "カベにぶつかる前に曲がって、おいしいソーセージ🌭をめざそう！",
         badge: "🌭 ソーセージへ",
@@ -1482,6 +1767,7 @@
       {
         id: 12,
         country: "🇨🇭 スイス",
+        theme: "switzerland",
         title: "🇨🇭 ステージ 13: スイス（チーズ）",
         desc: "アルプスの山道。「もし まえが道なら」を活用してチーズ🧀をめざそう！",
         badge: "🧀 スイスチーズへ",
@@ -1502,6 +1788,7 @@
       {
         id: 13,
         country: "🇲🇽 メキシコ",
+        theme: "mexico",
         title: "🇲🇽 ステージ 14: メキシコ（タコス）",
         desc: "カベをうまくよけながら進んで、タコス🌮へゴールしよう！",
         badge: "🌮 タコスへダッシュ",
@@ -1523,6 +1810,7 @@
       {
         id: 14,
         country: "🇷🇺 ロシア",
+        theme: "russia",
         title: "🇷🇺 ステージ 15: ロシア（マトリョーシカ）",
         desc: "ぐるぐる回るうずまき迷路のまん中にあるマトリョーシカ🪆をめざそう！",
         badge: "🪆 マトリョーシカへ",
@@ -1544,6 +1832,7 @@
       {
         id: 15,
         country: "🇳🇱 オランダ",
+        theme: "netherlands",
         title: "🇳🇱 ステージ 16: オランダ（チューリップ）",
         desc: "「🔄 ゴールするまで くりかえす」の登場！チューリップ畑🌷へ一気に進もう！",
         badge: "🌷 チューリップ畑へ",
@@ -1563,6 +1852,7 @@
       {
         id: 16,
         country: "🇪🇸 スペイン",
+        theme: "spain",
         title: "🇪🇸 ステージ 17: スペイン（闘牛）",
         desc: "「ゴールするまで」のあいだ、カベを曲がって牛🐂のところへ行こう！",
         badge: "🐂 闘牛の広場へ",
@@ -1583,6 +1873,7 @@
       {
         id: 17,
         country: "🇦🇶 南極/アイスランド",
+        theme: "antarctica",
         title: "🇦🇶 ステージ 18: 南極/アイスランド（ペンギン）",
         desc: "こおりの海をすいすいぬけて、ペンギン🐧に会いに行こう！",
         badge: "🐧 ペンギンの氷原へ",
@@ -1604,6 +1895,7 @@
       {
         id: 18,
         country: "🇬🇷 ギリシャ",
+        theme: "greece",
         title: "🇬🇷 ステージ 19: ギリシャ（神殿の柱）",
         desc: "古代ギリシャの神殿の柱🏛️がならぶ迷路をぬけて、ゴールをめざそう！",
         badge: "🏛️ 神殿の柱へ",
@@ -1625,6 +1917,7 @@
       {
         id: 19,
         country: "🚀 宇宙/月",
+        theme: "space",
         title: "🚀 ステージ 20: 宇宙/月（ロケット）",
         desc: "大冒険のフィナーレ！すべてのブロックを使いこなしてロケット🚀へ乗りこもう！",
         badge: "🚀 ロケットへ出発！",
@@ -1761,6 +2054,9 @@
       },
 
       buildStage(stage) {
+        // 国別テーマクラスをラッパーに適用
+        this.wrapperEl.className = `maze-wrapper theme-${stage.theme || 'japan'}`;
+
         // robotElを一旦保護
         if (this.robotEl.parentNode) {
           this.robotEl.parentNode.removeChild(this.robotEl);
@@ -2046,6 +2342,11 @@
                 <option value="3" selected>3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
               </select>
               <span>かい くりかえす</span>
             </div>
