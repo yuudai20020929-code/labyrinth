@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>けやっきーのせかいりょこう迷路！🌍✨ | スクラッチ風ブロックでゴールをめざそう！</title>
+  <title>けやっきーのせかいりょこう迷路！🌍✨ | ブロックでゴールをめざそう！</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800;900&display=swap" rel="stylesheet">
@@ -19,17 +19,17 @@
       --text: #0f172a;
       --text-muted: #64748b;
       --border: #e2e8f0;
-      
+
       /* スクラッチ風ブロックカラー */
       --block-motion: #4c97ff;       /* 動き: すすむ */
       --block-motion-border: #3373cc;
       --block-turn: #0da574;         /* 向き: まがる */
       --block-turn-border: #0b805a;
-      --block-control: #ffab19;      /* 制御: くりかえし */
+      --block-control: #ffab19;      /* くりかえし */
       --block-control-border: #cf8b17;
-      --block-while: #e67e22;        /* while: 〜のあいだ */
+      --block-while: #e67e22;        /* 〜のあいだ */
       --block-while-border: #b85c10;
-      --block-if: #855cd6;           /* 条件: もし */
+      --block-if: #855cd6;           /* もし */
       --block-if-border: #6b40b8;
     }
 
@@ -42,28 +42,29 @@
       -webkit-user-select: none;
     }
 
-    body {
+    /* 画面全体スクロール防止: 100vhに完全収容 */
+    html, body {
+      height: 100vh;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
       background: linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 100%);
       color: var(--text);
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
     }
 
-    /* ヘッダー */
+    /* ヘッダー: 省スペース化（高さ44px固定） */
     header {
       background: white;
-      padding: 8px 16px;
+      padding: 4px 14px;
+      height: 44px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-      position: sticky;
-      top: 0;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
       z-index: 50;
-      flex-wrap: wrap;
-      gap: 8px;
+      flex-shrink: 0;
     }
 
     .logo-area {
@@ -72,8 +73,10 @@
       gap: 8px;
     }
 
-    .logo-icon {
-      font-size: 1.8rem;
+    .header-logo-img {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
       animation: bounce 2s infinite ease-in-out;
     }
 
@@ -82,46 +85,39 @@
       50% { transform: translateY(-3px); }
     }
 
-    h1 {
-      font-size: 1.25rem;
+    .header-title {
+      font-size: 1.12rem;
       font-weight: 900;
       color: #0369a1;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
-    }
-
-    ruby rt {
-      font-size: 0.55em;
-      color: #64748b;
-      font-weight: 700;
+      line-height: 1;
     }
 
     .header-controls {
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .stage-selector-wrap {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: #f1f5f9;
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 9999px;
       font-weight: 800;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
     }
 
     select {
       font-family: inherit;
       font-weight: 800;
-      font-size: 0.85rem;
-      border: 2px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 3px 8px;
+      font-size: 0.82rem;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 2px 6px;
       background: white;
       color: #0f172a;
       cursor: pointer;
@@ -134,16 +130,17 @@
 
     .btn-icon {
       background: white;
-      border: 2px solid #cbd5e1;
+      border: 1.5px solid #cbd5e1;
       border-radius: 9999px;
-      padding: 5px 10px;
-      font-size: 0.85rem;
+      padding: 4px 9px;
+      font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 4px;
       transition: all 0.15s ease;
+      line-height: 1;
     }
 
     .btn-icon:hover {
@@ -151,48 +148,60 @@
       transform: translateY(-1px);
     }
 
-    /* メインレイアウト: 左38%, 右62% (作業スペース半分以上！) */
+    /* メインコンテナ: 画面の残りをすべて使って収める */
     .app-container {
+      flex: 1;
+      min-height: 0;
       display: grid;
-      grid-template-columns: 38% 62%;
-      gap: 14px;
-      padding: 12px 16px;
+      grid-template-columns: minmax(320px, 38%) 1fr;
+      gap: 10px;
+      padding: 8px 12px;
       max-width: 1560px;
       margin: 0 auto;
       width: 100%;
-      flex: 1;
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 768px) {
       .app-container {
         grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        overflow-y: auto;
+        padding: 6px;
+        gap: 8px;
       }
     }
 
-    /* 左カラム: 迷路 */
+    /* ========================================================
+       左カラム: 迷路エリア
+    ======================================================== */
     .maze-column {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+      min-height: 0;
+      height: 100%;
     }
 
     .stage-card {
       background: white;
-      border-radius: 14px;
-      padding: 10px 14px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border-radius: 12px;
+      padding: 8px 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
       border: 1.5px solid #e2e8f0;
+      flex-shrink: 0;
     }
 
     .stage-title-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .stage-title {
-      font-size: 1.05rem;
+      font-size: 0.98rem;
       font-weight: 900;
       color: #0f172a;
     }
@@ -210,31 +219,33 @@
     }
 
     .stage-desc {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #475569;
-      line-height: 1.4;
+      line-height: 1.35;
     }
 
     .maze-board-card {
       background: white;
-      border-radius: 14px;
-      padding: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border-radius: 12px;
+      padding: 8px 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
       border: 1.5px solid #e2e8f0;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: space-between;
+      flex: 1;
+      min-height: 0;
       position: relative;
     }
 
     .status-banner {
       width: 100%;
-      padding: 6px 10px;
+      padding: 5px 10px;
       border-radius: 8px;
       font-weight: 800;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       text-align: center;
-      margin-bottom: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -242,6 +253,8 @@
       transition: all 0.2s ease;
       background: #e0f2fe;
       color: #0369a1;
+      flex-shrink: 0;
+      line-height: 1.25;
     }
 
     .status-banner.running {
@@ -265,39 +278,41 @@
       100% { transform: scale(1.02); }
     }
 
-    /* ゼルダ風見下ろし2D迷路ボード */
+    /* ゼルダ風2D見下ろし迷路ボード */
     .maze-board-container {
       width: 100%;
+      flex: 1;
+      min-height: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 6px 0;
-      overflow-x: auto;
+      padding: 4px 0;
+      overflow: hidden;
     }
 
     .maze-wrapper {
       position: relative;
       background: #e2e8f0;
-      padding: 8px;
-      border-radius: 16px;
-      box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.12), 0 6px 16px rgba(0, 0, 0, 0.06);
+      padding: 6px;
+      border-radius: 14px;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
       display: inline-block;
-      border: 3px solid #cbd5e1;
+      border: 2.5px solid #cbd5e1;
     }
 
     .maze-grid {
       display: grid;
       gap: 3px;
       background: #94a3b8;
-      padding: 6px;
-      border-radius: 10px;
+      padding: 4px;
+      border-radius: 8px;
       position: relative;
     }
 
-    /* ゼルダ風トップダウン・タイル */
+    /* ゼルダ風タイル */
     .maze-cell {
-      width: 50px;
-      height: 50px;
+      width: 48px;
+      height: 48px;
       border-radius: 6px;
       display: flex;
       align-items: center;
@@ -308,7 +323,7 @@
       box-sizing: border-box;
     }
 
-    @media (max-width: 520px) {
+    @media (max-height: 720px) {
       .maze-cell {
         width: 40px;
         height: 40px;
@@ -316,29 +331,37 @@
       }
     }
 
-    /* 歩ける道: 明るくフラットで見やすい */
+    @media (max-height: 600px) {
+      .maze-cell {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+      }
+    }
+
+    /* 歩ける道 */
     .maze-cell.path {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9);
     }
 
-    /* 障害物壁: ゼルダ風ブロック（見下ろしなのでマスを隠さない！） */
+    /* 壁 */
     .maze-cell.wall {
       background: linear-gradient(180deg, #64748b 0%, #475569 40%, #334155 100%);
-      border-top: 3px solid #94a3b8;
-      border-bottom: 3px solid #1e293b;
-      box-shadow: 0 3px 0 #0f172a, inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      border-top: 2.5px solid #94a3b8;
+      border-bottom: 2.5px solid #1e293b;
+      box-shadow: 0 2px 0 #0f172a, inset 0 1px 1px rgba(255, 255, 255, 0.3);
       position: relative;
     }
 
     .maze-cell.wall::after {
       content: '';
       position: absolute;
-      top: 4px;
-      left: 4px;
-      right: 4px;
-      bottom: 4px;
+      top: 3px;
+      left: 3px;
+      right: 3px;
+      bottom: 3px;
       border: 1.5px dashed rgba(255, 255, 255, 0.15);
       border-radius: 3px;
       pointer-events: none;
@@ -352,18 +375,18 @@
 
     .maze-cell.start::before {
       content: '🚩';
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       position: absolute;
       top: 1px;
       left: 2px;
-      opacity: 0.5;
+      opacity: 0.55;
     }
 
     /* ゴールマス */
     .maze-cell.goal {
       background: radial-gradient(circle, #fef3c7 40%, #fde68a 100%);
       border: 2px solid #f59e0b;
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.45);
     }
 
     .goal-icon-sprite {
@@ -381,30 +404,9 @@
       50% { transform: translateY(-3px) scale(1.08); }
     }
 
-    /* 各国のアイテム */
-    .maze-item {
-      position: absolute;
-      font-size: 1.45rem;
-      z-index: 5;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-      animation: item-bounce 2s infinite ease-in-out;
-      line-height: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    @keyframes item-bounce {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-3px) scale(1.12); }
-    }
-
-    /* けやっきーキャラクター (2Dゼルダ風・顔がしっかり見える) */
+    /* けやっきーキャラクター（.maze-grid直下、マス完全中央配置） */
     .robot-character {
       position: absolute;
-      width: 50px;
-      height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -413,37 +415,23 @@
       transition: left 0.2s cubic-bezier(0.2, 0.8, 0.3, 1.2), top 0.2s cubic-bezier(0.2, 0.8, 0.3, 1.2);
     }
 
-    @media (max-width: 520px) {
-      .robot-character {
-        width: 40px;
-        height: 40px;
-      }
-    }
-
     .keyakki-sprite-box {
-      width: 44px;
-      height: 44px;
+      width: 86%;
+      height: 86%;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    @media (max-width: 520px) {
-      .keyakki-sprite-box {
-        width: 36px;
-        height: 36px;
-      }
-    }
-
     .keyakki-sprite-img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
     }
 
-    /* 進行方向インジケーター（▲） */
+    /* 進行方向マーカー（▲） */
     .keyakki-dir-marker {
       position: absolute;
       width: 14px;
@@ -451,7 +439,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: #ef4444;
       font-weight: 900;
       filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
@@ -460,10 +448,10 @@
       line-height: 1;
     }
 
-    .keyakki-dir-marker.dir-0 { top: -8px; left: 50%; transform: translateX(-50%); } /* 上 */
-    .keyakki-dir-marker.dir-1 { right: -8px; top: 50%; transform: translateY(-50%) rotate(90deg); } /* 右 */
-    .keyakki-dir-marker.dir-2 { bottom: -8px; left: 50%; transform: translateX(-50%) rotate(180deg); } /* 下 */
-    .keyakki-dir-marker.dir-3 { left: -8px; top: 50%; transform: translateY(-50%) rotate(270deg); } /* 左 */
+    .keyakki-dir-marker.dir-0 { top: -6px; left: 50%; transform: translateX(-50%); } /* 上 */
+    .keyakki-dir-marker.dir-1 { right: -6px; top: 50%; transform: translateY(-50%) rotate(90deg); } /* 右 */
+    .keyakki-dir-marker.dir-2 { bottom: -6px; left: 50%; transform: translateX(-50%) rotate(180deg); } /* 下 */
+    .keyakki-dir-marker.dir-3 { left: -6px; top: 50%; transform: translateY(-50%) rotate(270deg); } /* 左 */
 
     /* 歩行ジャンプアニメーション */
     .keyakki-jump {
@@ -472,19 +460,15 @@
 
     @keyframes keyakki-jump-anim {
       0%, 100% { transform: scale(1) translateY(0); }
-      40% { transform: scale(1.15, 0.88) translateY(-6px); }
+      40% { transform: scale(1.15, 0.88) translateY(-5px); }
       70% { transform: scale(0.92, 1.08) translateY(-2px); }
     }
 
-    /* ========================================================
-       センサー探査エフェクト（条件分岐・while実行時の前方スキャン）📡
-    ======================================================== */
+    /* センサー探査エフェクト */
     .sensor-beam {
       position: absolute;
       pointer-events: none;
       z-index: 25;
-      width: 50px;
-      height: 50px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(56, 189, 248, 0.6) 0%, rgba(14, 165, 233, 0.2) 65%, transparent 100%);
       border: 2px solid rgba(56, 189, 248, 0.9);
@@ -495,10 +479,9 @@
     @keyframes sensor-pulse {
       0% { transform: scale(0.2); opacity: 0; }
       40% { opacity: 1; transform: scale(1.1); }
-      100% { transform: scale(1.4); opacity: 0; }
+      100% { transform: scale(1.35); opacity: 0; }
     }
 
-    /* スキャンされた前方マスの発光 */
     .maze-cell.scanned-active {
       box-shadow: inset 0 0 14px #38bdf8, 0 0 12px #0ea5e9 !important;
       border: 2px solid #0284c7 !important;
@@ -510,15 +493,14 @@
       50% { filter: brightness(1.35) saturate(1.3); }
     }
 
-    /* センサー探査中のポップアップ吹き出し */
     .sensor-popup-badge {
       position: absolute;
-      top: -24px;
+      top: -22px;
       left: 50%;
       transform: translateX(-50%);
       background: #0284c7;
       color: white;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 900;
       padding: 2px 7px;
       border-radius: 12px;
@@ -540,16 +522,15 @@
     }
 
     .maze-stats {
-      margin-top: 10px;
-      display: flex;
-      gap: 12px;
       width: 100%;
+      display: flex;
       justify-content: space-around;
       background: #f8fafc;
-      padding: 6px 12px;
-      border-radius: 10px;
-      font-size: 0.85rem;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.82rem;
       font-weight: 700;
+      flex-shrink: 0;
     }
 
     .stat-item {
@@ -563,30 +544,41 @@
       color: var(--primary);
     }
 
-    /* 右カラム: ブロックプログラミング (作業スペース広々) */
+    /* ========================================================
+       右カラム: プログラミング操作画面
+    ======================================================== */
     .code-column {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+      min-height: 0;
+      height: 100%;
     }
 
-    /* パレット (高さ小さくコンパクト) */
+    /* つかえるブロックパレット */
     .palette-card {
       background: white;
-      border-radius: 14px;
-      padding: 10px 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border-radius: 12px;
+      padding: 8px 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
       border: 1.5px solid #e2e8f0;
+      flex-shrink: 0;
     }
 
     .section-title {
-      font-size: 0.9rem;
+      font-size: 0.86rem;
       font-weight: 900;
       color: #334155;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+    }
+
+    .hint-small {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: normal;
     }
 
     .palette-blocks {
@@ -596,18 +588,13 @@
       align-items: center;
     }
 
-    /* ========================================================
-       スクラッチ風ブロック共通デザイン (コンパクト & 隙間なく密着)
-    ======================================================== */
-    /* ========================================================
-       スクラッチ風ブロック共通デザイン (文字の上下ズレ完全解消)
-    ======================================================== */
+    /* スクラッチ風ブロック共通デザイン */
     .scratch-block {
       color: white;
       font-weight: 800;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       line-height: 1;
-      height: 34px;
+      height: 32px;
       padding: 0 10px;
       border-radius: 6px;
       display: inline-flex;
@@ -630,7 +617,6 @@
       cursor: grabbing;
     }
 
-    /* 色分け */
     .block-motion {
       background-color: var(--block-motion);
       border: 1px solid var(--block-motion-border);
@@ -656,7 +642,6 @@
       border: 1px solid var(--block-if-border);
     }
 
-    /* パレット用ボタンとしての調整 */
     .palette-btn {
       border: none;
       box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
@@ -666,45 +651,57 @@
     .palette-btn .palette-add-icon {
       background: rgba(255, 255, 255, 0.28);
       border-radius: 50%;
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       line-height: 1;
       margin-left: 2px;
     }
 
-    /* ========================================================
-       ワークスペース & スクラッチ風スタック (隙間0pxでピッタリ結合)
-    ======================================================== */
+    /* ワークスペースカード: 高さ連動 */
     .workspace-card {
       background: white;
-      border-radius: 14px;
-      padding: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border-radius: 12px;
+      padding: 8px 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
       border: 1.5px solid #e2e8f0;
       display: flex;
       flex-direction: column;
       flex: 1;
-      min-height: 480px;
+      min-height: 0;
+    }
+
+    .workspace-header {
+      flex-shrink: 0;
+      margin-bottom: 6px;
+    }
+
+    .speed-wrap {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #64748b;
     }
 
     .action-bar {
       display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+      align-items: center;
     }
 
     .btn-action {
       flex: 1;
-      min-width: 110px;
-      height: 40px;
-      padding: 0 14px;
-      border-radius: 10px;
-      font-size: 0.92rem;
+      min-width: 90px;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 8px;
+      font-size: 0.88rem;
       font-weight: 900;
       line-height: 1;
       border: none;
@@ -712,8 +709,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+      gap: 5px;
+      box-shadow: 0 2.5px 0 rgba(0, 0, 0, 0.15);
       transition: all 0.1s ease;
       box-sizing: border-box;
     }
@@ -731,6 +728,8 @@
     .btn-run {
       background: #10b981;
       color: white;
+      font-size: 0.95rem;
+      flex: 1.4;
     }
 
     .btn-run:disabled {
@@ -760,19 +759,18 @@
       border-color: #fca5a5;
     }
 
-    /* ワークスペース本体 */
+    /* ワークスペース本体: ここだけ縦スクロール */
     .workspace-area {
       background: #f8fafc;
       border: 2px dashed #cbd5e1;
-      border-radius: 12px;
-      padding: 10px;
+      border-radius: 10px;
+      padding: 8px;
       flex: 1;
+      min-height: 0;
       overflow-y: auto;
-      min-height: 380px;
       position: relative;
     }
 
-    /* スクラッチ風スタックコンテナ: ブロックが隙間なくピッタリ連結 */
     .blocks-stack {
       display: flex;
       flex-direction: column;
@@ -785,23 +783,24 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 0;
+      padding: 30px 0;
       color: #94a3b8;
       text-align: center;
       gap: 6px;
       pointer-events: none;
+      font-size: 0.85rem;
     }
 
     .empty-icon {
-      font-size: 2.2rem;
+      font-size: 1.8rem;
       line-height: 1;
     }
 
-    /* ワークスペース内の通常ブロック: 上下中央揃え */
+    /* ワークスペース内のブロック */
     .ws-block {
       width: fit-content;
-      min-width: 170px;
-      height: 34px;
+      min-width: 165px;
+      height: 32px;
       display: inline-flex;
       align-items: center;
       justify-content: space-between;
@@ -814,14 +813,6 @@
       box-sizing: border-box;
     }
 
-    .block-content-left {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      line-height: 1;
-    }
-
-    /* 実行中ハイライト */
     .ws-block.executing, .c-block.executing > .c-header {
       filter: brightness(1.3) saturate(1.4) !important;
       outline: 3px solid #facc15;
@@ -842,7 +833,7 @@
     .block-actions {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
       margin-left: 8px;
       line-height: 1;
     }
@@ -852,14 +843,14 @@
       border: none;
       color: white;
       border-radius: 4px;
-      width: 20px;
-      height: 20px;
+      width: 19px;
+      height: 19px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       font-weight: 900;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       line-height: 1;
       transition: background 0.12s ease;
     }
@@ -872,28 +863,26 @@
       background: #ef4444;
     }
 
-    /* ========================================================
-       C型ブロック（スクラッチ風のくりかえし / while / もし）
-    ======================================================== */
+    /* C型ブロック（くりかえし / while / もし） */
     .c-block {
       display: flex;
       flex-direction: column;
       width: fit-content;
-      min-width: 210px;
+      min-width: 200px;
       position: relative;
       margin-bottom: 0px;
     }
 
     .c-header {
       border-radius: 4px 4px 0 0;
-      height: 34px;
+      height: 32px;
       padding: 0 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       color: white;
       font-weight: 800;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       cursor: grab;
       border-bottom: 1.5px solid rgba(0, 0, 0, 0.15);
       line-height: 1;
@@ -902,9 +891,9 @@
 
     .c-body {
       margin-left: 14px;
-      padding: 3px 0 3px 6px;
+      padding: 2px 0 2px 6px;
       border-left: 14px solid;
-      min-height: 28px;
+      min-height: 26px;
       display: flex;
       flex-direction: column;
       gap: 0px;
@@ -914,13 +903,12 @@
 
     .c-footer {
       border-radius: 0 0 4px 4px;
-      height: 10px;
-      width: 60px;
+      height: 9px;
+      width: 58px;
       margin-bottom: 0px;
       border-bottom: 2px solid rgba(0, 0, 0, 0.2);
     }
 
-    /* C型ブロックの色ごとの枠線連携 */
     .c-block-control .c-header { background: var(--block-control); }
     .c-block-control .c-body { border-left-color: var(--block-control); }
     .c-block-control .c-footer { background: var(--block-control); }
@@ -933,17 +921,16 @@
     .c-block-if .c-body { border-left-color: var(--block-if); }
     .c-block-if .c-footer { background: var(--block-if); }
 
-    /* インラインセレクト（文字の上下ズレ解消） */
     .block-inline-select {
       background: white;
       color: #0f172a;
       font-weight: 900;
       border: 1.5px solid white;
       border-radius: 5px;
-      padding: 0 16px 0 6px;
-      font-size: 0.8rem;
-      height: 24px;
-      line-height: 22px;
+      padding: 0 15px 0 5px;
+      font-size: 0.78rem;
+      height: 23px;
+      line-height: 21px;
       margin: 0 3px;
       cursor: pointer;
       outline: none;
@@ -954,10 +941,9 @@
       -webkit-appearance: none;
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="5" viewBox="0 0 8 5"><path fill="%23475569" d="M0 0l4 5 4-5z"/></svg>');
       background-repeat: no-repeat;
-      background-position: right 5px center;
+      background-position: right 4px center;
     }
 
-    /* ドロップインジケーター（隙間に入る青いガイド線） */
     .drop-indicator {
       height: 4px;
       background: #0284c7;
@@ -971,17 +957,6 @@
 
     .dragging {
       opacity: 0.35;
-    }
-
-    /* フッター */
-    footer {
-      background: white;
-      padding: 8px 16px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #64748b;
-      border-top: 1px solid #e2e8f0;
-      margin-top: auto;
     }
 
     /* モーダル */
@@ -1011,7 +986,7 @@
       background: white;
       border-radius: 20px;
       padding: 24px;
-      max-width: 440px;
+      max-width: 420px;
       width: 90%;
       text-align: center;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
@@ -1024,37 +999,22 @@
     }
 
     .modal-icon {
-      font-size: 3.5rem;
-      margin-bottom: 8px;
-      animation: tada 1s ease-in-out;
-    }
-
-    @keyframes tada {
-      0% { transform: scale(1); }
-      10%, 20% { transform: scale(0.9) rotate(-3deg); }
-      30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
-      40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
-      100% { transform: scale(1) rotate(0); }
+      font-size: 3.2rem;
+      margin-bottom: 6px;
     }
 
     .modal-title {
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-weight: 900;
       color: #0f172a;
       margin-bottom: 6px;
     }
 
     .modal-desc {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: #475569;
       margin-bottom: 16px;
       line-height: 1.5;
-    }
-
-    .modal-stars {
-      font-size: 2rem;
-      margin-bottom: 12px;
-      letter-spacing: 4px;
     }
 
     .modal-btn-row {
@@ -1095,7 +1055,7 @@
       border-radius: 10px;
       text-align: left;
       font-family: 'Courier New', monospace;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       line-height: 1.5;
       max-height: 220px;
       overflow-y: auto;
@@ -1117,13 +1077,11 @@
 <body>
   <canvas id="confetti-canvas"></canvas>
 
-  <!-- ヘッダー -->
+  <!-- ヘッダー（高さ44px固定・すっきり1行） -->
   <header>
     <div class="logo-area">
-      <img src="images/keyakki.png" alt="けやっきー" style="width: 36px; height: 36px; object-fit: contain; animation: bounce 2s infinite ease-in-out;">
-      <h1 style="display: inline-flex; align-items: center; gap: 8px; font-size: 1.25rem; font-weight: 900; color: #0369a1; line-height: 1;">
-        🌍 けやっきーの せかいりょこう迷路！
-      </h1>
+      <img src="images/keyakki.png" alt="けやっきー" class="header-logo-img">
+      <h1 class="header-title">🌍 けやっきーの せかいりょこう迷路！</h1>
     </div>
 
     <div class="header-controls">
@@ -1137,22 +1095,22 @@
       </button>
 
       <button id="btn-view-code" class="btn-icon" title="JavaScriptコードをみる">
-        💻 <span>コードをみる</span>
+        💻 <span>コード</span>
       </button>
     </div>
   </header>
 
-  <!-- メインコンテンツ -->
+  <!-- メインコンテンツ（画面100%に収まるレイアウト） -->
   <main class="app-container">
-    <!-- 左側：めいろ画面（約38%） -->
+    <!-- 左側：めいろ画面 -->
     <section class="maze-column">
       <div class="stage-card">
         <div class="stage-title-row">
-          <div class="stage-title" id="stage-title">🇯🇵 ステージ 1: 日本・とうきょう</div>
-          <div class="stage-goal-badge" id="stage-badge">🚩 1歩進むだけ</div>
+          <div class="stage-title" id="stage-title">🇯🇵 ステージ 1: 日本（富士山）</div>
+          <div class="stage-goal-badge" id="stage-badge">🗻 富士山をめざそう</div>
         </div>
         <div class="stage-desc" id="stage-desc">
-          「1マスすすむ」ブロックをおいて、けやっきーをゴールのお城🏯へみちびこう！
+          「1マスすすむ」ブロックをおいて、富士山🗻をめざそう！
         </div>
       </div>
 
@@ -1164,12 +1122,14 @@
         <!-- ゼルダ風2D見下ろし迷路盤面 -->
         <div class="maze-board-container">
           <div class="maze-wrapper" id="maze-wrapper">
-            <div class="maze-grid" id="maze-grid"></div>
-            <!-- けやっきー 2Dキャラクター -->
-            <div class="robot-character" id="robot-character">
-              <div class="keyakki-sprite-box">
-                <img id="keyakki-img" class="keyakki-sprite-img" src="images/keyakki_front.png" alt="けやっきー">
-                <div id="keyakki-dir-marker" class="keyakki-dir-marker dir-1">▲</div>
+            <div class="maze-grid" id="maze-grid">
+              <!-- マスセルはJSで生成 -->
+              <!-- けやっきー 2Dキャラクター（maze-grid直下で完全中央吸着） -->
+              <div class="robot-character" id="robot-character">
+                <div class="keyakki-sprite-box">
+                  <img id="keyakki-img" class="keyakki-sprite-img" src="images/keyakki_front.png" alt="けやっきー">
+                  <div id="keyakki-dir-marker" class="keyakki-dir-marker dir-1">▲</div>
+                </div>
               </div>
             </div>
           </div>
@@ -1177,12 +1137,8 @@
 
         <div class="maze-stats">
           <div class="stat-item">
-            <span>歩いたかず:</span>
+            <span>あるいた数:</span>
             <span class="stat-val" id="stat-steps">0</span> 歩
-          </div>
-          <div class="stat-item">
-            <span id="stat-item-label">🎒 アイテム:</span>
-            <span class="stat-val" id="stat-stars">0 / 0</span>
           </div>
           <div class="stat-item">
             <span>ブロック数:</span>
@@ -1192,50 +1148,46 @@
       </div>
     </section>
 
-    <!-- 右側：ブロックプログラミング（約62%：広々作業スペース） -->
+    <!-- 右側：ブロックプログラミング操作画面 -->
     <section class="code-column">
-      <!-- 段階的に解放されるツールパレット -->
+      <!-- ツールパレット -->
       <div class="palette-card">
         <div class="section-title">
           <span>🧩 つかえるブロック</span>
-          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">クリックで追加できます</span>
+          <span class="hint-small">クリックかドラッグで追加</span>
         </div>
-        <div class="palette-blocks" id="palette-blocks">
-          <!-- JSでステージごとに動的表示・解放 -->
-        </div>
+        <div class="palette-blocks" id="palette-blocks"></div>
       </div>
 
       <!-- プログラム組み立てエリア -->
       <div class="workspace-card">
-        <div class="section-title">
-          <span>📜 プログラム（スクラッチ風スタック）</span>
-          <div style="display: flex; gap: 6px; align-items: center;">
-            <label style="font-size: 0.8rem; font-weight: 700; color: #64748b; display: inline-flex; align-items: center; gap: 4px;">
-              スピード:
-              <select id="speed-select" style="font-size: 0.78rem; padding: 2px 4px;">
-                <option value="500">ゆっくり</option>
-                <option value="260" selected>ふつう</option>
-                <option value="120">はやい</option>
+        <div class="workspace-header">
+          <div class="section-title">
+            <span>📜 プログラム</span>
+            <div class="speed-wrap">
+              <span>スピード:</span>
+              <select id="speed-select">
+                <option value="420">ゆっくり</option>
+                <option value="230" selected>ふつう</option>
+                <option value="100">はやい</option>
               </select>
-            </label>
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <button id="btn-run" class="btn-action btn-run">
+              ▶️ うごかす！
+            </button>
+            <button id="btn-reset" class="btn-action btn-reset">
+              ⏹️ もどす
+            </button>
+            <button id="btn-clear" class="btn-action btn-clear" title="ぜんぶ消す">
+              🗑️ ぜんぶけす
+            </button>
           </div>
         </div>
 
-        <div class="action-bar">
-          <button id="btn-run" class="btn-action btn-run">
-            ▶️ うごかす！
-          </button>
-          <button id="btn-reset" class="btn-action btn-reset">
-            ⏹️ もどす
-          </button>
-          <button id="btn-clear" class="btn-action btn-clear" title="ぜんぶ消す">
-            🗑️ ぜんぶけす
-          </button>
-        </div>
-          </button>
-        </div>
-
-        <!-- ブロック配置エリア -->
+        <!-- ブロック配置エリア（ここだけ縦スクロール） -->
         <div class="workspace-area" id="workspace-area">
           <div class="blocks-stack" id="main-stack">
             <div class="workspace-empty-hint" id="empty-hint">
@@ -1248,20 +1200,16 @@
     </section>
   </main>
 
-  <footer>
-    小学生向けプログラミング教材 (全20ステージ) — 順次・分岐・反復・Whileを楽しくマスターしよう！
-  </footer>
-
   <!-- ゴールおめでとうモーダル -->
   <div class="modal-overlay" id="goal-modal">
     <div class="modal-card">
       <div class="modal-icon">
-        <img src="images/keyakki.png" alt="けやっきー" style="width: 88px; height: 88px; object-fit: contain; animation: tada 1s ease-in-out; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
+        <img src="images/keyakki.png" alt="けやっきー" style="width: 80px; height: 80px; object-fit: contain; animation: tada 1s ease-in-out; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
       </div>
-      <h2 class="modal-title">迷路だっしゅつ おめでとう！</h2>
-      <div class="modal-stars" id="modal-stars">⭐⭐⭐</div>
+      <h2 class="modal-title">ゴール おめでとう！🎉</h2>
+      <div class="modal-stars" style="font-size: 2rem; margin-bottom: 8px;">⭐⭐⭐</div>
       <p class="modal-desc" id="modal-desc">
-        やったー！けやっきーがゴールのお城🏰へ脱出できたよ！
+        やったー！けやっきーがゴールできたよ！
       </p>
       <div class="modal-btn-row">
         <button class="btn-modal btn-modal-secondary" id="btn-modal-replay">もういちど</button>
@@ -1272,7 +1220,7 @@
 
   <!-- コード表示モーダル -->
   <div class="modal-overlay" id="code-modal">
-    <div class="modal-card" style="max-width: 520px;">
+    <div class="modal-card" style="max-width: 500px;">
       <div class="modal-icon">💻</div>
       <h2 class="modal-title">JavaScriptコード</h2>
       <p class="modal-desc" style="margin-bottom: 8px;">
@@ -1287,26 +1235,22 @@
 
   <script>
     /* ========================================================
-       1. 全20ステージ定義 (世界旅行＆宇宙大冒険！小学3年生向けスモールステップ)
-       0: 道, 1: 壁, 2: スタート, 3: ゴール, 4: アイテム
+       1. 全20ステージ定義 (世界旅行＆宇宙大冒険！アイテム拾いなし)
+       0: 道, 1: 壁, 2: スタート, 3: ゴール
        dir: 0: 上, 1: 右, 2: 下, 3: 左
     ======================================================== */
     const STAGES = [
-      // === 🇯🇵 第1章：日本編 (順次処理・はじめのいっぽ) ===
+      // ステージ 1（日本）： 富士山 🗻
       {
         id: 0,
         country: "🇯🇵 日本",
-        title: "🇯🇵 ステージ 1: 日本・とうきょう",
-        desc: "目の前にお城があるよ！「1マスすすむ」ブロックをおいてゴールのお城🏯をめざそう！",
-        badge: "🚩 はじめのいっぽ",
+        title: "🇯🇵 ステージ 1: 日本（富士山）",
+        desc: "「1マスすすむ」ブロックをおいて、富士山🗻をめざそう！",
+        badge: "🗻 富士山をめざそう",
         gridWidth: 3,
         gridHeight: 3,
-        itemIcon: "🍙",
-        itemName: "おにぎり",
-        itemsTotal: 0,
-        starsTotal: 0,
-        goalIcon: "🏯",
-        goalName: "おしろ",
+        goalIcon: "🗻",
+        goalName: "富士山",
         map: [
           [1, 1, 1],
           [2, 3, 1],
@@ -1315,20 +1259,17 @@
         start: { x: 0, y: 1, dir: 1 },
         availableBlocks: ['forward']
       },
+      // ステージ 2（アメリカ）： 自由の女神 🗽
       {
         id: 1,
-        country: "🇯🇵 日本",
-        title: "🇯🇵 ステージ 2: 日本・きょうと",
-        desc: "鳥居（とりい）⛩️まで2マス！「1マスすすむ」を2個つなげてみよう！",
-        badge: "🚶 2歩すすむ",
+        country: "🇺🇸 アメリカ",
+        title: "🇺🇸 ステージ 2: アメリカ（自由の女神）",
+        desc: "「1マスすすむ」を2つつなげて、自由の女神🗽へ行こう！",
+        badge: "🗽 自由の女神へ",
         gridWidth: 4,
         gridHeight: 3,
-        itemIcon: "🍙",
-        itemName: "おにぎり",
-        itemsTotal: 0,
-        starsTotal: 0,
-        goalIcon: "⛩️",
-        goalName: "とりい",
+        goalIcon: "🗽",
+        goalName: "自由の女神",
         map: [
           [1, 1, 1, 1],
           [2, 0, 3, 1],
@@ -1337,212 +1278,77 @@
         start: { x: 0, y: 1, dir: 1 },
         availableBlocks: ['forward']
       },
+      // ステージ 3（フランス）： エッフェル塔 🗼
       {
         id: 2,
-        country: "🇯🇵 日本",
-        title: "🇯🇵 ステージ 3: 日本・ふじさん",
-        desc: "名物「🍙 おにぎり」がおちているよ！おにぎりをひろって富士山🗻へゴールしよう！",
-        badge: "🍙 おにぎりをゲット",
-        gridWidth: 4,
-        gridHeight: 3,
-        itemIcon: "🍙",
-        itemName: "おにぎり",
-        itemsTotal: 1,
-        starsTotal: 1,
-        goalIcon: "🗻",
-        goalName: "ふじさん",
-        map: [
-          [1, 1, 1, 1],
-          [2, 4, 3, 1],
-          [1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 1, dir: 1 },
-        availableBlocks: ['forward']
-      },
-      {
-        id: 3,
-        country: "🇯🇵 日本",
-        title: "🇯🇵 ステージ 4: 日本・おきなわ",
-        desc: "道がまがっているよ！すすんだあとに「みぎをむく」をつかって、シーサー🦁のお城へ行こう！",
-        badge: "↪️ みぎにまがる",
+        country: "🇫🇷 フランス",
+        title: "🇫🇷 ステージ 3: フランス（エッフェル塔）",
+        desc: "道がまがっているよ！「みぎをむく」をつかってエッフェル塔🗼へ行こう！",
+        badge: "🗼 エッフェル塔へ",
         gridWidth: 3,
-        gridHeight: 4,
-        itemIcon: "🌺",
-        itemName: "ハイビスカス",
-        itemsTotal: 0,
-        starsTotal: 0,
-        goalIcon: "🏯",
-        goalName: "首里城",
+        gridHeight: 3,
+        goalIcon: "🗼",
+        goalName: "エッフェル塔",
         map: [
           [2, 0, 1],
-          [1, 0, 1],
           [1, 3, 1],
           [1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right']
       },
-
-      // === 🇫🇷 第2章：フランス編 (くりかえしループ) ===
+      // ステージ 4（イギリス）： ビッグベン（時計台） 🕰️
       {
-        id: 4,
-        country: "🇫🇷 フランス",
-        title: "🇫🇷 ステージ 5: フランス・パリ",
-        desc: "パリに到着！「🔁 くりかえし」ブロックをつかって、まっすぐ3マス進みエッフェル塔🗼へ！",
-        badge: "🔁 くりかえし",
-        gridWidth: 5,
-        gridHeight: 3,
-        itemIcon: "🥐",
-        itemName: "クロワッサン",
-        itemsTotal: 1,
-        starsTotal: 1,
-        goalIcon: "🗼",
-        goalName: "エッフェルとう",
-        map: [
-          [1, 1, 1, 1, 1],
-          [2, 0, 4, 3, 1],
-          [1, 1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 1, dir: 1 },
-        availableBlocks: ['forward', 'repeat']
-      },
-      {
-        id: 5,
-        country: "🇫🇷 フランス",
-        title: "🇫🇷 ステージ 6: フランス・ルーブル",
-        desc: "美術館の長いろうか！「🥐 クロワッサン」を2つあつめて凱旋門🏛️へゴールしよう！",
-        badge: "🥐 2つのクロワッサン",
-        gridWidth: 6,
-        gridHeight: 3,
-        itemIcon: "🥐",
-        itemName: "クロワッサン",
-        itemsTotal: 2,
-        starsTotal: 2,
-        goalIcon: "🏛️",
-        goalName: "がいせんもん",
-        map: [
-          [1, 1, 1, 1, 1, 1],
-          [2, 4, 0, 4, 3, 1],
-          [1, 1, 1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 1, dir: 1 },
-        availableBlocks: ['forward', 'repeat']
-      },
-
-      // === 🇮🇹 第3章：イタリア編 (くりかえし＋まがる) ===
-      {
-        id: 6,
-        country: "🇮🇹 イタリア",
-        title: "🇮🇹 ステージ 7: イタリア・ローマ",
-        desc: "おいしい「🍕 ピザ」を発見！階段状の道を（すすむ→まがる）で進んでコロッセオ🏛️へ！",
-        badge: "🍕 かいだんの道",
+        id: 3,
+        country: "🇬🇧 イギリス",
+        title: "🇬🇧 ステージ 4: イギリス（ビッグベン）",
+        desc: "「ひだりをむく」もつかって、時計台（ビッグベン）🕰️をめざそう！",
+        badge: "🕰️ 時計台へ",
         gridWidth: 4,
         gridHeight: 4,
-        itemIcon: "🍕",
-        itemName: "ピザ",
-        itemsTotal: 1,
-        starsTotal: 1,
-        goalIcon: "🏛️",
-        goalName: "コロッセオ",
+        goalIcon: "🕰️",
+        goalName: "ビッグベン",
         map: [
           [2, 0, 1, 1],
-          [1, 4, 0, 1],
+          [1, 0, 0, 1],
           [1, 1, 3, 1],
           [1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
+        availableBlocks: ['forward', 'turn_right', 'turn_left']
       },
+      // ステージ 5（イタリア）： ピザ 🍕
       {
-        id: 7,
+        id: 4,
         country: "🇮🇹 イタリア",
-        title: "🇮🇹 ステージ 8: イタリア・ベネチア",
-        desc: "水の都ベネチア！ゴンドラ🚣を目指してジグザグに進み、ピザを2枚あつめよう！",
-        badge: "🚣 ゴンドラへ",
+        title: "🇮🇹 ステージ 5: イタリア（ピザ）",
+        desc: "「🔁 くりかえす」ブロックの登場！すくないブロックでピザ🍕へ行こう！",
+        badge: "🍕 おいしいピザへ",
         gridWidth: 5,
-        gridHeight: 4,
-        itemIcon: "🍕",
-        itemName: "ピザ",
-        itemsTotal: 2,
-        starsTotal: 2,
-        goalIcon: "🚣",
-        goalName: "ゴンドラ",
+        gridHeight: 3,
+        goalIcon: "🍕",
+        goalName: "ピザ",
         map: [
-          [2, 0, 1, 1, 1],
-          [1, 4, 0, 1, 1],
-          [1, 1, 4, 3, 1],
+          [1, 1, 1, 1, 1],
+          [2, 0, 0, 3, 1],
           [1, 1, 1, 1, 1]
         ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
+        start: { x: 0, y: 1, dir: 1 },
+        availableBlocks: ['forward', 'repeat']
       },
-
-      // === 🇪🇬 第4章：エジプト編 (ピラミッドと迷路) ===
+      // ステージ 6（中国）： パンダ 🐼
       {
-        id: 8,
-        country: "🇪🇬 エジプト",
-        title: "🇪🇬 ステージ 9: エジプト・ピラミッド",
-        desc: "砂漠のピラミッド🏛️！四角い道をぐるっと回って、古代的「💎 ダイヤ」をゲットしよう！",
-        badge: "💎 古代のダイヤ",
+        id: 5,
+        country: "🇨🇳 中国",
+        title: "🇨🇳 ステージ 6: 中国（パンダ）",
+        desc: "「くりかえす」と「まがる」をくみあわせて、パンダ🐼に会いに行こう！",
+        badge: "🐼 パンダに会おう",
         gridWidth: 4,
         gridHeight: 4,
-        itemIcon: "💎",
-        itemName: "ダイヤ",
-        itemsTotal: 1,
-        starsTotal: 1,
-        goalIcon: "🏛️",
-        goalName: "ピラミッド",
-        map: [
-          [2, 0, 0, 1],
-          [1, 1, 4, 1],
-          [1, 3, 0, 1],
-          [1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'repeat']
-      },
-      {
-        id: 9,
-        country: "🇪🇬 エジプト",
-        title: "🇪🇬 ステージ 10: エジプト・オアシス",
-        desc: "オアシス🌴まであと少し！ダイヤ2個をしっかり拾って、スフィンクス🦁のオアシスへ！",
-        badge: "🌴 オアシス",
-        gridWidth: 5,
-        gridHeight: 4,
-        itemIcon: "💎",
-        itemName: "ダイヤ",
-        itemsTotal: 2,
-        starsTotal: 2,
-        goalIcon: "🌴",
-        goalName: "オアシス",
-        map: [
-          [2, 0, 4, 1, 1],
-          [1, 1, 0, 1, 1],
-          [1, 1, 4, 3, 1],
-          [1, 1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
-      },
-
-      // === 🇮🇳 第5章：インド編 (条件分岐：もし〜なら) ===
-      {
-        id: 10,
-        country: "🇮🇳 インド",
-        title: "🇮🇳 ステージ 11: インド・アグラ",
-        desc: "本場の「🍛 カレー」を発見！タージマハル🕌を目指して、くりかえしで進もう！",
-        badge: "🍛 カレースパイス",
-        gridWidth: 4,
-        gridHeight: 5,
-        itemIcon: "🍛",
-        itemName: "カレー",
-        itemsTotal: 1,
-        starsTotal: 1,
-        goalIcon: "🕌",
-        goalName: "タージマハル",
+        goalIcon: "🐼",
+        goalName: "パンダ",
         map: [
           [2, 0, 1, 1],
-          [1, 4, 1, 1],
           [1, 0, 0, 1],
           [1, 1, 3, 1],
           [1, 1, 1, 1]
@@ -1550,219 +1356,288 @@
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
       },
+      // ステージ 7（エジプト）： ピラミッド 🔺
       {
-        id: 11,
+        id: 6,
+        country: "🇪🇬 エジプト",
+        title: "🇪🇬 ステージ 7: エジプト（ピラミッド）",
+        desc: "かいだんの道をトントンと登って、ピラミッド🔺をめざそう！",
+        badge: "🔺 ピラミッドへ",
+        gridWidth: 5,
+        gridHeight: 4,
+        goalIcon: "🔺",
+        goalName: "ピラミッド",
+        map: [
+          [2, 0, 1, 1, 1],
+          [1, 0, 0, 1, 1],
+          [1, 1, 0, 3, 1],
+          [1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
+      },
+      // ステージ 8（オーストラリア）： コアラ 🐨
+      {
+        id: 7,
+        country: "🇦🇺 オーストラリア",
+        title: "🇦🇺 ステージ 8: オーストラリア（コアラ）",
+        desc: "ジグザグに進んで、ユーカリの木の上にいるコアラ🐨をめざそう！",
+        badge: "🐨 コアラの木へ",
+        gridWidth: 5,
+        gridHeight: 5,
+        goalIcon: "🐨",
+        goalName: "コアラ",
+        map: [
+          [2, 0, 1, 1, 1],
+          [1, 0, 0, 1, 1],
+          [1, 1, 0, 0, 1],
+          [1, 1, 1, 3, 1],
+          [1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
+      },
+      // ステージ 9（ブラジル）： サッカーボール ⚽
+      {
+        id: 8,
+        country: "🇧🇷 ブラジル",
+        title: "🇧🇷 ステージ 9: ブラジル（サッカーボール）",
+        desc: "広いスタジアムを駆けぬけて、サッカーボール⚽にシュート！",
+        badge: "⚽ サッカーボールへ",
+        gridWidth: 5,
+        gridHeight: 4,
+        goalIcon: "⚽",
+        goalName: "サッカーボール",
+        map: [
+          [2, 0, 0, 0, 1],
+          [1, 1, 1, 0, 1],
+          [1, 3, 0, 0, 1],
+          [1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
+      },
+      // ステージ 10（カナダ）： カエデの葉っぱ 🍁
+      {
+        id: 9,
+        country: "🇨🇦 カナダ",
+        title: "🇨🇦 ステージ 10: カナダ（カエデの葉っぱ）",
+        desc: "もみじの森の小道を進んで、きれいなカエデの葉っぱ🍁を見つけよう！",
+        badge: "🍁 カエデの森へ",
+        gridWidth: 5,
+        gridHeight: 5,
+        goalIcon: "🍁",
+        goalName: "カエデの葉っぱ",
+        map: [
+          [2, 0, 0, 1, 1],
+          [1, 1, 0, 1, 1],
+          [1, 1, 0, 0, 1],
+          [1, 1, 1, 3, 1],
+          [1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
+      },
+      // ステージ 11（インド）： カレー 🍛
+      {
+        id: 10,
         country: "🇮🇳 インド",
-        title: "🇮🇳 ステージ 12: インド・ガンジス",
-        desc: "新ブロック「❓ もし まえがカベなら」登場！センサー📡でカベを調べながら進もう！",
-        badge: "📡 センサーでカベ調べ",
+        title: "🇮🇳 ステージ 11: インド（カレー）",
+        desc: "「❓ もし まえがカベなら」登場！センサーでカベをしらべながらカレー🍛へ！",
+        badge: "🍛 カレーをめざそう",
         gridWidth: 4,
         gridHeight: 4,
-        itemIcon: "🍛",
-        itemName: "カレー",
-        itemsTotal: 1,
-        starsTotal: 1,
-        goalIcon: "🪷",
-        goalName: "ハスの花",
+        goalIcon: "🍛",
+        goalName: "カレー",
         map: [
           [2, 0, 1, 1],
-          [1, 4, 1, 1],
+          [1, 0, 1, 1],
           [1, 3, 1, 1],
           [1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right', 'repeat', 'if']
       },
-
-      // === 🇺🇸 第6章：アメリカ編 (条件分岐の活用) ===
+      // ステージ 12（ドイツ）： ソーセージ 🌭
       {
-        id: 12,
-        country: "🇺🇸 アメリカ",
-        title: "🇺🇸 ステージ 13: アメリカ・ニューヨーク",
-        desc: "摩天楼ニューヨーク！「🍔 ハンバーガー」をひろい、カベにぶつかる前に曲がろう！",
-        badge: "🗽 自由の女神へ",
+        id: 11,
+        country: "🇩🇪 ドイツ",
+        title: "🇩🇪 ステージ 12: ドイツ（ソーセージ）",
+        desc: "カベにぶつかる前に曲がって、おいしいソーセージ🌭をめざそう！",
+        badge: "🌭 ソーセージへ",
         gridWidth: 5,
         gridHeight: 4,
-        itemIcon: "🍔",
-        itemName: "ハンバーガー",
-        itemsTotal: 1,
-        starsTotal: 1,
-        goalIcon: "🗽",
-        goalName: "じゆうのめがみ",
+        goalIcon: "🌭",
+        goalName: "ソーセージ",
         map: [
           [2, 0, 0, 1, 1],
-          [1, 1, 4, 1, 1],
-          [1, 1, 3, 1, 1],
+          [1, 1, 0, 1, 1],
+          [1, 1, 0, 3, 1],
           [1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'repeat', 'if']
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
       },
+      // ステージ 13（スイス）： チーズ 🧀
+      {
+        id: 12,
+        country: "🇨🇭 スイス",
+        title: "🇨🇭 ステージ 13: スイス（チーズ）",
+        desc: "アルプスの山道。「もし まえが道なら」を活用してチーズ🧀をめざそう！",
+        badge: "🧀 スイスチーズへ",
+        gridWidth: 5,
+        gridHeight: 4,
+        goalIcon: "🧀",
+        goalName: "チーズ",
+        map: [
+          [2, 0, 1, 1, 1],
+          [1, 0, 0, 1, 1],
+          [1, 1, 0, 3, 1],
+          [1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
+      },
+      // ステージ 14（メキシコ）： タコス 🌮
       {
         id: 13,
-        country: "🇺🇸 アメリカ",
-        title: "🇺🇸 ステージ 14: アメリカ・キャニオン",
-        desc: "広大なグランドキャニオン！「❓ もし まえが道なら すすむ」をつかって谷をぬけよう！",
-        badge: "🏜️ まえが道なら",
+        country: "🇲🇽 メキシコ",
+        title: "🇲🇽 ステージ 14: メキシコ（タコス）",
+        desc: "カベをうまくよけながら進んで、タコス🌮へゴールしよう！",
+        badge: "🌮 タコスへダッシュ",
         gridWidth: 5,
-        gridHeight: 4,
-        itemIcon: "🍔",
-        itemName: "ハンバーガー",
-        itemsTotal: 2,
-        starsTotal: 2,
-        goalIcon: "🏜️",
-        goalName: "キャニオン",
+        gridHeight: 5,
+        goalIcon: "🌮",
+        goalName: "タコス",
         map: [
-          [2, 4, 0, 4, 1],
-          [1, 1, 1, 3, 1],
-          [1, 1, 1, 1, 1],
+          [2, 0, 0, 0, 1],
+          [1, 1, 1, 0, 1],
+          [1, 1, 1, 0, 1],
+          [1, 3, 0, 0, 1],
           [1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'repeat', 'if']
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
       },
-
-      // === 🇧🇷 第7章：ブラジル編 (サンバとアイテム判定) ===
+      // ステージ 15（ロシア）： マトリョーシカ 🪆
       {
         id: 14,
-        country: "🇧🇷 ブラジル",
-        title: "🇧🇷 ステージ 15: ブラジル・リオ",
-        desc: "情熱の国ブラジル！「⚽ サッカーボール」をゲットして、カーニバル会場🎉へダッシュ！",
-        badge: "⚽ サッカーボール",
+        country: "🇷🇺 ロシア",
+        title: "🇷🇺 ステージ 15: ロシア（マトリョーシカ）",
+        desc: "ぐるぐる回るうずまき迷路のまん中にあるマトリョーシカ🪆をめざそう！",
+        badge: "🪆 マトリョーシカへ",
         gridWidth: 5,
-        gridHeight: 4,
-        itemIcon: "⚽",
-        itemName: "サッカーボール",
-        itemsTotal: 1,
-        starsTotal: 1,
-        goalIcon: "🎉",
-        goalName: "カーニバル",
+        gridHeight: 5,
+        goalIcon: "🪆",
+        goalName: "マトリョーシカ",
         map: [
-          [2, 0, 1, 1, 1],
-          [1, 4, 0, 1, 1],
-          [1, 1, 0, 3, 1],
+          [2, 0, 0, 0, 0],
+          [1, 1, 1, 1, 0],
+          [1, 0, 3, 1, 0],
+          [1, 0, 0, 0, 0],
           [1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
       },
+      // ステージ 16（オランダ）： チューリップ 🌷
       {
         id: 15,
-        country: "🇧🇷 ブラジル",
-        title: "🇧🇷 ステージ 16: ブラジル・アマゾン",
-        desc: "大自然のアマゾン！ボールを2個ひろって、オウムの森🦜へ無事にたどり着こう！",
-        badge: "🦜 アマゾンの森",
-        gridWidth: 5,
-        gridHeight: 5,
-        itemIcon: "⚽",
-        itemName: "サッカーボール",
-        itemsTotal: 2,
-        starsTotal: 2,
-        goalIcon: "🦜",
-        goalName: "オウムの森",
-        map: [
-          [2, 0, 4, 1, 1],
-          [1, 1, 0, 1, 1],
-          [1, 1, 4, 0, 1],
-          [1, 1, 1, 3, 1],
-          [1, 1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
-      },
-
-      // === 🇦🇶 第8章：南極編 (極寒の氷原迷路) ===
-      {
-        id: 16,
-        country: "🇦🇶 南極",
-        title: "🇦🇶 ステージ 17: 南極・こおりの海",
-        desc: "地球の南の果て、南極！かわいい「🐧 ペンギン」と出会いながら南極観測船🚢へ！",
-        badge: "🐧 ペンギンと海",
-        gridWidth: 5,
-        gridHeight: 4,
-        itemIcon: "🐧",
-        itemName: "ペンギン",
-        itemsTotal: 1,
-        starsTotal: 1,
-        goalIcon: "🚢",
-        goalName: "かんそくせん",
-        map: [
-          [2, 0, 0, 4, 1],
-          [1, 1, 1, 0, 1],
-          [1, 1, 1, 3, 1],
-          [1, 1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
-      },
-      {
-        id: 17,
-        country: "🇦🇶 南極",
-        title: "🇦🇶 ステージ 18: 南極・オーロラ基地",
-        desc: "夜空に光るオーロラ🌌！ペンギン2匹を保護して、オーロラ観測基地へゴール！",
-        badge: "🌌 オーロラ基地",
-        gridWidth: 5,
-        gridHeight: 5,
-        itemIcon: "🐧",
-        itemName: "ペンギン",
-        itemsTotal: 2,
-        starsTotal: 2,
-        goalIcon: "🌌",
-        goalName: "オーロラ",
-        map: [
-          [2, 0, 1, 1, 1],
-          [1, 4, 0, 1, 1],
-          [1, 1, 4, 1, 1],
-          [1, 1, 0, 3, 1],
-          [1, 1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
-      },
-
-      // === 🌕/🌌 第9〜10章：宇宙編 (クライマックス！) ===
-      {
-        id: 18,
-        country: "🌕 月面",
-        title: "🌕 ステージ 19: 月面基地・クレーター",
-        desc: "ついに宇宙へ飛び立った！新ブロック「🔄 ゴールするまで くりかえす」で「🌙 月の石」をとって基地🛰️へ！",
-        badge: "🛰️ ゴールまで進む",
+        country: "🇳🇱 オランダ",
+        title: "🇳🇱 ステージ 16: オランダ（チューリップ）",
+        desc: "「🔄 ゴールするまで くりかえす」の登場！チューリップ畑🌷へ一気に進もう！",
+        badge: "🌷 チューリップ畑へ",
         gridWidth: 6,
         gridHeight: 3,
-        itemIcon: "🌙",
-        itemName: "つきのいし",
-        itemsTotal: 1,
-        starsTotal: 1,
-        goalIcon: "🛰️",
-        goalName: "ステーション",
+        goalIcon: "🌷",
+        goalName: "チューリップ",
         map: [
           [1, 1, 1, 1, 1, 1],
-          [2, 0, 4, 0, 3, 1],
+          [2, 0, 0, 0, 3, 1],
           [1, 1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 1, dir: 1 },
         availableBlocks: ['forward', 'while']
       },
+      // ステージ 17（スペイン）： 闘牛（牛） 🐂
       {
-        id: 19,
-        country: "🌌 宇宙",
-        title: "🌌 ステージ 20: 宇宙の果て・ぎんがロケット！",
-        desc: "大冒険フィナーレ！「⭐ 宇宙のクリスタル」を2つ集め、地球へ帰還するロケット🚀に乗りこもう！",
-        badge: "🚀 地球へ帰還！",
+        id: 16,
+        country: "🇪🇸 スペイン",
+        title: "🇪🇸 ステージ 17: スペイン（闘牛）",
+        desc: "「ゴールするまで」のあいだ、カベを曲がって牛🐂のところへ行こう！",
+        badge: "🐂 闘牛の広場へ",
+        gridWidth: 5,
+        gridHeight: 4,
+        goalIcon: "🐂",
+        goalName: "闘牛",
+        map: [
+          [2, 0, 0, 1, 1],
+          [1, 1, 0, 1, 1],
+          [1, 1, 3, 1, 1],
+          [1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'while', 'if']
+      },
+      // ステージ 18（南極/アイスランド）： ペンギン 🐧
+      {
+        id: 17,
+        country: "🇦🇶 南極/アイスランド",
+        title: "🇦🇶 ステージ 18: 南極/アイスランド（ペンギン）",
+        desc: "こおりの海をすいすいぬけて、ペンギン🐧に会いに行こう！",
+        badge: "🐧 ペンギンの氷原へ",
         gridWidth: 5,
         gridHeight: 5,
-        itemIcon: "⭐",
-        itemName: "クリスタル",
-        itemsTotal: 2,
-        starsTotal: 2,
+        goalIcon: "🐧",
+        goalName: "ペンギン",
+        map: [
+          [2, 0, 0, 0, 1],
+          [1, 1, 1, 0, 1],
+          [1, 0, 0, 0, 1],
+          [1, 0, 1, 1, 1],
+          [1, 3, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'while', 'if']
+      },
+      // ステージ 19（ギリシャ）： 神殿の柱 🏛️
+      {
+        id: 18,
+        country: "🇬🇷 ギリシャ",
+        title: "🇬🇷 ステージ 19: ギリシャ（神殿の柱）",
+        desc: "古代ギリシャの神殿の柱🏛️がならぶ迷路をぬけて、ゴールをめざそう！",
+        badge: "🏛️ 神殿の柱へ",
+        gridWidth: 5,
+        gridHeight: 5,
+        goalIcon: "🏛️",
+        goalName: "神殿の柱",
+        map: [
+          [2, 0, 1, 0, 1],
+          [1, 0, 1, 0, 1],
+          [1, 0, 0, 0, 1],
+          [1, 1, 1, 0, 1],
+          [1, 3, 0, 0, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'while', 'if']
+      },
+      // ステージ 20（宇宙/月）： ロケット 🚀
+      {
+        id: 19,
+        country: "🚀 宇宙/月",
+        title: "🚀 ステージ 20: 宇宙/月（ロケット）",
+        desc: "大冒険のフィナーレ！すべてのブロックを使いこなしてロケット🚀へ乗りこもう！",
+        badge: "🚀 ロケットへ出発！",
+        gridWidth: 5,
+        gridHeight: 5,
         goalIcon: "🚀",
         goalName: "ロケット",
         map: [
-          [2, 0, 0, 1, 1],
-          [1, 1, 4, 1, 1],
-          [1, 1, 0, 4, 1],
-          [1, 1, 1, 3, 1],
-          [1, 1, 1, 1, 1]
+          [2, 0, 0, 0, 1],
+          [1, 1, 1, 0, 1],
+          [1, 0, 0, 0, 1],
+          [1, 0, 1, 1, 1],
+          [1, 0, 0, 3, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if', 'while']
@@ -1818,17 +1693,11 @@
         } catch (e) {}
       },
       turn() { playTone(360, 'square', 0.06); },
-      star() {
-        playTone(587.33, 'triangle', 0.08, 0);
-        playTone(880, 'triangle', 0.12, 0.06);
-        playTone(1174.66, 'triangle', 0.2, 0.12);
-      },
       sensor() {
-        // ピピッ！というSF風探査ソナー音（高音2連パルス）
         if (!isSoundOn) return;
         initAudio();
-        playTone(987.77, 'sine', 0.06, 0);       // B5
-        playTone(1318.51, 'sine', 0.08, 0.07);   // E6
+        playTone(987.77, 'sine', 0.06, 0);
+        playTone(1318.51, 'sine', 0.08, 0.07);
       },
       bump() { playTone(120, 'sawtooth', 0.2); },
       clear() {
@@ -1843,12 +1712,11 @@
     ======================================================== */
     let currentStageIndex = 0;
     let robotPos = { x: 0, y: 0, dir: 1 };
-    let starsCollected = 0;
     let stepsCount = 0;
     let isRunning = false;
     let shouldStop = false;
     let totalExecutionSteps = 0;
-    const MAX_STEPS = 250; // 無限ループ防止リミット
+    const MAX_STEPS = 250;
 
     // DOM要素
     const stageSelect = document.getElementById('stage-select');
@@ -1857,8 +1725,6 @@
     const stageBadgeEl = document.getElementById('stage-badge');
     const statusBanner = document.getElementById('status-banner');
     const statStepsEl = document.getElementById('stat-steps');
-    const statStarsEl = document.getElementById('stat-stars');
-    const statItemLabel = document.getElementById('stat-item-label');
     const statBlocksEl = document.getElementById('stat-blocks');
     const paletteBlocksEl = document.getElementById('palette-blocks');
     const workspaceArea = document.getElementById('workspace-area');
@@ -1878,6 +1744,7 @@
 
     /* ========================================================
        4. ゼルダ風2D見下ろし迷路システム (Maze2D)
+       マスの中心に100%ピッタリ合わせる幾何学配置
     ======================================================== */
     const Maze2D = {
       gridEl: document.getElementById('maze-grid'),
@@ -1885,23 +1752,24 @@
       robotEl: document.getElementById('robot-character'),
       keyakkiImg: document.getElementById('keyakki-img'),
       dirMarker: document.getElementById('keyakki-dir-marker'),
-      cellWidth: 50,
-      cellHeight: 50,
 
-      // 4方向のけやっきー画像（正面・背面・左右）
       sprites: {
-        0: 'images/keyakki_back.png',   // 上: 後ろ姿
-        1: 'images/keyakki_right.png',  // 右: 右向き
-        2: 'images/keyakki_front.png',  // 下: 正面（笑顔）
-        3: 'images/keyakki_left.png'    // 左: 左向き
+        0: 'images/keyakki_back.png',   // 上
+        1: 'images/keyakki_right.png',  // 右
+        2: 'images/keyakki_front.png',  // 下
+        3: 'images/keyakki_left.png'    // 左
       },
 
       buildStage(stage) {
+        // robotElを一旦保護
+        if (this.robotEl.parentNode) {
+          this.robotEl.parentNode.removeChild(this.robotEl);
+        }
+
         this.gridEl.innerHTML = '';
         this.gridEl.style.gridTemplateColumns = `repeat(${stage.gridWidth}, 1fr)`;
         this.gridEl.style.gridTemplateRows = `repeat(${stage.gridHeight}, 1fr)`;
 
-        // 各マスの生成
         for (let y = 0; y < stage.gridHeight; y++) {
           for (let x = 0; x < stage.gridWidth; x++) {
             const cellType = stage.map[y][x];
@@ -1917,57 +1785,45 @@
                 cell.classList.add('start');
               } else if (cellType === 3) {
                 cell.classList.add('goal');
-                cell.innerHTML = `<span class="goal-icon-sprite" title="${stage.goalName || 'ゴール'}">${stage.goalIcon || '🏰'}</span>`;
-              } else if (cellType === 4) {
-                const item = document.createElement('div');
-                item.className = 'maze-item';
-                item.id = `item-${x}-${y}`;
-                item.innerText = stage.itemIcon || '⭐';
-                item.title = stage.itemName || 'アイテム';
-                cell.appendChild(item);
+                cell.innerHTML = `<span class="goal-icon-sprite" title="${stage.goalName}">${stage.goalIcon}</span>`;
               }
             }
             this.gridEl.appendChild(cell);
           }
         }
 
-        // セルサイズ測定と初期配置
-        setTimeout(() => {
-          this.updateCellSize();
-          this.resetKeyakki(stage.start.x, stage.start.y, stage.start.dir);
-        }, 20);
-      },
+        // robotElをgridElの直下に再配置
+        this.gridEl.appendChild(this.robotEl);
 
-      updateCellSize() {
-        const firstCell = this.gridEl.querySelector('.maze-cell');
-        if (firstCell) {
-          this.cellWidth = firstCell.offsetWidth;
-          this.cellHeight = firstCell.offsetHeight;
-        }
+        // レンダリング後の確実な中心配置（即時・次フレーム・少し後の3段階で確実化）
+        this.resetKeyakki(stage.start.x, stage.start.y, stage.start.dir);
+        requestAnimationFrame(() => {
+          this.updateRobotPosition(false);
+        });
+        setTimeout(() => {
+          this.updateRobotPosition(false);
+        }, 60);
       },
 
       resetKeyakki(x, y, dir) {
-        this.updateCellSize();
         robotPos = { x, y, dir };
         this.updateRobotPosition(false);
       },
 
+      /* けやっきーをセルの幾何学的中心に完全一致させる */
       updateRobotPosition(withJump = false) {
-        this.updateCellSize();
-        // 4方向スプライト切り替え
         this.keyakkiImg.src = this.sprites[robotPos.dir] || 'images/keyakki_front.png';
-        
-        // 向きマーカー（▲）
         this.dirMarker.className = `keyakki-dir-marker dir-${robotPos.dir}`;
 
-        // 位置（マスの中心）
-        const padding = 6; // grid padding
-        const gap = 3;     // grid gap
-        const left = padding + robotPos.x * (this.cellWidth + gap) + (this.cellWidth - this.robotEl.offsetWidth) / 2;
-        const top = padding + robotPos.y * (this.cellHeight + gap) + (this.cellHeight - this.robotEl.offsetHeight) / 2;
-
-        this.robotEl.style.left = `${left}px`;
-        this.robotEl.style.top = `${top}px`;
+        const targetCell = document.getElementById(`cell-${robotPos.x}-${robotPos.y}`);
+        if (targetCell && targetCell.offsetWidth > 0) {
+          const cellW = targetCell.offsetWidth;
+          const cellH = targetCell.offsetHeight;
+          this.robotEl.style.width = `${cellW}px`;
+          this.robotEl.style.height = `${cellH}px`;
+          this.robotEl.style.left = `${targetCell.offsetLeft}px`;
+          this.robotEl.style.top = `${targetCell.offsetTop}px`;
+        }
 
         if (withJump) {
           this.robotEl.classList.remove('keyakki-jump');
@@ -1981,17 +1837,16 @@
         robotPos.y = toY;
         robotPos.dir = dir;
         this.updateRobotPosition(true);
-        await sleep(Math.min(speedMs, 280));
+        await sleep(Math.min(speedMs, 260));
       },
 
       async turnKeyakki(toDir, speedMs) {
         robotPos.dir = toDir;
         this.updateRobotPosition(false);
-        await sleep(Math.min(speedMs, 180));
+        await sleep(Math.min(speedMs, 160));
       },
 
       async bumpAnimation() {
-        // 壁衝突時のブルブルノックバック
         this.robotEl.animate([
           { transform: 'translateX(0)' },
           { transform: 'translateX(-5px)' },
@@ -2002,62 +1857,41 @@
         await sleep(250);
       },
 
-      collectItem(x, y) {
-        const item = document.getElementById(`item-${x}-${y}`);
-        if (item) {
-          item.animate([
-            { transform: 'scale(1)', opacity: 1 },
-            { transform: 'scale(1.8) translateY(-14px)', opacity: 0 }
-          ], { duration: 280 });
-          setTimeout(() => {
-            if (item.parentNode) item.parentNode.removeChild(item);
-          }, 260);
-        }
-      },
-
-      hasItem(x, y) {
-        const item = document.getElementById(`item-${x}-${y}`);
-        return !!item;
-      },
-
-      // 📡 センサー探査エフェクト（条件分岐・while実行時の前方スキャン！）
+      /* センサー探査演出（マス中央にレーダー波を正確に照射） */
       async triggerSensorScan(targetX, targetY, dir, resultType) {
         Sound.sensor();
 
-        // 1. けやっきーの目の前から放射されるレーダービーム
-        const beam = document.createElement('div');
-        beam.className = 'sensor-beam';
-        const padding = 6, gap = 3;
-        const beamLeft = padding + robotPos.x * (this.cellWidth + gap) + (this.cellWidth - 50) / 2;
-        const beamTop = padding + robotPos.y * (this.cellHeight + gap) + (this.cellHeight - 50) / 2;
-        beam.style.left = `${beamLeft}px`;
-        beam.style.top = `${beamTop}px`;
-        this.wrapperEl.appendChild(beam);
-
-        // 2. 前方のマスの発光
+        const currentCell = document.getElementById(`cell-${robotPos.x}-${robotPos.y}`);
         const targetCell = document.getElementById(`cell-${targetX}-${targetY}`);
+
+        if (currentCell) {
+          const beam = document.createElement('div');
+          beam.className = 'sensor-beam';
+          beam.style.width = `${currentCell.offsetWidth}px`;
+          beam.style.height = `${currentCell.offsetHeight}px`;
+          beam.style.left = `${currentCell.offsetLeft}px`;
+          beam.style.top = `${currentCell.offsetTop}px`;
+          this.gridEl.appendChild(beam);
+          setTimeout(() => beam.remove(), 320);
+        }
+
         if (targetCell) {
           targetCell.classList.add('scanned-active');
         }
 
-        // 3. けやっきーの頭上にポップアップする吹き出しバッジ
         const badge = document.createElement('div');
         badge.className = 'sensor-popup-badge';
         let badgeIcon = '📡';
         let badgeText = 'しらべ中...';
         if (resultType === 'wall') { badgeIcon = '🧱'; badgeText = 'カベ！'; }
         else if (resultType === 'path') { badgeIcon = '⭕'; badgeText = '道OK！'; }
-        else if (resultType === 'item') { badgeIcon = '✨'; badgeText = 'アイテム！'; }
         else if (resultType === 'goal') { badgeIcon = '🏁'; badgeText = 'ゴール！'; }
         badge.innerHTML = `${badgeIcon} ${badgeText}`;
         this.robotEl.appendChild(badge);
 
-        // アニメーション待機（子どもが目で確認できる時間）
-        await sleep(320);
+        await sleep(300);
 
-        // クリーンアップ
-        if (beam.parentNode) beam.parentNode.removeChild(beam);
-        if (badge.parentNode) badge.parentNode.removeChild(badge);
+        badge.remove();
         if (targetCell) targetCell.classList.remove('scanned-active');
       }
     };
@@ -2088,34 +1922,23 @@
       }
 
       updatePaletteBlocks(stage.availableBlocks);
-
-      // 2Dゼルダ風迷路ステージの構築
       Maze2D.buildStage(stage);
 
-      starsCollected = 0;
       resetRobot();
       updateStats();
-      setStatus('🌱 ブロックをならべて「うごかす」ボタンをおしてね！');
+      setStatus('🌱 ブロックをならべて「うごかす！」をおしてね！');
     }
 
     function resetRobot() {
       const stage = STAGES[currentStageIndex];
       robotPos = { ...stage.start };
       stepsCount = 0;
-      starsCollected = 0;
-
-      Maze2D.buildStage(stage);
+      Maze2D.resetKeyakki(stage.start.x, stage.start.y, stage.start.dir);
       updateStats();
     }
 
     function updateStats() {
-      const stage = STAGES[currentStageIndex];
       statStepsEl.innerText = stepsCount;
-      if (statItemLabel) {
-        statItemLabel.innerHTML = `🎒 <strong>${stage.itemName || 'アイテム'}:</strong> <span id="stat-stars">${starsCollected} / ${stage.starsTotal}</span>`;
-      } else if (statStarsEl) {
-        statStarsEl.innerText = `${starsCollected} / ${stage.starsTotal}`;
-      }
       statBlocksEl.innerText = countTotalBlocks();
     }
 
@@ -2132,7 +1955,6 @@
     }
 
     function clearAllBlocks() {
-      // emptyHint以外のブロックを全削除
       const blocks = Array.from(mainStack.children).filter(el => el !== emptyHint);
       blocks.forEach(b => b.remove());
       checkEmptyHint();
@@ -2140,7 +1962,7 @@
     }
 
     /* ========================================================
-       5. パレットの段階的ブロック表示（ブロックの追加・削除）
+       6. パレットのブロック表示
     ======================================================== */
     const BLOCK_DEFS = {
       forward: {
@@ -2186,12 +2008,10 @@
         btn.innerHTML = def.html;
         btn.setAttribute('draggable', 'true');
 
-        // クリックで追加
         btn.addEventListener('click', () => {
           addBlock(def.name);
         });
 
-        // パレットからドラッグ開始
         btn.addEventListener('dragstart', (e) => {
           e.stopPropagation();
           draggedSource = { mode: 'new', type: def.name };
@@ -2203,14 +2023,13 @@
     }
 
     /* ========================================================
-       6. スクラッチ風ブロック生成 & ドラッグ＆ドロップ（密着吸着）
+       7. スクラッチ風ブロック生成 & ドラッグ＆ドロップ
     ======================================================== */
-    let draggedSource = null; // { mode: 'new', type: string } or { mode: 'move', el: Element }
+    let draggedSource = null;
     let dropIndicator = document.createElement('div');
     dropIndicator.className = 'drop-indicator';
 
     function createBlockDOM(type) {
-      // 1. くりかえし (repeat)
       if (type === 'repeat') {
         const cBlock = document.createElement('div');
         cBlock.className = 'c-block c-block-control';
@@ -2243,7 +2062,6 @@
         return cBlock;
       }
 
-      // 2. もし (if)
       if (type === 'if') {
         const cBlock = document.createElement('div');
         cBlock.className = 'c-block c-block-if';
@@ -2258,7 +2076,6 @@
               <select class="block-inline-select if-cond">
                 <option value="wall_ahead">まえがカベ🧱</option>
                 <option value="path_ahead">まえが道⬜</option>
-                <option value="star_here">いま星⭐がある</option>
               </select>
               <span>なら</span>
             </div>
@@ -2275,7 +2092,6 @@
         return cBlock;
       }
 
-      // 3. while (〜のあいだ くりかえす)
       if (type === 'while') {
         const cBlock = document.createElement('div');
         cBlock.className = 'c-block c-block-while';
@@ -2306,7 +2122,6 @@
         return cBlock;
       }
 
-      // 通常ブロック (forward, turn_right, turn_left)
       const block = document.createElement('div');
       block.className = `scratch-block ws-block ${type === 'forward' ? 'block-motion' : 'block-turn'}`;
       block.dataset.type = type;
@@ -2340,7 +2155,6 @@
     }
 
     function setupBlockInteractions(el) {
-      // 削除ボタン
       el.querySelector('.btn-delete').addEventListener('click', (e) => {
         e.stopPropagation();
         Sound.click();
@@ -2349,7 +2163,6 @@
         updateStats();
       });
 
-      // 上へボタン
       el.querySelector('.btn-up').addEventListener('click', (e) => {
         e.stopPropagation();
         Sound.click();
@@ -2359,7 +2172,6 @@
         }
       });
 
-      // 下へボタン
       el.querySelector('.btn-down').addEventListener('click', (e) => {
         e.stopPropagation();
         Sound.click();
@@ -2369,7 +2181,6 @@
         }
       });
 
-      // ドラッグイベント
       el.addEventListener('dragstart', (e) => {
         e.stopPropagation();
         draggedSource = { mode: 'move', el: el };
@@ -2385,7 +2196,6 @@
         updateStats();
       });
 
-      // C型ブロックのボディ（ドロップ受け入れ領域）
       const cBody = el.querySelector('.c-body');
       if (cBody) {
         setupStackDropTarget(cBody);
@@ -2406,7 +2216,6 @@
       emptyHint.style.display = hasBlocks ? 'none' : 'flex';
     }
 
-    // ドラッグ＆ドロップ受け入れ（スタック単位の並べ替え・挿入）
     function setupStackDropTarget(stackEl) {
       stackEl.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -2461,7 +2270,6 @@
       }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
-    // メインスタックのドロップ設定
     setupStackDropTarget(mainStack);
 
     workspaceArea.addEventListener('dragleave', (e) => {
@@ -2471,8 +2279,7 @@
     });
 
     /* ========================================================
-       7. プログラム実行エンジン (再帰的AST実行VM)
-       条件分岐、While文、くりかえしのネストを完全サポート！
+       8. プログラム実行エンジン
     ======================================================== */
     function parseStackToAST(stackContainer) {
       const nodes = [];
@@ -2514,7 +2321,6 @@
       }
     }
 
-    // 📡 条件判定ヘルパー（条件分岐・while実行時に前方センサーエフェクトを発生！）
     async function checkCondition(condType) {
       const stage = STAGES[currentStageIndex];
       const dx = [0, 1, 0, -1][robotPos.dir];
@@ -2524,21 +2330,15 @@
 
       const isWall = (nx < 0 || nx >= stage.gridWidth || ny < 0 || ny >= stage.gridHeight || stage.map[ny][nx] === 1);
       const isGoalAhead = (!isWall && stage.map[ny][nx] === 3);
-      const hasItemAhead = (!isWall && Maze2D.hasItem(nx, ny));
 
       let resultType = 'path';
       if (isWall) resultType = 'wall';
-      else if (hasItemAhead) resultType = 'item';
       else if (isGoalAhead) resultType = 'goal';
 
-      // センサー探査演出（青白レーダー波 + 前方セル発光 + 頭上バッジ + ソナー音）
       await Maze2D.triggerSensorScan(nx, ny, robotPos.dir, resultType);
 
       if (condType === 'wall_ahead') return isWall;
       if (condType === 'path_ahead') return !isWall;
-      if (condType === 'star_here') {
-        return Maze2D.hasItem(robotPos.x, robotPos.y);
-      }
       if (condType === 'not_goal') {
         return stage.map[robotPos.y][robotPos.x] !== 3;
       }
@@ -2612,7 +2412,7 @@
       setStatus('🏃 けやっきーが動いているよ...', 'running');
 
       resetRobot();
-      await sleep(200);
+      await sleep(150);
 
       const speed = parseInt(speedSelect.value, 10);
       let errorMsg = null;
@@ -2623,7 +2423,6 @@
         errorMsg = err.message;
       }
 
-      // 実行完了処理
       document.querySelectorAll('.ws-block, .c-block').forEach(b => b.classList.remove('executing'));
       btnRun.disabled = false;
       isRunning = false;
@@ -2664,17 +2463,8 @@
       stepsCount++;
       Sound.move();
 
-      // ゼルダ風2Dジャンプ移動アニメーション
       await Maze2D.moveKeyakki(nextX, nextY, robotPos.dir, speed);
       updateStats();
-
-      // アイテム取得判定
-      if (Maze2D.hasItem(nextX, nextY)) {
-        Maze2D.collectItem(nextX, nextY);
-        starsCollected++;
-        Sound.star();
-        updateStats();
-      }
 
       return { success: true };
     }
@@ -2684,13 +2474,7 @@
       const isAtGoal = (stage.map[robotPos.y][robotPos.x] === 3);
 
       if (isAtGoal) {
-        if (stage.starsTotal > 0 && starsCollected < stage.starsTotal) {
-          setStatus(`🎒 まだアイテムがのこっているよ！ぜんぶあつめてゴールしよう！ (${starsCollected}/${stage.starsTotal})`, 'error');
-          Sound.bump();
-          return;
-        }
-
-        setStatus('🎉 やったー！ゴールせいこう！！', 'success');
+        setStatus(`🎉 やったー！${stage.goalName}にゴールせいこう！！`, 'success');
         Sound.clear();
         Maze2D.robotEl.classList.add('keyakki-jump');
         triggerConfetti();
@@ -2701,7 +2485,7 @@
     }
 
     /* ========================================================
-       8. 紙吹雪演出 (Confetti)
+       9. 紙吹雪演出 (Confetti)
     ======================================================== */
     const canvas = document.getElementById('confetti-canvas');
     const ctx = canvas.getContext('2d');
@@ -2712,9 +2496,7 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', () => {
-      resizeCanvas();
-    });
+    window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
     function triggerConfetti() {
@@ -2768,19 +2550,16 @@
     }
 
     /* ========================================================
-       9. モーダル & UI操作
+       10. モーダル & UIイベント
     ======================================================== */
     function openGoalModal() {
       const stage = STAGES[currentStageIndex];
-      const starsDiv = document.getElementById('modal-stars');
-      starsDiv.innerText = '⭐⭐⭐';
-      
       const modalDesc = document.getElementById('modal-desc');
       modalDesc.innerHTML = `
-        <strong>${stage.title}</strong> をクリアできたね！<br>
-        歩いた数: <strong>${stepsCount}</strong> 歩 ／ ブロック: <strong>${countTotalBlocks()}</strong> 個
+        <strong>${stage.title}</strong> をクリアしたよ！<br>
+        あるいた数: <strong>${stepsCount}</strong> 歩 ／ 使ったブロック: <strong>${countTotalBlocks()}</strong> 個
       `;
-      
+
       if (currentStageIndex >= STAGES.length - 1) {
         btnModalNext.innerText = '🎉 全ステージクリア！はじめから';
       } else {
@@ -2797,7 +2576,6 @@
 
     btnModalNext.addEventListener('click', () => {
       goalModal.classList.remove('active');
-      // 要求仕様: 「次のステージに行くとブロックを消す」
       if (currentStageIndex >= STAGES.length - 1) {
         loadStage(0, true);
       } else {
@@ -2805,15 +2583,13 @@
       }
     });
 
-    btnRun.addEventListener('click', () => {
-      runProgram();
-    });
+    btnRun.addEventListener('click', runProgram);
 
     btnReset.addEventListener('click', () => {
       Sound.click();
       shouldStop = true;
       resetRobot();
-      setStatus('⏹️ 最初にもどしたよ！もう一度チャレンジしよう。');
+      setStatus('⏹️ 最初にもどしたよ！もう一度ためしてみよう。');
     });
 
     btnClear.addEventListener('click', () => {
@@ -2827,7 +2603,6 @@
 
     stageSelect.addEventListener('change', (e) => {
       shouldStop = true;
-      // ステージセレクトで切り替えた時もブロックを消す
       loadStage(parseInt(e.target.value, 10), true);
     });
 
@@ -2838,7 +2613,6 @@
       if (isSoundOn) Sound.click();
     });
 
-    // JavaScriptコード表示機能
     btnViewCode.addEventListener('click', () => {
       Sound.click();
       const ast = parseStackToAST(mainStack);
@@ -2868,7 +2642,6 @@
         } else if (node.type === 'if') {
           let condStr = 'keyakki.isWallAhead()';
           if (node.condition === 'path_ahead') condStr = 'keyakki.isPathAhead()';
-          if (node.condition === 'star_here') condStr = 'keyakki.hasStarHere()';
           code += `${indent}if (${condStr}) {\n`;
           code += generateJSFromAST(node.children, indent + '  ');
           code += `${indent}}\n`;
@@ -2883,12 +2656,14 @@
       return code;
     }
 
-    // 初期起動
     window.addEventListener('DOMContentLoaded', () => {
       initStageSelectOptions();
       loadStage(0, false);
-      // ステージ1の親しみやすさのために、初期ブロックとして「1マスすすむ」を1つだけ配置
       addBlock('forward');
+    });
+
+    window.addEventListener('load', () => {
+      Maze2D.updateRobotPosition(false);
     });
 
     window.addEventListener('resize', () => {
