@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>プログラミングめいろ 🤖 | ブロックでめざせゴール！</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #f0fdf4;
+      --card-bg: #ffffff;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      
+      /* ブロックの色 */
+      --block-move: #3b82f6;
+      --block-move-dark: #1d4ed8;
+      --block-turn: #f97316;
+      --block-turn-dark: #c2410c;
+      --block-repeat: #10b981;
+      --block-repeat-dark: #047857;
+      
+      --maze-wall: #334155;
+      --maze-path: #f8fafc;
+      --maze-grid: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ヘッダー */
+    header {
+      background: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      font-size: 2rem;
+      animation: bounce 2s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #0369a1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    ruby rt {
+      font-size: 0.55em;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stage-selector-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    select {
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.95rem;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 4px 10px;
+      background: white;
+      color: #0f172a;
+      cursor: pointer;
+      outline: none;
+    }
+
+    select:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-icon {
+      background: white;
+      border: 2px solid #cbd5e1;
+      border-radius: 9999px;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-icon:hover {
+      background: #f8fafc;
+      transform: translateY(-1px);
+    }
+
+    .btn-icon:active {
+      transform: translateY(1px);
+    }
+
+    /* メインコンテナ */
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 16px 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+    }
+
+    @media (max-width: 960px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 左カラム：迷路エリア */
+    .maze-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .stage-card {
+      background: white;
+      border-radius: 16px;
+      padding: 14px 18px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 2px solid #e2e8f0;
+    }
+
+    .stage-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .stage-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    .stage-goal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #fef3c7;
+      color: #92400e;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+
+    .stage-desc {
+      font-size: 0.95rem;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    /* 迷路ボード */
+    .maze-board-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 2px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .status-banner {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      text-align: center;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .status-banner.running {
+      background: #fef08a;
+      color: #854d0e;
+    }
+
+    .status-banner.success {
+      background: #bbf7d0;
+      color: #166534;
+      animation: pulse 1s infinite alternate;
+    }
+
+    .status-banner.error {
+      background: #fecaca;
+      color: #991b1b;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.02); }
+    }
+
+    .maze-wrapper {
+      position: relative;
+      background: #cbd5e1;
+      padding: 10px;
+      border-radius: 16px;
+      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+    }
+
+    .maze-grid {
+      display: grid;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .maze-cell {
+      width: 58px;
+      height: 58px;
+      box-sizing: border-box;
+      border: 1px solid #f1f5f9;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s ease;
+    }
+
+    @media (max-width: 480px) {
+      .maze-cell {
+        width: 46px;
+        height: 46px;
+      }
+    }
+
+    .maze-cell.wall {
+      background: linear-gradient(135deg, #475569 0%, #1e293b 100%);
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    }
+
+    .maze-cell.wall::after {
+      content: '🧱';
+      font-size: 1.4rem;
+      opacity: 0.6;
+    }
+
+    .maze-cell.path {
+      background: #ffffff;
+    }
+
+    .maze-cell.start::before {
+      content: '🚩';
+      font-size: 1.1rem;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      opacity: 0.5;
+    }
+
+    .maze-cell.goal {
+      background: radial-gradient(circle, #fef3c7 40%, #ffffff 80%);
+    }
+
+    .maze-cell.goal::after {
+      content: '🏰';
+      font-size: 1.9rem;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+      animation: float 2s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    /* アイテム（スター/宝石） */
+    .maze-item {
+      position: absolute;
+      font-size: 1.5rem;
+      z-index: 5;
+      animation: spin 3s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.15); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    /* ロボットキャラクター */
+    .robot-character {
+      position: absolute;
+      width: 58px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.28s ease, top 0.28s ease;
+      pointer-events: none;
+    }
+
+    @media (max-width: 480px) {
+      .robot-character {
+        width: 46px;
+        height: 46px;
+      }
+    }
+
+    .robot-body {
+      width: 44px;
+      height: 44px;
+      background: #38bdf8;
+      border: 3px solid #0369a1;
+      border-radius: 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 480px) {
+      .robot-body {
+        width: 36px;
+        height: 36px;
+      }
+    }
+
+    /* アンテナ */
+    .robot-antenna {
+      position: absolute;
+      top: -8px;
+      width: 4px;
+      height: 7px;
+      background: #0369a1;
+      border-radius: 2px;
+    }
+
+    .robot-antenna::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: -4px;
+      width: 10px;
+      height: 10px;
+      background: #f43f5e;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #f43f5e;
+    }
+
+    /* 目 */
+    .robot-face {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    .robot-eye {
+      width: 8px;
+      height: 8px;
+      background: #0f172a;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .robot-eye::after {
+      content: '';
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      width: 3px;
+      height: 3px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    /* 口（ほほえみ） */
+    .robot-mouth {
+      width: 12px;
+      height: 4px;
+      border-bottom: 2px solid #0369a1;
+      border-radius: 0 0 6px 6px;
+      margin-top: 3px;
+    }
+
+    /* 前を向いている矢印 */
+    .robot-pointer {
+      position: absolute;
+      top: 1px;
+      font-size: 0.65rem;
+      color: #ffffff;
+      font-weight: 900;
+    }
+
+    /* 迷路フッター情報 */
+    .maze-stats {
+      margin-top: 12px;
+      display: flex;
+      gap: 16px;
+      width: 100%;
+      justify-content: space-around;
+      background: #f8fafc;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-val {
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    /* 右カラム：プログラミングブロックエリア */
+    .code-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ツールパレット */
+    .palette-card {
+      background: white;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 2px solid #e2e8f0;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #334155;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .palette-blocks {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+    }
+
+    /* 共通ブロックスタイル */
+    .code-block {
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: white;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+      position: relative;
+    }
+
+    .code-block:hover {
+      filter: brightness(1.08);
+      transform: translateY(-2px);
+    }
+
+    .code-block:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .code-block.block-move {
+      background: var(--block-move);
+      border-left: 6px solid var(--block-move-dark);
+    }
+
+    .code-block.block-turn {
+      background: var(--block-turn);
+      border-left: 6px solid var(--block-turn-dark);
+    }
+
+    .code-block.block-repeat {
+      background: var(--block-repeat);
+      border-left: 6px solid var(--block-repeat-dark);
+    }
+
+    .palette-block-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      font-family: inherit;
+    }
+
+    .palette-add-icon {
+      font-size: 1.1rem;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ワークスペース（組み立てエリア） */
+    .workspace-card {
+      background: white;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 2px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 380px;
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      flex: 1;
+      min-width: 120px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 900;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+      transition: all 0.12s ease;
+    }
+
+    .btn-action:hover {
+      filter: brightness(1.06);
+      transform: translateY(-2px);
+    }
+
+    .btn-action:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-run {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-run:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-reset {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .btn-clear {
+      background: #f1f5f9;
+      color: #64748b;
+      border: 2px solid #cbd5e1;
+      box-shadow: none;
+      flex: 0 0 auto;
+      min-width: auto;
+    }
+
+    .btn-clear:hover {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+
+    /* プログラムブロックリスト */
+    .workspace-area {
+      background: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 12px;
+      flex: 1;
+      overflow-y: auto;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .workspace-empty-hint {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 180px;
+      color: #94a3b8;
+      text-align: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .empty-icon {
+      font-size: 2.5rem;
+    }
+
+    /* ワークスペース内のブロック */
+    .ws-block {
+      margin-bottom: 0;
+      position: relative;
+    }
+
+    /* 実行中ハイライト */
+    .ws-block.executing {
+      filter: brightness(1.25) saturate(1.3);
+      box-shadow: 0 0 0 4px #facc15, 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+      transform: scale(1.02);
+      z-index: 20;
+    }
+
+    .block-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .block-drag-handle {
+      cursor: grab;
+      opacity: 0.6;
+      padding-right: 4px;
+    }
+
+    .block-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-block-ctrl {
+      background: rgba(255, 255, 255, 0.25);
+      border: none;
+      color: white;
+      border-radius: 6px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 0.8rem;
+      transition: background 0.15s ease;
+    }
+
+    .btn-block-ctrl:hover {
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    .btn-block-ctrl.btn-delete:hover {
+      background: #ef4444;
+    }
+
+    /* くりかえしブロック専用 */
+    .repeat-container {
+      display: flex;
+      flex-direction: column;
+      background: #059669;
+      border-left: 6px solid var(--block-repeat-dark);
+      border-radius: 12px;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .repeat-header {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+      font-weight: 800;
+    }
+
+    .repeat-select {
+      background: white;
+      color: #047857;
+      font-weight: 900;
+      border: 2px solid white;
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 0.95rem;
+      margin: 0 4px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .repeat-body {
+      background: rgba(255, 255, 255, 0.15);
+      margin: 0 8px 8px 18px;
+      padding: 8px;
+      border-radius: 8px;
+      border-left: 4px solid #34d399;
+      min-height: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .repeat-body-hint {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 6px;
+      pointer-events: none;
+    }
+
+    /* ドラッグ中スタイル */
+    .dragging {
+      opacity: 0.4;
+    }
+
+    .drag-over {
+      border: 2px dashed #0284c7 !important;
+      background: #e0f2fe !important;
+    }
+
+    /* フッター */
+    footer {
+      background: white;
+      padding: 12px 20px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #64748b;
+      border-top: 1px solid #e2e8f0;
+      margin-top: auto;
+    }
+
+    /* モーダル */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      max-width: 480px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+      transform: scale(0.9);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-icon {
+      font-size: 4rem;
+      margin-bottom: 12px;
+      animation: tada 1s ease-in-out;
+    }
+
+    @keyframes tada {
+      0% { transform: scale(1); }
+      10%, 20% { transform: scale(0.9) rotate(-3deg); }
+      30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+      40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+
+    .modal-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 1rem;
+      color: #475569;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .modal-stars {
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+      letter-spacing: 4px;
+    }
+
+    .modal-btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-modal {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .btn-modal:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-modal-primary {
+      background: #10b981;
+      color: white;
+      box-shadow: 0 4px 0 #047857;
+    }
+
+    .btn-modal-secondary {
+      background: #e2e8f0;
+      color: #475569;
+    }
+
+    /* コード閲覧モーダル */
+    .code-view-box {
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 14px;
+      border-radius: 12px;
+      text-align: left;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      max-height: 220px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+      white-space: pre-wrap;
+    }
+
+    /* 紙吹雪 Canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 99;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ヘッダー -->
+  <header>
+    <div class="logo-area">
+      <div class="logo-icon">🤖</div>
+      <div>
+        <h1>
+          <ruby>文法<rt>ぶんぽう</rt></ruby>ブロックで<ruby>迷路<rt>めいろ</rt></ruby>をクリア！
+        </h1>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <div class="stage-selector-wrap">
+        <span>ステージ:</span>
+        <select id="stage-select">
+          <option value="0">1. まっすぐ すすもう！</option>
+          <option value="1">2. みぎに まがろう！</option>
+          <option value="2">3. ジグザグ みち！</option>
+          <option value="3">4. くりかえし で いこう！</option>
+          <option value="4">5. スターあつめ だいぼうけん！</option>
+        </select>
+      </div>
+
+      <button id="btn-sound-toggle" class="btn-icon" title="おと ON/OFF">
+        🔊 <span>おと: ON</span>
+      </button>
+
+      <button id="btn-view-code" class="btn-icon" title="JavaScriptコードをみる">
+        💻 <span>コードをみる</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="app-container">
+    <!-- 左側：めいろ画面 -->
+    <section class="maze-column">
+      <!-- ステージ情報カード -->
+      <div class="stage-card">
+        <div class="stage-title-row">
+          <div class="stage-title" id="stage-title">ステージ 1: まっすぐ すすもう！</div>
+          <div class="stage-goal-badge" id="stage-badge">🚩 ゴールをめざそう</div>
+        </div>
+        <div class="stage-desc" id="stage-desc">
+          「1マスすすむ」ブロックをならべて、ロボットをお城🏰のゴールまでつれていこう！
+        </div>
+      </div>
+
+      <!-- 迷路ボード -->
+      <div class="maze-board-card">
+        <div class="status-banner" id="status-banner">
+          🤖 ブロックをならべて「うごかす」ボタンをおしてね！
+        </div>
+
+        <div class="maze-wrapper">
+          <div class="maze-grid" id="maze-grid"></div>
+          <!-- ロボット -->
+          <div class="robot-character" id="robot">
+            <div class="robot-body">
+              <div class="robot-antenna"></div>
+              <div class="robot-face">
+                <div class="robot-eye"></div>
+                <div class="robot-eye"></div>
+              </div>
+              <div class="robot-mouth"></div>
+              <div class="robot-pointer">▲</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="maze-stats">
+          <div class="stat-item">
+            <span>歩いたかず:</span>
+            <span class="stat-val" id="stat-steps">0</span> 歩
+          </div>
+          <div class="stat-item">
+            <span>⭐ スター:</span>
+            <span class="stat-val" id="stat-stars">0 / 0</span>
+          </div>
+          <div class="stat-item">
+            <span>ブロック数:</span>
+            <span class="stat-val" id="stat-blocks">0</span> 個
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右側：ブロックプログラミング -->
+    <section class="code-column">
+      <!-- ブロックパレット -->
+      <div class="palette-card">
+        <div class="section-title">
+          <span>🧩 つかえるブロック</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">クリックで追加できます</span>
+        </div>
+        <div class="palette-blocks">
+          <button class="code-block block-move palette-block-btn" data-type="forward">
+            <span>⬆️ 1マス すすむ</span>
+            <span class="palette-add-icon">＋</span>
+          </button>
+          <button class="code-block block-turn palette-block-btn" data-type="turn_right">
+            <span>↪️ みぎを むく</span>
+            <span class="palette-add-icon">＋</span>
+          </button>
+          <button class="code-block block-turn palette-block-btn" data-type="turn_left">
+            <span>↩️ ひだりを むく</span>
+            <span class="palette-add-icon">＋</span>
+          </button>
+          <button class="code-block block-repeat palette-block-btn" data-type="repeat">
+            <span>🔁 くりかえす</span>
+            <span class="palette-add-icon">＋</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- プログラム組み立てエリア -->
+      <div class="workspace-card">
+        <div class="section-title">
+          <span>📜 プログラム</span>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #64748b;">
+              スピード:
+              <select id="speed-select" style="font-size: 0.8rem; padding: 2px 6px;">
+                <option value="600">ゆっくり</option>
+                <option value="360" selected>ふつう</option>
+                <option value="180">はやい</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button id="btn-run" class="btn-action btn-run">
+            ▶️ <ruby>動<rt>うご</rt></ruby>かす！
+          </button>
+          <button id="btn-reset" class="btn-action btn-reset">
+            ⏹️ <ruby>元<rt>もと</rt></ruby>にもどす
+          </button>
+          <button id="btn-clear" class="btn-action btn-clear" title="ぜんぶ消す">
+            🗑️ ぜんぶけす
+          </button>
+        </div>
+
+        <!-- ブロック配置エリア -->
+        <div class="workspace-area" id="workspace-area">
+          <div class="workspace-empty-hint" id="empty-hint">
+            <div class="empty-icon">👆</div>
+            <div>上のブロックをクリックして<br>プログラムを作ってみよう！</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    小学生向けプログラミング教材 (MVP) — 楽しみながら「順次処理」「繰り返し」をマスターしよう！
+  </footer>
+
+  <!-- ゴールおめでとうモーダル -->
+  <div class="modal-overlay" id="goal-modal">
+    <div class="modal-card">
+      <div class="modal-icon">🎉</div>
+      <h2 class="modal-title">ゴールおめでとう！</h2>
+      <div class="modal-stars" id="modal-stars">⭐⭐⭐</div>
+      <p class="modal-desc" id="modal-desc">
+        すばらしい！迷路をクリアできたね！<br>
+        プログラミングの才能バツグンです！
+      </p>
+      <div class="modal-btn-row">
+        <button class="btn-modal btn-modal-secondary" id="btn-modal-replay">もういちど</button>
+        <button class="btn-modal btn-modal-primary" id="btn-modal-next">つぎのステージへ ➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- コード表示モーダル -->
+  <div class="modal-overlay" id="code-modal">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-icon">💻</div>
+      <h2 class="modal-title">JavaScriptコード</h2>
+      <p class="modal-desc" style="margin-bottom: 10px;">
+        ブロックはプログラミング言語（JavaScript）でこう書かれているよ！
+      </p>
+      <div class="code-view-box" id="code-view-text">// ここにコードが表示されます</div>
+      <div class="modal-btn-row">
+        <button class="btn-modal btn-modal-primary" id="btn-close-code">とじる</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========================================================
+       1. ステージ定義
+       0: 道 (Path)
+       1: 壁 (Wall)
+       2: スタート (Start)
+       3: ゴール (Goal)
+       4: スター (Star/Gem)
+       robot.dir: 0: 上(North), 1: 右(East), 2: 下(South), 3: 左(West)
+    ======================================================== */
+    const STAGES = [
+      {
+        id: 0,
+        title: "ステージ 1: まっすぐ すすもう！",
+        desc: "「1マスすすむ」ブロックをならべて、ゴールのお城🏰をめざそう！",
+        badge: "🚩 順次処理（じゅんじしょり）",
+        gridWidth: 5,
+        gridHeight: 3,
+        map: [
+          [1, 1, 1, 1, 1],
+          [2, 0, 0, 0, 3],
+          [1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 1, dir: 1 }, // 右向き
+        starsTotal: 0
+      },
+      {
+        id: 1,
+        title: "ステージ 2: みぎに まがろう！",
+        desc: "まがり角（かど）にきたら「みぎをむく」をつかって方向をかえよう！",
+        badge: "↪️ 方向転換（ほうこうてんかん）",
+        gridWidth: 4,
+        gridHeight: 4,
+        map: [
+          [2, 0, 0, 1],
+          [1, 1, 0, 1],
+          [1, 1, 0, 1],
+          [1, 1, 3, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 }, // 右向き
+        starsTotal: 0
+      },
+      {
+        id: 2,
+        title: "ステージ 3: ジグザグ みち！",
+        desc: "「ひだりをむく」「みぎをむく」をうまくつかって、星⭐をとりながらゴールへ！",
+        badge: "⭐ アイテムゲット",
+        gridWidth: 5,
+        gridHeight: 5,
+        map: [
+          [2, 0, 1, 1, 1],
+          [1, 0, 4, 0, 1],
+          [1, 1, 1, 0, 1],
+          [1, 4, 0, 0, 1],
+          [1, 1, 1, 3, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 }, // 右向き
+        starsTotal: 2
+      },
+      {
+        id: 3,
+        title: "ステージ 4: くりかえし で いこう！",
+        desc: "「すすむ」「まがる」がおなじパターン！「🔁 くりかえす」ブロックを使うと短いプログラムでクリアできるよ！",
+        badge: "🔁 ループ処理（くりかえし）",
+        gridWidth: 5,
+        gridHeight: 5,
+        map: [
+          [2, 0, 1, 1, 1],
+          [1, 0, 0, 1, 1],
+          [1, 1, 0, 0, 1],
+          [1, 1, 1, 0, 3],
+          [1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 }, // 右向き
+        starsTotal: 0
+      },
+      {
+        id: 4,
+        title: "ステージ 5: スターあつめ だいぼうけん！",
+        desc: "迷路のなかのすべての星⭐をあつめてからゴールのお城へいこう！",
+        badge: "🏆 応用（おうよう）チャレンジ",
+        gridWidth: 6,
+        gridHeight: 6,
+        map: [
+          [2, 0, 4, 1, 1, 1],
+          [1, 1, 0, 0, 4, 1],
+          [1, 4, 0, 1, 0, 1],
+          [1, 1, 0, 1, 0, 1],
+          [1, 1, 0, 0, 0, 3],
+          [1, 1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 }, // 右向き
+        starsTotal: 3
+      }
+    ];
+
+    /* ========================================================
+       2. サウンドエンジン (Web Audio API)
+    ======================================================== */
+    let audioCtx = null;
+    let isSoundOn = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.1, delay = 0) {
+      if (!isSoundOn) return;
+      initAudio();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + delay + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime + delay);
+      osc.stop(audioCtx.currentTime + delay + duration);
+    }
+
+    const Sound = {
+      click() { playTone(440, 'triangle', 0.05); },
+      move() {
+        if (!isSoundOn) return;
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(260, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(520, audioCtx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      },
+      turn() {
+        playTone(330, 'square', 0.08);
+      },
+      star() {
+        if (!isSoundOn) return;
+        playTone(587.33, 'triangle', 0.1, 0);     // D5
+        playTone(880, 'triangle', 0.15, 0.08);    // A5
+        playTone(1174.66, 'triangle', 0.25, 0.16);// D6
+      },
+      bump() {
+        if (!isSoundOn) return;
+        playTone(130, 'sawtooth', 0.25);
+      },
+      clear() {
+        if (!isSoundOn) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C E G C
+        notes.forEach((freq, idx) => {
+          playTone(freq, 'triangle', 0.22, idx * 0.1);
+        });
+      }
+    };
+
+    /* ========================================================
+       3. ゲーム状態
+    ======================================================== */
+    let currentStageIndex = 0;
+    let robotPos = { x: 0, y: 0, dir: 1 };
+    let starsCollected = 0;
+    let starsPositions = []; // {x, y}
+    let stepsCount = 0;
+    let isRunning = false;
+    let shouldStop = false;
+
+    // DOM要素
+    const mazeGridEl = document.getElementById('maze-grid');
+    const robotEl = document.getElementById('robot');
+    const stageSelect = document.getElementById('stage-select');
+    const stageTitleEl = document.getElementById('stage-title');
+    const stageDescEl = document.getElementById('stage-desc');
+    const stageBadgeEl = document.getElementById('stage-badge');
+    const statusBanner = document.getElementById('status-banner');
+    const statStepsEl = document.getElementById('stat-steps');
+    const statStarsEl = document.getElementById('stat-stars');
+    const statBlocksEl = document.getElementById('stat-blocks');
+    const workspaceArea = document.getElementById('workspace-area');
+    const emptyHint = document.getElementById('empty-hint');
+    const btnRun = document.getElementById('btn-run');
+    const btnReset = document.getElementById('btn-reset');
+    const btnClear = document.getElementById('btn-clear');
+    const speedSelect = document.getElementById('speed-select');
+    const btnSoundToggle = document.getElementById('btn-sound-toggle');
+    const btnViewCode = document.getElementById('btn-view-code');
+    const goalModal = document.getElementById('goal-modal');
+    const codeModal = document.getElementById('code-modal');
+    const btnCloseCode = document.getElementById('btn-close-code');
+    const btnModalNext = document.getElementById('btn-modal-next');
+    const btnModalReplay = document.getElementById('btn-modal-replay');
+
+    /* ========================================================
+       4. 迷路の描画と初期化
+    ======================================================== */
+    function loadStage(index) {
+      currentStageIndex = index;
+      const stage = STAGES[index];
+      stageTitleEl.innerText = stage.title;
+      stageDescEl.innerText = stage.desc;
+      stageBadgeEl.innerText = stage.badge;
+      stageSelect.value = index;
+
+      // グリッド初期化
+      mazeGridEl.innerHTML = '';
+      mazeGridEl.style.gridTemplateColumns = `repeat(${stage.gridWidth}, 1fr)`;
+
+      starsPositions = [];
+      starsCollected = 0;
+
+      for (let y = 0; y < stage.gridHeight; y++) {
+        for (let x = 0; x < stage.gridWidth; x++) {
+          const cellType = stage.map[y][x];
+          const cell = document.createElement('div');
+          cell.className = 'maze-cell';
+          cell.dataset.x = x;
+          cell.dataset.y = y;
+
+          if (cellType === 1) {
+            cell.classList.add('wall');
+          } else {
+            cell.classList.add('path');
+            if (cellType === 2) cell.classList.add('start');
+            if (cellType === 3) cell.classList.add('goal');
+            if (cellType === 4) {
+              const item = document.createElement('div');
+              item.className = 'maze-item';
+              item.id = `star-${x}-${y}`;
+              item.innerText = '⭐';
+              cell.appendChild(item);
+              starsPositions.push({ x, y });
+            }
+          }
+          mazeGridEl.appendChild(cell);
+        }
+      }
+
+      resetRobot();
+      updateStats();
+      setStatus('🤖 ブロックをならべて「うごかす」ボタンをおしてね！');
+    }
+
+    function resetRobot() {
+      const stage = STAGES[currentStageIndex];
+      robotPos = { ...stage.start };
+      stepsCount = 0;
+      starsCollected = 0;
+
+      // 星の表示を復活
+      starsPositions.forEach(p => {
+        const item = document.getElementById(`star-${p.x}-${p.y}`);
+        if (item) item.style.display = 'block';
+      });
+
+      updateRobotDOM();
+      updateStats();
+    }
+
+    function updateRobotDOM() {
+      // セルのサイズを計算
+      const firstCell = mazeGridEl.querySelector('.maze-cell');
+      if (!firstCell) return;
+      const cellWidth = firstCell.offsetWidth;
+      const cellHeight = firstCell.offsetHeight;
+
+      // 迷路内の相対位置
+      const left = robotPos.x * cellWidth + (cellWidth - robotEl.offsetWidth) / 2;
+      const top = robotPos.y * cellHeight + (cellHeight - robotEl.offsetHeight) / 2;
+      
+      robotEl.style.left = `${left}px`;
+      robotEl.style.top = `${top}px`;
+
+      // 向き：0: 上(0deg), 1: 右(90deg), 2: 下(180deg), 3: 左(270deg)
+      const deg = robotPos.dir * 90;
+      robotEl.style.transform = `rotate(${deg}deg)`;
+    }
+
+    function updateStats() {
+      const stage = STAGES[currentStageIndex];
+      statStepsEl.innerText = stepsCount;
+      statStarsEl.innerText = `${starsCollected} / ${stage.starsTotal}`;
+      statBlocksEl.innerText = countTotalBlocks();
+    }
+
+    function countTotalBlocks() {
+      return workspaceArea.querySelectorAll('.code-block').length;
+    }
+
+    function setStatus(text, type = 'normal') {
+      statusBanner.className = 'status-banner';
+      if (type === 'running') statusBanner.classList.add('running');
+      if (type === 'success') statusBanner.classList.add('success');
+      if (type === 'error') statusBanner.classList.add('error');
+      statusBanner.innerText = text;
+    }
+
+    /* ========================================================
+       5. ブロックの作成とワークスペース管理
+    ======================================================== */
+    function createBlockElement(type) {
+      if (type === 'repeat') {
+        const container = document.createElement('div');
+        container.className = 'repeat-container code-block block-repeat ws-block';
+        container.dataset.type = 'repeat';
+        container.setAttribute('draggable', 'true');
+
+        container.innerHTML = `
+          <div class="repeat-header">
+            <div class="block-content">
+              <span class="block-drag-handle">☰</span>
+              <span>🔁</span>
+              <select class="repeat-select">
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+              <span>かい くりかえす</span>
+            </div>
+            <div class="block-actions">
+              <button class="btn-block-ctrl btn-up" title="上へ">▲</button>
+              <button class="btn-block-ctrl btn-down" title="下へ">▼</button>
+              <button class="btn-block-ctrl btn-delete" title="削除">✕</button>
+            </div>
+          </div>
+          <div class="repeat-body">
+            <div class="repeat-body-hint">ここにブロックを入れてね</div>
+          </div>
+        `;
+        setupBlockEvents(container);
+        return container;
+      }
+
+      // 通常ブロック (forward, turn_right, turn_left)
+      const block = document.createElement('div');
+      block.className = `code-block ws-block ${type === 'forward' ? 'block-move' : 'block-turn'}`;
+      block.dataset.type = type;
+      block.setAttribute('draggable', 'true');
+
+      let icon = '⬆️';
+      let label = '1マス すすむ';
+      if (type === 'turn_right') {
+        icon = '↪️';
+        label = 'みぎを むく';
+      } else if (type === 'turn_left') {
+        icon = '↩️';
+        label = 'ひだりを むく';
+      }
+
+      block.innerHTML = `
+        <div class="block-content">
+          <span class="block-drag-handle">☰</span>
+          <span>${icon}</span>
+          <span>${label}</span>
+        </div>
+        <div class="block-actions">
+          <button class="btn-block-ctrl btn-up" title="上へ">▲</button>
+          <button class="btn-block-ctrl btn-down" title="下へ">▼</button>
+          <button class="btn-block-ctrl btn-delete" title="削除">✕</button>
+        </div>
+      `;
+
+      setupBlockEvents(block);
+      return block;
+    }
+
+    function setupBlockEvents(el) {
+      // 削除ボタン
+      el.querySelector('.btn-delete').addEventListener('click', (e) => {
+        e.stopPropagation();
+        Sound.click();
+        el.remove();
+        checkEmptyHint();
+        updateStats();
+      });
+
+      // 上へ移動ボタン
+      el.querySelector('.btn-up').addEventListener('click', (e) => {
+        e.stopPropagation();
+        Sound.click();
+        const prev = el.previousElementSibling;
+        if (prev && prev !== emptyHint) {
+          el.parentNode.insertBefore(el, prev);
+        }
+      });
+
+      // 下へ移動ボタン
+      el.querySelector('.btn-down').addEventListener('click', (e) => {
+        e.stopPropagation();
+        Sound.click();
+        const next = el.nextElementSibling;
+        if (next) {
+          el.parentNode.insertBefore(next, el);
+        }
+      });
+
+      // ドラッグ＆ドロップイベント
+      el.addEventListener('dragstart', (e) => {
+        e.stopPropagation();
+        el.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', 'reorder');
+      });
+
+      el.addEventListener('dragend', (e) => {
+        e.stopPropagation();
+        el.classList.remove('dragging');
+      });
+
+      // リピートボディ内の処理
+      const repeatBody = el.querySelector('.repeat-body');
+      if (repeatBody) {
+        repeatBody.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          repeatBody.classList.add('drag-over');
+        });
+        repeatBody.addEventListener('dragleave', (e) => {
+          e.stopPropagation();
+          repeatBody.classList.remove('drag-over');
+        });
+        repeatBody.addEventListener('drop', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          repeatBody.classList.remove('drag-over');
+          const draggingEl = document.querySelector('.dragging');
+          if (draggingEl && draggingEl !== el && !draggingEl.contains(el)) {
+            repeatBody.appendChild(draggingEl);
+            const hint = repeatBody.querySelector('.repeat-body-hint');
+            if (hint) hint.style.display = 'none';
+          }
+        });
+      }
+    }
+
+    function addBlockToWorkspace(type, targetContainer = workspaceArea) {
+      Sound.click();
+      const newBlock = createBlockElement(type);
+      targetContainer.appendChild(newBlock);
+      checkEmptyHint();
+      updateStats();
+      // スクロールを末尾へ
+      workspaceArea.scrollTop = workspaceArea.scrollHeight;
+    }
+
+    function checkEmptyHint() {
+      const hasBlocks = workspaceArea.querySelectorAll('.code-block').length > 0;
+      emptyHint.style.display = hasBlocks ? 'none' : 'flex';
+    }
+
+    // パレットブロックのクリックイベント
+    document.querySelectorAll('.palette-block-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.type;
+        addBlockToWorkspace(type);
+      });
+    });
+
+    // ワークスペース自体のドラッグオーバー・ドロップ
+    workspaceArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      workspaceArea.classList.add('drag-over');
+    });
+
+    workspaceArea.addEventListener('dragleave', () => {
+      workspaceArea.classList.remove('drag-over');
+    });
+
+    workspaceArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      workspaceArea.classList.remove('drag-over');
+      const draggingEl = document.querySelector('.dragging');
+      if (draggingEl) {
+        workspaceArea.appendChild(draggingEl);
+        checkEmptyHint();
+      }
+    });
+
+    /* ========================================================
+       6. プログラムの実行エンジン
+    ======================================================== */
+    // ワークスペースのDOMをフラットな実行命令列にコンパイル
+    function compileInstructions(container) {
+      const instructions = [];
+      const blocks = Array.from(container.children).filter(el => el.classList.contains('code-block'));
+
+      for (const block of blocks) {
+        const type = block.dataset.type;
+        if (type === 'forward' || type === 'turn_right' || type === 'turn_left') {
+          instructions.push({ type, element: block });
+        } else if (type === 'repeat') {
+          const countSelect = block.querySelector('.repeat-select');
+          const count = parseInt(countSelect.value, 10) || 2;
+          const body = block.querySelector('.repeat-body');
+          const childInstructions = compileInstructions(body);
+
+          for (let i = 0; i < count; i++) {
+            instructions.push({ type: 'repeat-tick', element: block, iteration: i + 1, total: count });
+            for (const child of childInstructions) {
+              instructions.push(child);
+            }
+          }
+        }
+      }
+      return instructions;
+    }
+
+    const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+
+    async function runProgram() {
+      if (isRunning) return;
+      initAudio();
+
+      const instructions = compileInstructions(workspaceArea);
+      if (instructions.length === 0) {
+        setStatus('⚠️ ブロックがまだ並んでいないよ！ブロックを追加してね。', 'error');
+        return;
+      }
+
+      isRunning = true;
+      shouldStop = false;
+      btnRun.disabled = true;
+      setStatus('🏃 ロボットが動いているよ...', 'running');
+
+      // 最初にロボットの位置をリセット
+      resetRobot();
+      await sleep(300);
+
+      const stage = STAGES[currentStageIndex];
+      let hasError = false;
+      const speed = parseInt(speedSelect.value, 10);
+
+      for (let i = 0; i < instructions.length; i++) {
+        if (shouldStop) break;
+
+        const cmd = instructions[i];
+
+        // ハイライト
+        document.querySelectorAll('.ws-block').forEach(b => b.classList.remove('executing'));
+        if (cmd.element) {
+          cmd.element.classList.add('executing');
+          cmd.element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // 命令実行
+        if (cmd.type === 'forward') {
+          const res = executeMove();
+          if (!res.success) {
+            hasError = true;
+            setStatus(`💥 ${res.message}`, 'error');
+            break;
+          }
+        } else if (cmd.type === 'turn_right') {
+          robotPos.dir = (robotPos.dir + 1) % 4;
+          Sound.turn();
+          updateRobotDOM();
+        } else if (cmd.type === 'turn_left') {
+          robotPos.dir = (robotPos.dir + 3) % 4;
+          Sound.turn();
+          updateRobotDOM();
+        } else if (cmd.type === 'repeat-tick') {
+          // ループのターン合図
+        }
+
+        await sleep(speed);
+      }
+
+      // 実行完了処理
+      document.querySelectorAll('.ws-block').forEach(b => b.classList.remove('executing'));
+      btnRun.disabled = false;
+      isRunning = false;
+
+      if (shouldStop) {
+        setStatus('⏹️ うごくのをストップしたよ。');
+        return;
+      }
+
+      if (!hasError) {
+        checkGoalCondition();
+      }
+    }
+
+    function executeMove() {
+      const stage = STAGES[currentStageIndex];
+      // 向き: 0: 上, 1: 右, 2: 下, 3: 左
+      const dx = [0, 1, 0, -1][robotPos.dir];
+      const dy = [-1, 0, 1, 0][robotPos.dir];
+
+      const nextX = robotPos.x + dx;
+      const nextY = robotPos.y + dy;
+
+      // 画面外判定
+      if (nextX < 0 || nextX >= stage.gridWidth || nextY < 0 || nextY >= stage.gridHeight) {
+        Sound.bump();
+        return { success: false, message: '迷路の外にとびだしちゃった！' };
+      }
+
+      // 壁判定
+      if (stage.map[nextY][nextX] === 1) {
+        Sound.bump();
+        return { success: false, message: '壁（🧱）にぶつかっちゃった！もう一度ためしてみよう！' };
+      }
+
+      // 前進
+      robotPos.x = nextX;
+      robotPos.y = nextY;
+      stepsCount++;
+      Sound.move();
+      updateRobotDOM();
+      updateStats();
+
+      // 星（⭐）取得チェック
+      const starIdx = starsPositions.findIndex(p => p.x === nextX && p.y === nextY);
+      if (starIdx !== -1) {
+        const item = document.getElementById(`star-${nextX}-${nextY}`);
+        if (item && item.style.display !== 'none') {
+          item.style.display = 'none';
+          starsCollected++;
+          Sound.star();
+          updateStats();
+        }
+      }
+
+      return { success: true };
+    }
+
+    function checkGoalCondition() {
+      const stage = STAGES[currentStageIndex];
+      const isAtGoal = (stage.map[robotPos.y][robotPos.x] === 3);
+
+      if (isAtGoal) {
+        // すべての星を集めたか
+        if (stage.starsTotal > 0 && starsCollected < stage.starsTotal) {
+          setStatus(`⭐ まだ星がのこっているよ！すべての星をとってゴールしよう！ (${starsCollected}/${stage.starsTotal})`, 'error');
+          Sound.bump();
+          return;
+        }
+
+        // ゴール成功！
+        setStatus('🎉 やったー！ゴールせいこう！！', 'success');
+        Sound.clear();
+        triggerConfetti();
+        openGoalModal();
+      } else {
+        setStatus('🤔 ゴールにとどかなかったよ。ブロックをふやしてみよう！', 'error');
+      }
+    }
+
+    /* ========================================================
+       7. 紙吹雪演出 (Confetti)
+    ======================================================== */
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let confettiParticles = [];
+    let confettiAnimationId = null;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      updateRobotDOM();
+    });
+    resizeCanvas();
+
+    function triggerConfetti() {
+      const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+      confettiParticles = [];
+      for (let i = 0; i < 90; i++) {
+        confettiParticles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          w: Math.random() * 10 + 6,
+          h: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 16,
+          vy: (Math.random() - 0.8) * 16,
+          rot: Math.random() * 360,
+          vRot: (Math.random() - 0.5) * 10,
+          opacity: 1
+        });
+      }
+      if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      confettiParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.35; // 重力
+        p.rot += p.vRot;
+        p.opacity -= 0.008;
+
+        if (p.opacity > 0) {
+          alive = true;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.opacity);
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rot * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        }
+      });
+
+      if (alive) {
+        confettiAnimationId = requestAnimationFrame(animateConfetti);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    /* ========================================================
+       8. モーダルと各種UIアクション
+    ======================================================== */
+    function openGoalModal() {
+      const stage = STAGES[currentStageIndex];
+      const starsDiv = document.getElementById('modal-stars');
+      starsDiv.innerText = '⭐⭐⭐';
+      
+      const modalDesc = document.getElementById('modal-desc');
+      modalDesc.innerHTML = `
+        <strong>${stage.title}</strong> をクリアできたね！<br>
+        歩いた数: <strong>${stepsCount}</strong> 歩 ／ ブロック: <strong>${countTotalBlocks()}</strong> 個
+      `;
+      
+      // 次のステージボタン
+      if (currentStageIndex >= STAGES.length - 1) {
+        btnModalNext.innerText = 'ぜんぶクリア！はじめから';
+      } else {
+        btnModalNext.innerText = 'つぎのステージへ ➡️';
+      }
+
+      goalModal.classList.add('active');
+    }
+
+    btnModalReplay.addEventListener('click', () => {
+      goalModal.classList.remove('active');
+      resetRobot();
+    });
+
+    btnModalNext.addEventListener('click', () => {
+      goalModal.classList.remove('active');
+      if (currentStageIndex >= STAGES.length - 1) {
+        loadStage(0);
+      } else {
+        loadStage(currentStageIndex + 1);
+      }
+    });
+
+    // 実行ボタン
+    btnRun.addEventListener('click', () => {
+      runProgram();
+    });
+
+    // リセットボタン
+    btnReset.addEventListener('click', () => {
+      Sound.click();
+      shouldStop = true;
+      resetRobot();
+      setStatus('⏹️ 最初にもどしたよ！もう一度チャレンジしよう。');
+    });
+
+    // ぜんぶ消すボタン
+    btnClear.addEventListener('click', () => {
+      if (confirm('プログラムをぜんぶ消してもいいですか？')) {
+        Sound.click();
+        shouldStop = true;
+        workspaceArea.innerHTML = '';
+        workspaceArea.appendChild(emptyHint);
+        checkEmptyHint();
+        resetRobot();
+        updateStats();
+      }
+    });
+
+    // ステージ切り替え
+    stageSelect.addEventListener('change', (e) => {
+      shouldStop = true;
+      loadStage(parseInt(e.target.value, 10));
+    });
+
+    // サウンド切り替え
+    btnSoundToggle.addEventListener('click', () => {
+      isSoundOn = !isSoundOn;
+      btnSoundToggle.querySelector('span').innerText = isSoundOn ? 'おと: ON' : 'おと: OFF';
+      btnSoundToggle.style.color = isSoundOn ? 'inherit' : '#94a3b8';
+      if (isSoundOn) Sound.click();
+    });
+
+    // コード表示モーダル
+    btnViewCode.addEventListener('click', () => {
+      Sound.click();
+      const code = generateJavaScriptCode(workspaceArea);
+      document.getElementById('code-view-text').innerText = code;
+      codeModal.classList.add('active');
+    });
+
+    btnCloseCode.addEventListener('click', () => {
+      codeModal.classList.remove('active');
+    });
+
+    function generateJavaScriptCode(container, indent = '') {
+      let code = '';
+      const blocks = Array.from(container.children).filter(el => el.classList.contains('code-block'));
+
+      if (blocks.length === 0) {
+        return '// まだブロックがありません';
+      }
+
+      for (const block of blocks) {
+        const type = block.dataset.type;
+        if (type === 'forward') {
+          code += `${indent}robot.move(); // 1マスすすむ\n`;
+        } else if (type === 'turn_right') {
+          code += `${indent}robot.turnRight(); // みぎをむく\n`;
+        } else if (type === 'turn_left') {
+          code += `${indent}robot.turnLeft(); // ひだりをむく\n`;
+        } else if (type === 'repeat') {
+          const count = block.querySelector('.repeat-select').value;
+          const body = block.querySelector('.repeat-body');
+          code += `${indent}for (let i = 0; i < ${count}; i++) {\n`;
+          code += generateJavaScriptCode(body, indent + '  ');
+          code += `${indent}}\n`;
+        }
+      }
+      return code;
+    }
+
+    // 初期化ロード
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStage(0);
+      // 初期の親しみやすさのために、ステージ1用のサンプルブロックを1つ置いてあげる
+      addBlockToWorkspace('forward');
+    });
+  </script>
+</body>
+</html>
