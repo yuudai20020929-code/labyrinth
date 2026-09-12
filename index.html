@@ -1727,7 +1727,7 @@
         country: "🇮🇳 インド",
         theme: "india",
         title: "🇮🇳 ステージ 11: インド（カレー）",
-        desc: "「❓ もし まえがカベなら」登場！センサーでカベをしらべながらカレー🍛へ！",
+        desc: "「❓ もし まえがカベなら」登場！「🔄 くりかえす」と組み合わせてカレー🍛へ！",
         badge: "🍛 カレーをめざそう",
         gridWidth: 4,
         gridHeight: 4,
@@ -1740,7 +1740,7 @@
           [1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'repeat', 'if']
+        availableBlocks: ['forward', 'turn_right', 'repeat', 'while', 'if']
       },
       // ステージ 12（ドイツ）： ソーセージ 🌭
       {
@@ -1761,7 +1761,7 @@
           [1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'while', 'if']
       },
       // ステージ 13（スイス）： チーズ 🧀
       {
@@ -1782,7 +1782,7 @@
           [1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'while', 'if']
       },
       // ステージ 14（メキシコ）： タコス 🌮
       {
@@ -1804,7 +1804,7 @@
           [1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'while', 'if']
       },
       // ステージ 15（ロシア）： マトリョーシカ 🪆
       {
@@ -1826,7 +1826,7 @@
           [1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if']
+        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'while', 'if']
       },
       // ステージ 16（オランダ）： チューリップ 🌷
       {
@@ -2264,17 +2264,17 @@
       forward: {
         name: 'forward',
         className: 'block-motion',
-        html: `<span>⬆️ 1マス すすむ</span><span class="palette-add-icon">＋</span>`
+        html: `<span>1マス すすむ</span><span class="palette-add-icon">＋</span>`
       },
       turn_right: {
         name: 'turn_right',
         className: 'block-turn',
-        html: `<span>↪️ みぎを むく</span><span class="palette-add-icon">＋</span>`
+        html: `<span>みぎを むく</span><span class="palette-add-icon">＋</span>`
       },
       turn_left: {
         name: 'turn_left',
         className: 'block-turn',
-        html: `<span>↩️ ひだりを むく</span><span class="palette-add-icon">＋</span>`
+        html: `<span>ひだりを むく</span><span class="palette-add-icon">＋</span>`
       },
       repeat: {
         name: 'repeat',
@@ -2294,8 +2294,13 @@
     };
 
     function updatePaletteBlocks(availableTypes) {
+      // 条件分岐（if）をつかうときはwhile文もセットで提供
+      const types = [...availableTypes];
+      if (types.includes('if') && !types.includes('while')) {
+        types.push('while');
+      }
       paletteBlocksEl.innerHTML = '';
-      availableTypes.forEach(type => {
+      types.forEach(type => {
         const def = BLOCK_DEFS[type];
         if (!def) return;
         const btn = document.createElement('button');
@@ -2428,20 +2433,16 @@
       block.dataset.type = type;
       block.setAttribute('draggable', 'true');
 
-      let icon = '⬆️';
       let label = '1マス すすむ';
       if (type === 'turn_right') {
-        icon = '↪️';
         label = 'みぎを むく';
       } else if (type === 'turn_left') {
-        icon = '↩️';
         label = 'ひだりを むく';
       }
 
       block.innerHTML = `
         <div style="display:flex; align-items:center;">
           <span class="block-drag-handle">☰</span>
-          <span>${icon}</span>
           <span style="margin-left:4px;">${label}</span>
         </div>
         <div class="block-actions">
