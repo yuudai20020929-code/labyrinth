@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>教師ダッシュボード | けやっきーのせかいりょこう迷路</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <script src="config.js"></script>
+  <script src="js/classroom-api.js"></script>
+  <style>
+    :root {
+      --bg: #f0fdf4;
+      --card: #ffffff;
+      --primary: #0284c7;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --ok: #10b981;
+      --perfect: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "M PLUS Rounded 1c", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(56, 189, 248, 0.28), transparent 45%),
+        radial-gradient(ellipse at 90% 100%, rgba(16, 185, 129, 0.22), transparent 40%),
+        linear-gradient(165deg, #ecfeff, #f0fdf4 60%, #e0f2fe);
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+    header.top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+    }
+    .hidden { display: none !important; }
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+    input, select {
+      height: 40px;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 0 10px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.95rem;
+      width: 100%;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
+    }
+    .btn {
+      height: 42px;
+      border: none;
+      border-radius: 10px;
+      padding: 0 16px;
+      font-family: inherit;
+      font-weight: 900;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 3px 0 #0369a1;
+    }
+    .btn:hover { filter: brightness(1.05); }
+    .btn:disabled { opacity: 0.6; cursor: wait; }
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 2px solid #7dd3fc;
+      box-shadow: none;
+    }
+    .btn-danger-text {
+      background: transparent;
+      color: #dc2626;
+      box-shadow: none;
+      border: none;
+      text-decoration: underline;
+      height: auto;
+      padding: 0;
+    }
+    .login-grid {
+      max-width: 360px;
+      margin: 40px auto 0;
+      display: grid;
+      gap: 12px;
+    }
+    .error {
+      min-height: 1.2em;
+      color: #dc2626;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+    .toolbar .field { width: 110px; }
+    .toolbar .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+    .legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 4px; }
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      max-height: 70vh;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 900px;
+      font-size: 0.78rem;
+    }
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 6px 4px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      font-weight: 900;
+      z-index: 1;
+    }
+    td.num, th.num { font-weight: 900; background: #f0f9ff; }
+    .cell-empty { color: #cbd5e1; }
+    .cell-clear { color: var(--ok); font-weight: 900; }
+    .cell-perfect { color: var(--perfect); font-weight: 900; }
+    .meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .empty-msg {
+      text-align: center;
+      padding: 28px 12px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .config-warn {
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      color: #9a3412;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <img src="images/keyakki.png" alt="けやっきー">
+        <div>
+          <h1>教師ダッシュボード</h1>
+          <p>けやっきーのせかいりょこう迷路</p>
+        </div>
+      </div>
+      <div id="header-actions" class="hidden">
+        <button type="button" class="btn btn-danger-text" id="btn-teacher-logout">ログアウト</button>
+      </div>
+    </header>
+
+    <div id="config-warn" class="config-warn hidden">
+      config.js の gasUrl が未設定です。README のセットアップ手順に従って Google Apps Script をデプロイしてください。
+    </div>
+
+    <section class="card" id="login-panel">
+      <div class="login-grid">
+        <div>
+          <label for="teacher-password">教師パスワード</label>
+          <input id="teacher-password" type="password" autocomplete="current-password" placeholder="パスワード">
+        </div>
+        <p class="error" id="login-error"></p>
+        <button type="button" class="btn" id="btn-teacher-login">ログイン</button>
+        <p class="meta">初期パスワードはスプレッドシート config シートの teacherPassword（初期値: sensei）です。</p>
+      </div>
+    </section>
+
+    <section class="card hidden" id="dash-panel">
+      <div class="toolbar">
+        <div class="field">
+          <label for="dash-grade">学年</label>
+          <select id="dash-grade">
+            <option value="1">1年</option>
+            <option value="2">2年</option>
+            <option value="3" selected>3年</option>
+            <option value="4">4年</option>
+            <option value="5">5年</option>
+            <option value="6">6年</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="dash-class">組</label>
+          <select id="dash-class">
+            <option value="1" selected>1組</option>
+            <option value="2">2組</option>
+            <option value="3">3組</option>
+            <option value="4">4組</option>
+            <option value="5">5組</option>
+            <option value="6">6組</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="btn-reload">再読み込み</button>
+          <a class="btn btn-secondary" id="btn-test-play" href="index.html?mode=teacher" target="_blank" rel="noopener">ゲームをひらく（テストプレイ）</a>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span><span class="cell-empty">・</span> 未クリア</span>
+        <span><span class="cell-clear">✅</span> クリア</span>
+        <span><span class="cell-perfect">👑</span> パーフェクト</span>
+      </div>
+
+      <div class="table-wrap">
+        <div class="empty-msg" id="empty-msg">学年・組を選んで「再読み込み」を押してください</div>
+        <table class="hidden" id="progress-table">
+          <thead>
+            <tr id="progress-head"></tr>
+          </thead>
+          <tbody id="progress-body"></tbody>
+        </table>
+      </div>
+      <p class="meta" id="dash-meta"></p>
+    </section>
+  </div>
+
+  <script>
+    const STAGE_COUNT = 20;
+
+    const loginPanel = document.getElementById('login-panel');
+    const dashPanel = document.getElementById('dash-panel');
+    const headerActions = document.getElementById('header-actions');
+    const configWarn = document.getElementById('config-warn');
+    const loginError = document.getElementById('login-error');
+    const btnLogin = document.getElementById('btn-teacher-login');
+    const btnLogout = document.getElementById('btn-teacher-logout');
+    const btnReload = document.getElementById('btn-reload');
+    const emptyMsg = document.getElementById('empty-msg');
+    const table = document.getElementById('progress-table');
+    const headRow = document.getElementById('progress-head');
+    const body = document.getElementById('progress-body');
+    const dashMeta = document.getElementById('dash-meta');
+
+    function showDashboard() {
+      loginPanel.classList.add('hidden');
+      dashPanel.classList.remove('hidden');
+      headerActions.classList.remove('hidden');
+    }
+
+    function showLogin() {
+      loginPanel.classList.remove('hidden');
+      dashPanel.classList.add('hidden');
+      headerActions.classList.add('hidden');
+    }
+
+    function stageMark(clearedMap, perfectMap, idx) {
+      if (perfectMap[idx]) return '<span class="cell-perfect" title="パーフェクト">👑</span>';
+      if (clearedMap[idx]) return '<span class="cell-clear" title="クリア">✅</span>';
+      return '<span class="cell-empty">・</span>';
+    }
+
+    function renderTable(students, grade, className) {
+      headRow.innerHTML = '';
+      const thNo = document.createElement('th');
+      thNo.className = 'num';
+      thNo.textContent = '出席';
+      headRow.appendChild(thNo);
+      for (let i = 1; i <= STAGE_COUNT; i++) {
+        const th = document.createElement('th');
+        th.textContent = String(i);
+        headRow.appendChild(th);
+      }
+      const thMedals = document.createElement('th');
+      thMedals.textContent = 'メダル';
+      headRow.appendChild(thMedals);
+      const thUpdated = document.createElement('th');
+      thUpdated.textContent = '更新';
+      headRow.appendChild(thUpdated);
+
+      body.innerHTML = '';
+      if (!students.length) {
+        table.classList.add('hidden');
+        emptyMsg.classList.remove('hidden');
+        emptyMsg.textContent = `${grade}年${className}組のデータはまだありません（生徒がログインすると表示されます）`;
+        dashMeta.textContent = '';
+        return;
+      }
+
+      emptyMsg.classList.add('hidden');
+      table.classList.remove('hidden');
+
+      students.forEach((s) => {
+        const parsed = s.parsed || ClassroomAPI.progressFromSheet(s);
+        const cleared = parsed.standard.cleared || {};
+        const perfect = parsed.standard.perfect || {};
+        const tr = document.createElement('tr');
+        let html = `<td class="num">${s.studentNo}</td>`;
+        for (let i = 0; i < STAGE_COUNT; i++) {
+          html += `<td>${stageMark(cleared, perfect, i)}</td>`;
+        }
+        const medalCount = String(s.medals || '')
+          .split(',')
+          .map((x) => x.trim())
+          .filter(Boolean).length;
+        const updated = s.updatedAt ? new Date(s.updatedAt).toLocaleString('ja-JP') : '-';
+        html += `<td>${medalCount}</td><td class="meta">${updated}</td>`;
+        tr.innerHTML = html;
+        body.appendChild(tr);
+      });
+
+      dashMeta.textContent = `${grade}年${className}組 / ${students.length}人（スタンダードコース表示）`;
+    }
+
+    async function reloadProgress() {
+      const grade = document.getElementById('dash-grade').value;
+      const className = document.getElementById('dash-class').value;
+      btnReload.disabled = true;
+      emptyMsg.classList.remove('hidden');
+      emptyMsg.textContent = '読み込み中…';
+      table.classList.add('hidden');
+      try {
+        const data = await ClassroomAPI.getClassProgress(grade, className);
+        renderTable(data.students, data.grade, data.className);
+      } catch (err) {
+        emptyMsg.textContent = '読み込みに失敗しました。再ログインしてください。';
+        if (err && (err.message === 'unauthorized' || err.code === 'unauthorized')) {
+          ClassroomAPI.clearTeacherToken();
+          showLogin();
+          loginError.textContent = 'セッションが切れました。もう一度ログインしてください。';
+        }
+      } finally {
+        btnReload.disabled = false;
+      }
+    }
+
+    btnLogin.addEventListener('click', async () => {
+      loginError.textContent = '';
+      if (!ClassroomAPI.isConfigured()) {
+        loginError.textContent = 'config.js の gasUrl が未設定です';
+        return;
+      }
+      const password = document.getElementById('teacher-password').value;
+      btnLogin.disabled = true;
+      try {
+        await ClassroomAPI.teacherLogin(password);
+        showDashboard();
+        await reloadProgress();
+      } catch (err) {
+        if (err && err.code === 'bad_password') {
+          loginError.textContent = 'パスワードが違います';
+        } else {
+          loginError.textContent = 'ログインできませんでした（接続を確認してください）';
+        }
+      } finally {
+        btnLogin.disabled = false;
+      }
+    });
+
+    document.getElementById('teacher-password').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnLogin.click();
+    });
+
+    btnLogout.addEventListener('click', () => {
+      ClassroomAPI.clearTeacherToken();
+      showLogin();
+    });
+
+    btnReload.addEventListener('click', () => reloadProgress());
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!ClassroomAPI.isConfigured()) {
+        configWarn.classList.remove('hidden');
+      }
+      if (ClassroomAPI.getTeacherToken() && ClassroomAPI.isConfigured()) {
+        showDashboard();
+        reloadProgress();
+      }
+    });
+  </script>
+</body>
+</html>

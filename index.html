@@ -1695,10 +1695,273 @@
       0%, 100% { transform: translateY(0) rotate(0deg); }
       50% { transform: translateY(-4px) rotate(6deg); }
     }
+
+    /* 授業ログイン */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background:
+        radial-gradient(ellipse at 20% 10%, rgba(56, 189, 248, 0.35), transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(16, 185, 129, 0.3), transparent 45%),
+        linear-gradient(160deg, #ecfeff 0%, #f0fdf4 55%, #e0f2fe 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-overlay.hidden {
+      display: none;
+    }
+
+    .login-card {
+      width: min(420px, 100%);
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 28px 24px 22px;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+      text-align: center;
+    }
+
+    .login-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+
+    .login-card h2 {
+      margin: 0 0 6px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    .login-card .login-sub {
+      margin: 0 0 18px;
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .login-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .login-field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    .login-field select,
+    .login-field input {
+      width: 100%;
+      height: 40px;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 0 10px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #0f172a;
+      background: #fff;
+      box-sizing: border-box;
+    }
+
+    .login-field select:focus,
+    .login-field input:focus {
+      outline: none;
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+    }
+
+    .login-error {
+      min-height: 1.2em;
+      margin: 0 0 10px;
+      color: #dc2626;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .btn-login {
+      width: 100%;
+      height: 46px;
+      border: none;
+      border-radius: 12px;
+      background: #0284c7;
+      color: white;
+      font-family: inherit;
+      font-weight: 900;
+      font-size: 1.05rem;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #0369a1;
+    }
+
+    .btn-login:hover {
+      filter: brightness(1.05);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .btn-login-guest {
+      margin-top: 10px;
+      background: white;
+      color: #0284c7;
+      border: 2px solid #7dd3fc;
+      box-shadow: none;
+    }
+
+    .login-hint {
+      margin: 12px 0 0;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .teacher-play-badge {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #f59e0b;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      white-space:nowrap;
+    }
+
+    .teacher-play-badge.visible {
+      display: inline-flex;
+    }
+
+    .student-session-chip {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: #e0f2fe;
+      color: #075985;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .student-session-chip.visible {
+      display: inline-flex;
+    }
+
+    .btn-logout-mini {
+      border: none;
+      background: transparent;
+      color: #0284c7;
+      font-weight: 900;
+      font-size: 0.72rem;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      font-family: inherit;
+    }
+
+    body.app-locked > header,
+    body.app-locked > main.app-container,
+    body.app-locked > .modal-overlay {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .sync-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(20px);
+      background: #0f172a;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      max-width: min(90vw, 420px);
+      text-align: center;
+    }
+
+    .sync-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .sync-toast.warn {
+      background: #b45309;
+    }
   </style>
+  <script src="config.js"></script>
+  <script src="js/classroom-api.js"></script>
 </head>
-<body>
+<body class="app-locked">
   <canvas id="confetti-canvas"></canvas>
+
+  <div class="login-overlay" id="login-overlay">
+    <div class="login-card">
+      <img src="images/keyakki.png" alt="けやっきー" class="login-logo">
+      <h2>じぶんの ばんごうで はじめる</h2>
+      <p class="login-sub">がくねん・くみ・しゅっせきばんごうを いれてね</p>
+      <div class="login-fields">
+        <div class="login-field">
+          <label for="login-grade">がくねん</label>
+          <select id="login-grade">
+            <option value="1">1ねん</option>
+            <option value="2">2ねん</option>
+            <option value="3" selected>3ねん</option>
+            <option value="4">4ねん</option>
+            <option value="5">5ねん</option>
+            <option value="6">6ねん</option>
+          </select>
+        </div>
+        <div class="login-field">
+          <label for="login-class">くみ</label>
+          <select id="login-class">
+            <option value="1" selected>1くみ</option>
+            <option value="2">2くみ</option>
+            <option value="3">3くみ</option>
+            <option value="4">4くみ</option>
+            <option value="5">5くみ</option>
+            <option value="6">6くみ</option>
+          </select>
+        </div>
+        <div class="login-field">
+          <label for="login-number">ばんごう</label>
+          <input id="login-number" type="number" min="1" max="40" step="1" placeholder="例: 12" inputmode="numeric">
+        </div>
+      </div>
+      <p class="login-error" id="login-error"></p>
+      <button type="button" class="btn-login" id="btn-login-start">はじめる！</button>
+      <button type="button" class="btn-login btn-login-guest" id="btn-login-guest">まずはためす（ほぞんなし）</button>
+      <p class="login-hint" id="login-config-hint">
+        ※ 先生が Googleスプレッドシート連携を設定すると、すすみが保存されます
+      </p>
+    </div>
+  </div>
+
+  <div class="sync-toast" id="sync-toast"></div>
 
   <!-- ヘッダー（高さ44px固定・すっきり1行） -->
   <header>
@@ -1708,6 +1971,11 @@
     </div>
 
     <div class="header-controls">
+      <span class="teacher-play-badge" id="teacher-play-badge">🧪 テストプレイ中</span>
+      <span class="student-session-chip" id="student-session-chip">
+        <span id="student-session-label"></span>
+        <button type="button" class="btn-logout-mini" id="btn-student-logout">でなおす</button>
+      </span>
       <div class="stage-selector-wrap">
         <span class="course-badge" id="course-badge" title="コースをきりかえる">🗺️ スタンダード</span>
         <span>ステージ:</span>
@@ -2552,26 +2820,186 @@
 
     // コース・進捗・指定ブロック状態
     let currentCourse = 'standard'; // 'standard' | 'master'
-    let isMasterUnlocked = (localStorage.getItem('agy_master_unlocked') === 'true');
+    let isMasterUnlocked = false;
     let hasDeletedDesignated = false;
     let stage10LeafPos = null;
     let stage10LeavesCollected = 0;
+    let isTeacherPlayMode = false;
+    let classroomReady = false;
 
     let gameProgress = {
       standard: { cleared: {}, perfect: {} },
       master: { cleared: {}, perfect: {} }
     };
-    try {
-      const saved = localStorage.getItem('agy_progress_data_v2');
-      if (saved) gameProgress = JSON.parse(saved);
-      if (!gameProgress.standard) gameProgress.standard = { cleared: {}, perfect: {} };
-      if (!gameProgress.master) gameProgress.master = { cleared: {}, perfect: {} };
-    } catch (e) {}
+
+    function showSyncToast(message, isWarn) {
+      const toast = document.getElementById('sync-toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.toggle('warn', Boolean(isWarn));
+      toast.classList.add('show');
+      clearTimeout(showSyncToast._timer);
+      showSyncToast._timer = setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+
+    function getUnlockedMedalIds() {
+      const ids = [];
+      const allTrue = (map) => STAGES.every((_, idx) => map[idx] === true);
+      if (allTrue(gameProgress.standard?.cleared || {})) ids.push('bronze');
+      if (allTrue(gameProgress.standard?.perfect || {})) ids.push('silver');
+      if (allTrue(gameProgress.master?.cleared || {})) ids.push('gold');
+      if (allTrue(gameProgress.master?.perfect || {})) ids.push('platinum');
+      return ids;
+    }
+
+    function applyRemoteProgress(remote) {
+      if (!remote) return;
+      gameProgress = {
+        standard: {
+          cleared: { ...(remote.standard && remote.standard.cleared) },
+          perfect: { ...(remote.standard && remote.standard.perfect) }
+        },
+        master: {
+          cleared: { ...(remote.master && remote.master.cleared) },
+          perfect: { ...(remote.master && remote.master.perfect) }
+        }
+      };
+      const stdCleared = gameProgress.standard.cleared || {};
+      isMasterUnlocked = Boolean(stdCleared[STAGES.length - 1]);
+    }
 
     function saveProgressData() {
       try {
-        localStorage.setItem('agy_progress_data_v2', JSON.stringify(gameProgress));
+        const session = window.ClassroomAPI && ClassroomAPI.getStudentSession();
+        if (session) {
+          localStorage.setItem('agy_progress_data_v2_' + session.key, JSON.stringify(gameProgress));
+          localStorage.setItem('agy_master_unlocked_' + session.key, isMasterUnlocked ? 'true' : 'false');
+        } else if (!isTeacherPlayMode) {
+          localStorage.setItem('agy_progress_data_v2_guest', JSON.stringify(gameProgress));
+          localStorage.setItem('agy_master_unlocked_guest', isMasterUnlocked ? 'true' : 'false');
+        }
       } catch (e) {}
+
+      if (isTeacherPlayMode || !classroomReady) return;
+      if (!window.ClassroomAPI || !ClassroomAPI.isConfigured() || !ClassroomAPI.getStudentSession()) return;
+
+      ClassroomAPI.saveProgress(gameProgress, getUnlockedMedalIds()).catch(() => {
+        showSyncToast('すすみの ほぞんに しっぱいしたよ（あとでまたためしてね）', true);
+      });
+    }
+
+    function loadLocalProgressForSession(sessionKey) {
+      try {
+        const saved = localStorage.getItem('agy_progress_data_v2_' + sessionKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.standard) gameProgress = parsed;
+        }
+        isMasterUnlocked = localStorage.getItem('agy_master_unlocked_' + sessionKey) === 'true';
+      } catch (e) {}
+      if (!gameProgress.standard) gameProgress.standard = { cleared: {}, perfect: {} };
+      if (!gameProgress.master) gameProgress.master = { cleared: {}, perfect: {} };
+    }
+
+    function unlockAppShell() {
+      document.body.classList.remove('app-locked');
+      const overlay = document.getElementById('login-overlay');
+      if (overlay) overlay.classList.add('hidden');
+    }
+
+    function updateSessionChrome() {
+      const badge = document.getElementById('teacher-play-badge');
+      const chip = document.getElementById('student-session-chip');
+      const label = document.getElementById('student-session-label');
+      if (badge) badge.classList.toggle('visible', isTeacherPlayMode);
+      if (isTeacherPlayMode) {
+        if (chip) chip.classList.remove('visible');
+        return;
+      }
+      const session = ClassroomAPI.getStudentSession();
+      if (session && chip && label) {
+        label.textContent = `${session.grade}年${session.className}組 ${session.studentNo}番`;
+        chip.classList.add('visible');
+      } else if (chip) {
+        chip.classList.remove('visible');
+      }
+    }
+
+    async function startStudentSession(grade, className, studentNo) {
+      if (!ClassroomAPI.isConfigured()) {
+        throw new Error('gas_url_missing');
+      }
+      const result = await ClassroomAPI.studentLogin(grade, className, studentNo);
+      applyRemoteProgress(result.progress);
+      // ローカルに新しい進行があればマージ（オフライン時の保険）
+      try {
+        const localRaw = localStorage.getItem('agy_progress_data_v2_' + result.session.key);
+        if (localRaw) {
+          const local = JSON.parse(localRaw);
+          ['standard', 'master'].forEach((course) => {
+            ['cleared', 'perfect'].forEach((kind) => {
+              const remoteMap = gameProgress[course][kind] || {};
+              const localMap = (local[course] && local[course][kind]) || {};
+              gameProgress[course][kind] = { ...remoteMap, ...localMap };
+            });
+          });
+        }
+      } catch (e) {}
+      const stdCleared = gameProgress.standard.cleared || {};
+      isMasterUnlocked = isMasterUnlocked || Boolean(stdCleared[STAGES.length - 1]);
+      classroomReady = true;
+      updateSessionChrome();
+      unlockAppShell();
+      bootstrapGame();
+      saveProgressData();
+    }
+
+    function startGuestPlayMode() {
+      isTeacherPlayMode = false;
+      classroomReady = false;
+      try {
+        const saved = localStorage.getItem('agy_progress_data_v2_guest') || localStorage.getItem('agy_progress_data_v2');
+        if (saved) gameProgress = JSON.parse(saved);
+        isMasterUnlocked = localStorage.getItem('agy_master_unlocked_guest') === 'true'
+          || localStorage.getItem('agy_master_unlocked') === 'true';
+      } catch (e) {
+        gameProgress = {
+          standard: { cleared: {}, perfect: {} },
+          master: { cleared: {}, perfect: {} }
+        };
+        isMasterUnlocked = false;
+      }
+      if (!gameProgress.standard) gameProgress.standard = { cleared: {}, perfect: {} };
+      if (!gameProgress.master) gameProgress.master = { cleared: {}, perfect: {} };
+      ClassroomAPI.clearStudentSession();
+      updateSessionChrome();
+      unlockAppShell();
+      bootstrapGame();
+    }
+
+    function startTeacherPlayMode() {
+      isTeacherPlayMode = true;
+      classroomReady = false;
+      gameProgress = {
+        standard: { cleared: {}, perfect: {} },
+        master: { cleared: {}, perfect: {} }
+      };
+      isMasterUnlocked = true;
+      currentCourse = 'standard';
+      updateSessionChrome();
+      unlockAppShell();
+      bootstrapGame();
+    }
+
+    function bootstrapGame() {
+      updateCourseUI();
+      updateMedalsUI();
+      initStageSelectOptions();
+      loadStage(0, false);
+      if (countTotalBlocks() === 0) {
+        addBlock('forward');
+      }
+      requestAnimationFrame(() => Maze2D.updateRobotPosition(false));
     }
 
     /* ========================================================
@@ -3721,7 +4149,7 @@
         if (currentStageIndex >= STAGES.length - 1) {
           if (!isMasterUnlocked) {
             isMasterUnlocked = true;
-            localStorage.setItem('agy_master_unlocked', 'true');
+            saveProgressData();
             updateCourseUI();
             setTimeout(() => {
               goalModal.classList.remove('active');
@@ -4114,13 +4542,101 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      updateCourseUI();
-      updateMedalsUI();
-      initStageSelectOptions();
-      loadStage(0, false);
-      if (countTotalBlocks() === 0) {
-        addBlock('forward');
+      const params = new URLSearchParams(window.location.search);
+      isTeacherPlayMode = params.get('mode') === 'teacher';
+
+      const loginOverlay = document.getElementById('login-overlay');
+      const loginError = document.getElementById('login-error');
+      const btnLoginStart = document.getElementById('btn-login-start');
+      const btnLoginGuest = document.getElementById('btn-login-guest');
+      const loginHint = document.getElementById('login-config-hint');
+      const btnStudentLogout = document.getElementById('btn-student-logout');
+
+      if (loginHint) {
+        if (!ClassroomAPI.isConfigured()) {
+          loginHint.textContent = '※ まだスプレッドシート連携が設定されていません。授業で使うときは config.js の gasUrl を設定してください';
+        } else {
+          loginHint.textContent = '※ すすみは クラスの シートに ほぞんされます';
+        }
       }
+
+      if (btnLoginGuest) {
+        btnLoginGuest.addEventListener('click', () => {
+          startGuestPlayMode();
+        });
+      }
+
+      if (btnStudentLogout) {
+        btnStudentLogout.addEventListener('click', () => {
+          ClassroomAPI.clearStudentSession();
+          classroomReady = false;
+          location.href = location.pathname;
+        });
+      }
+
+      if (isTeacherPlayMode) {
+        startTeacherPlayMode();
+        return;
+      }
+
+      const existing = ClassroomAPI.getStudentSession();
+      if (existing && ClassroomAPI.isConfigured()) {
+        loginError.textContent = 'よみこみ中…';
+        ClassroomAPI.studentLogin(existing.grade, existing.className, existing.studentNo)
+          .then((result) => {
+            applyRemoteProgress(result.progress);
+            const stdCleared = gameProgress.standard.cleared || {};
+            isMasterUnlocked = Boolean(stdCleared[STAGES.length - 1]);
+            classroomReady = true;
+            updateSessionChrome();
+            unlockAppShell();
+            bootstrapGame();
+          })
+          .catch(() => {
+            loadLocalProgressForSession(existing.key);
+            classroomReady = true;
+            updateSessionChrome();
+            unlockAppShell();
+            bootstrapGame();
+            showSyncToast('ネットから よめなかったので、この端末の すすみを つかうよ', true);
+          });
+        return;
+      }
+
+      if (btnLoginStart) {
+        btnLoginStart.addEventListener('click', async () => {
+          const grade = document.getElementById('login-grade').value;
+          const className = document.getElementById('login-class').value;
+          const studentNo = Number(document.getElementById('login-number').value);
+          loginError.textContent = '';
+          if (!Number.isInteger(studentNo) || studentNo < 1 || studentNo > 40) {
+            loginError.textContent = 'しゅっせきばんごうを 1〜40で いれてね';
+            return;
+          }
+          if (!ClassroomAPI.isConfigured()) {
+            loginError.textContent = '先生の せってい（config.js）が まだだよ';
+            return;
+          }
+          btnLoginStart.disabled = true;
+          btnLoginStart.textContent = 'じゅんび中…';
+          try {
+            await startStudentSession(grade, className, studentNo);
+          } catch (err) {
+            const code = err && err.code;
+            if (code === 'invalid_grade' || code === 'invalid_class' || code === 'invalid_student_no') {
+              loginError.textContent = 'にゅうりょくが ただしくないよ';
+            } else if (err && err.message === 'gas_url_missing') {
+              loginError.textContent = '先生の せってい（config.js）が まだだよ';
+            } else {
+              loginError.textContent = 'せつぞくできなかったよ。もういちど ためしてね';
+            }
+            btnLoginStart.disabled = false;
+            btnLoginStart.textContent = 'はじめる！';
+          }
+        });
+      }
+
+      if (loginOverlay) loginOverlay.classList.remove('hidden');
     });
 
     window.addEventListener('load', () => {
