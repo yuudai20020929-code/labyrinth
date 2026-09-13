@@ -1440,6 +1440,185 @@
       pointer-events: none;
       z-index: 99;
     }
+
+    /* コースバッジ・切替 */
+    .course-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+    .course-badge:hover {
+      transform: scale(1.05);
+    }
+    .course-badge.master-active {
+      background: linear-gradient(135deg, #fef08a, #fde047);
+      color: #854d0e;
+      border: 1px solid #facc15;
+      box-shadow: 0 0 8px rgba(250, 204, 21, 0.4);
+    }
+
+    /* ヒントボタン */
+    .btn-hint {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .btn-hint:hover {
+      background: #fde68a;
+      transform: translateY(-1px);
+    }
+
+    /* 指定ブロック */
+    .c-block.designated-block, .ws-block.designated-block {
+      border: 2px solid #3b82f6 !important;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+    }
+    .designated-tag {
+      position: absolute;
+      top: -9px;
+      right: 12px;
+      background: #2563eb;
+      color: white;
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      pointer-events: none;
+      z-index: 10;
+    }
+    .designated-locked-select {
+      background: #f1f5f9 !important;
+      color: #334155 !important;
+      border-color: #cbd5e1 !important;
+      cursor: not-allowed !important;
+      opacity: 0.95;
+    }
+
+    /* クリアバッジ */
+    .clear-badge-pill {
+      display: inline-block;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    .clear-badge-pill.normal {
+      background: #e0f2fe;
+      color: #0284c7;
+      border: 2px solid #38bdf8;
+    }
+    .clear-badge-pill.perfect {
+      background: linear-gradient(135deg, #fef9c3, #fde047);
+      color: #a16207;
+      border: 2px solid #eab308;
+      box-shadow: 0 0 16px rgba(234, 179, 8, 0.5);
+      animation: pulse-glow 1.5s infinite alternate;
+    }
+    @keyframes pulse-glow {
+      from { transform: scale(1); box-shadow: 0 0 12px rgba(234, 179, 8, 0.4); }
+      to { transform: scale(1.05); box-shadow: 0 0 22px rgba(234, 179, 8, 0.8); }
+    }
+
+    /* メダルモーダル */
+    .medals-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 14px 0;
+      text-align: left;
+    }
+    .medal-item {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .medal-item.unlocked {
+      background: #fffbeb;
+      border-color: #fde68a;
+      box-shadow: 0 3px 8px rgba(245, 158, 11, 0.15);
+    }
+    .medal-item.locked {
+      opacity: 0.45;
+      filter: grayscale(1);
+    }
+    .medal-thumb {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .medal-info-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 2px;
+    }
+    .medal-info-desc {
+      font-size: 0.68rem;
+      color: #64748b;
+      line-height: 1.3;
+    }
+    .medal-status-tag {
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-top: 3px;
+    }
+    .medal-status-tag.unlocked {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .medal-status-tag.locked {
+      background: #f1f5f9;
+      color: #94a3b8;
+    }
+
+    /* カエデの葉っぱ（ステージ10アイテム） */
+    .map-item-leaf {
+      position: absolute;
+      width: 75%;
+      height: 75%;
+      top: 12.5%;
+      left: 12.5%;
+      object-fit: contain;
+      z-index: 15;
+      animation: leaf-float 2s ease-in-out infinite;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+    }
+    @keyframes leaf-float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(6deg); }
+    }
   </style>
 </head>
 <body>
@@ -1454,9 +1633,14 @@
 
     <div class="header-controls">
       <div class="stage-selector-wrap">
+        <span class="course-badge" id="course-badge" title="コース切替">🗺️ スタンダード</span>
         <span>ステージ:</span>
         <select id="stage-select"></select>
       </div>
+
+      <button id="btn-view-medals" class="btn-icon" title="かくとくメダルをみる">
+        🏅 <span id="medals-label">メダル</span>
+      </button>
 
       <button id="btn-sound-toggle" class="btn-icon" title="おと ON/OFF">
         🔊 <span>おと: ON</span>
@@ -1475,7 +1659,10 @@
       <div class="stage-card">
         <div class="stage-title-row">
           <div class="stage-title" id="stage-title">🇯🇵 ステージ 1: 日本（富士山）</div>
-          <div class="stage-goal-badge" id="stage-badge">🗻 富士山をめざそう</div>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button id="btn-view-hint" class="btn-hint" title="ヒントをみる">💡 ヒント</button>
+            <div class="stage-goal-badge" id="stage-badge">🗻 富士山をめざそう</div>
+          </div>
         </div>
         <div class="stage-desc" id="stage-desc">
           「1マスすすむ」ブロックをおいて、富士山🗻をめざそう！
@@ -1575,14 +1762,60 @@
       <div class="modal-icon">
         <img src="images/keyakki.png" alt="けやっきー" style="width: 80px; height: 80px; object-fit: contain; animation: tada 1s ease-in-out; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
       </div>
-      <h2 class="modal-title">ゴール おめでとう！🎉</h2>
-      <div class="modal-stars" style="font-size: 2rem; margin-bottom: 8px;">⭐⭐⭐</div>
+      <h2 class="modal-title" id="goal-modal-title">ゴール おめでとう！🎉</h2>
+      <div id="clear-badge-container">
+        <!-- 「クリア」または「パーフェクトクリア」のバッジ -->
+      </div>
       <p class="modal-desc" id="modal-desc">
         やったー！けやっきーがゴールできたよ！
       </p>
       <div class="modal-btn-row">
         <button class="btn-modal btn-modal-secondary" id="btn-modal-replay">もういちど</button>
         <button class="btn-modal btn-modal-primary" id="btn-modal-next">つぎのステージへ ➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ヒントモーダル -->
+  <div class="modal-overlay" id="hint-modal">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-icon" style="font-size: 2.5rem;">💡</div>
+      <h2 class="modal-title" id="hint-modal-title">ヒント</h2>
+      <div id="hint-modal-desc" style="font-size: 0.95rem; line-height: 1.6; margin: 14px 0; text-align: left; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 14px; color: #92400e;"></div>
+      <div class="modal-btn-row">
+        <button class="btn-modal btn-modal-primary" id="btn-close-hint">わかった！</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- あつめたメダルモーダル -->
+  <div class="modal-overlay" id="medals-modal">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-icon" style="font-size: 2.5rem;">🏅</div>
+      <h2 class="modal-title">あつめたメダル</h2>
+      <p class="modal-desc" style="margin-bottom: 6px;">
+        ステージをクリアして特別なメダルを手に入れよう！
+      </p>
+      <div class="medals-grid" id="medals-grid"></div>
+      <div class="modal-btn-row">
+        <button class="btn-modal btn-modal-primary" id="btn-close-medals">とじる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2周目マスターコース解禁モーダル -->
+  <div class="modal-overlay" id="course-unlock-modal">
+    <div class="modal-card" style="max-width: 460px;">
+      <div class="modal-icon" style="font-size: 3rem;">🏆</div>
+      <h2 class="modal-title">全ブロック解禁！<br>マスターコース登場！</h2>
+      <p class="modal-desc" style="line-height: 1.6; margin: 12px 0;">
+        ステージ20クリアおめでとう！🎉<br>
+        <strong>すべてのブロックが自由につかえる「マスターコース」</strong>が解禁されたよ！<br>
+        指定ブロックなし、くりかえし・あいだブロックも使い放題！<br>
+        ステージ1から新しい最短記録に挑戦しよう！
+      </p>
+      <div class="modal-btn-row">
+        <button class="btn-modal btn-modal-primary" id="btn-start-master">マスターコースへ進む！ 🚀</button>
       </div>
     </div>
   </div>
@@ -1617,10 +1850,12 @@
         title: "🇯🇵 ステージ 1: 日本（富士山）",
         desc: "「1マスすすむ」ブロックをおいて、富士山🗻をめざそう！",
         badge: "🗻 富士山をめざそう",
+        hint: "「1マスすすむ」を1つ置いて、うごかす！を押してみてね！",
         gridWidth: 3,
         gridHeight: 3,
         goalIcon: "🗻",
         goalName: "富士山",
+        minBlocks: 1,
         map: [
           [1, 1, 1],
           [2, 3, 1],
@@ -1637,10 +1872,12 @@
         title: "🇺🇸 ステージ 2: アメリカ（自由の女神）",
         desc: "「1マスすすむ」を2つつなげて、自由の女神🗽へ行こう！",
         badge: "🗽 自由の女神へ",
+        hint: "「1マスすすむ」を縦に2つつなげてみよう！",
         gridWidth: 4,
         gridHeight: 3,
         goalIcon: "🗽",
         goalName: "自由の女神",
+        minBlocks: 2,
         map: [
           [1, 1, 1, 1],
           [2, 0, 3, 1],
@@ -1655,12 +1892,36 @@
         country: "🇫🇷 フランス",
         theme: "france",
         title: "🇫🇷 ステージ 3: フランス（エッフェル塔）",
-        desc: "道がまがっているよ！「みぎをむく」をつかってエッフェル塔🗼へ行こう！",
+        desc: "「1マスすすむ」を3つつなげて、エッフェル塔🗼へ行こう！",
         badge: "🗼 エッフェル塔へ",
-        gridWidth: 3,
+        hint: "ゴールまであと3マス！「1マスすすむ」を3つつなげてみよう！",
+        gridWidth: 5,
         gridHeight: 3,
         goalIcon: "🗼",
         goalName: "エッフェル塔",
+        minBlocks: 3,
+        map: [
+          [1, 1, 1, 1, 1],
+          [2, 0, 0, 3, 1],
+          [1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 1, dir: 1 },
+        availableBlocks: ['forward']
+      },
+      // ステージ 4（イギリス）： ビッグベン 🕰️
+      {
+        id: 3,
+        country: "🇬🇧 イギリス",
+        theme: "uk",
+        title: "🇬🇧 ステージ 4: イギリス（ビッグベン）",
+        desc: "すすんでから右をむいて、ビッグベン🕰️をめざそう！",
+        badge: "🕰️ ビッグベンへ",
+        hint: "すすむ → みぎをむく → すすむ の順番でブロックをつなごう！",
+        gridWidth: 3,
+        gridHeight: 3,
+        goalIcon: "🕰️",
+        goalName: "ビッグベン",
+        minBlocks: 3,
         map: [
           [2, 0, 1],
           [1, 3, 1],
@@ -1669,216 +1930,220 @@
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right']
       },
-      // ステージ 4（イギリス）： ビッグベン（時計台） 🕰️
-      {
-        id: 3,
-        country: "🇬🇧 イギリス",
-        theme: "uk",
-        title: "🇬🇧 ステージ 4: イギリス（ビッグベン）",
-        desc: "「ひだりをむく」もつかって、時計台（ビッグベン）🕰️をめざそう！",
-        badge: "🕰️ 時計台へ",
-        gridWidth: 4,
-        gridHeight: 4,
-        goalIcon: "🕰️",
-        goalName: "ビッグベン",
-        map: [
-          [2, 0, 1, 1],
-          [1, 0, 0, 1],
-          [1, 1, 3, 1],
-          [1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left']
-      },
       // ステージ 5（イタリア）： ピザ 🍕
       {
         id: 4,
         country: "🇮🇹 イタリア",
         theme: "italy",
         title: "🇮🇹 ステージ 5: イタリア（ピザ）",
-        desc: "「🔁 くりかえす」ブロックの登場！すくないブロックでピザ🍕へ行こう！",
-        badge: "🍕 おいしいピザへ",
-        gridWidth: 5,
+        desc: "すすんでから左をむいて、おいしいピザ🍕を食べに行こう！",
+        badge: "🍕 ピザの広場へ",
+        hint: "すすむ → ひだりをむく → すすむ の順番で上に向かおう！",
+        gridWidth: 3,
         gridHeight: 3,
         goalIcon: "🍕",
         goalName: "ピザ",
+        minBlocks: 3,
+        map: [
+          [1, 3, 1],
+          [2, 0, 1],
+          [1, 1, 1]
+        ],
+        start: { x: 0, y: 1, dir: 1 },
+        availableBlocks: ['forward', 'turn_left']
+      },
+      // ステージ 6（ドイツ）： ノイシュヴァンシュタイン城 🏰
+      {
+        id: 5,
+        country: "🇩🇪 ドイツ",
+        theme: "germany",
+        title: "🇩🇪 ステージ 6: ドイツ（ノイシュヴァンシュタイン城）",
+        desc: "右に2回曲がってUターン！お城🏰へ行こう！",
+        badge: "🏰 ノイシュヴァンシュタイン城へ",
+        hint: "すすむ → みぎをむく → すすむ → みぎをむく → すすむ でくるっとUターンしよう！",
+        gridWidth: 3,
+        gridHeight: 3,
+        goalIcon: "🏰",
+        goalName: "ノイシュヴァンシュタイン城",
+        minBlocks: 5,
+        map: [
+          [2, 0, 1],
+          [3, 0, 1],
+          [1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right']
+      },
+      // ステージ 7（中国）： パンダ 🐼
+      {
+        id: 6,
+        country: "🇨🇳 中国",
+        theme: "china",
+        title: "🇨🇳 ステージ 7: 中国（パンダ）",
+        desc: "右と左を組み合わせて、かわいいパンダ🐼に会いに行こう！",
+        badge: "🐼 パンダの庭へ",
+        hint: "すすむ → みぎをむく → すすむ → ひだりをむく → すすむ で階段のように進もう！",
+        gridWidth: 4,
+        gridHeight: 3,
+        goalIcon: "🐼",
+        goalName: "パンダ",
+        minBlocks: 5,
+        map: [
+          [2, 0, 1, 1],
+          [1, 0, 3, 1],
+          [1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left']
+      },
+      // ステージ 8（インド）： カレー 🍛
+      {
+        id: 7,
+        country: "🇮🇳 インド",
+        theme: "india",
+        title: "🇮🇳 ステージ 8: インド（カレー）",
+        desc: "ジグザグの道をリズミカルに進んで、カレー🍛を食べに行こう！",
+        badge: "🍛 カレーの屋台へ",
+        hint: "「みぎ・ひだり」のジグザグパターンを2回くりかえす形になっているよ！",
+        gridWidth: 5,
+        gridHeight: 4,
+        goalIcon: "🍛",
+        goalName: "カレー",
+        minBlocks: 9,
+        map: [
+          [2, 0, 1, 1, 1],
+          [1, 0, 0, 1, 1],
+          [1, 1, 0, 3, 1],
+          [1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left']
+      },
+      // ステージ 9（エジプト）： ピラミッド 🔺
+      {
+        id: 8,
+        country: "🇪🇬 エジプト",
+        theme: "egypt",
+        title: "🇪🇬 ステージ 9: エジプト（ピラミッド）",
+        desc: "砂漠の長い曲がり角を乗りこえて、ピラミッド🔺をめざそう！",
+        badge: "🔺 ピラミッドへ",
+        hint: "すすむ4回 → みぎ → すすむ2回 → みぎ → すすむ2回 → ひだり → すすむ2回 だよ！",
+        gridWidth: 6,
+        gridHeight: 6,
+        goalIcon: "🔺",
+        goalName: "ピラミッド",
+        minBlocks: 13,
+        map: [
+          [2, 0, 0, 0, 0, 1],
+          [1, 1, 1, 1, 0, 1],
+          [1, 1, 0, 0, 0, 1],
+          [1, 1, 0, 1, 1, 1],
+          [1, 1, 3, 1, 1, 1],
+          [1, 1, 1, 1, 1, 1]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left']
+      },
+      // ステージ 10（カナダ）： カエデの森 🍁
+      {
+        id: 9,
+        country: "🇨🇦 カナダ",
+        theme: "canada",
+        title: "🇨🇦 ステージ 10: カナダ（カエデの森）",
+        desc: "まんなかの森でカエデの葉っぱ🍁を1つひろい、ゴールの葉っぱと合わせて2つ集めよう！",
+        badge: "🍁 カエデの森へ",
+        hint: "広い広場！まんなか3×3のどこかにある葉っぱ🍁をひろってから、右下のゴール🍁へ向かおう（最短11ブロック）！",
+        gridWidth: 5,
+        gridHeight: 5,
+        goalIcon: "🍁",
+        goalName: "カエデの葉っぱ",
+        minBlocks: 11,
+        isLeafCollectorStage: true,
+        map: [
+          [2, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 3]
+        ],
+        start: { x: 0, y: 0, dir: 1 },
+        availableBlocks: ['forward', 'turn_right', 'turn_left']
+      },
+      // ステージ 11（オーストラリア）： カンガルー 🦘
+      {
+        id: 10,
+        country: "🇦🇺 オーストラリア",
+        theme: "australia",
+        title: "🇦🇺 ステージ 11: オーストラリア（カンガルー）",
+        desc: "「🔁 くりかえす」の登場！指定ブロックの中に「すすむ」を入れてみよう！",
+        badge: "🦘 カンガルーの草原へ",
+        hint: "最初から置いてある「3かい くりかえす」の中に「1マスすすむ」を入れると、一気に3マス進めるよ！",
+        gridWidth: 5,
+        gridHeight: 3,
+        goalIcon: "🦘",
+        goalName: "カンガルー",
+        minBlocks: 2,
         map: [
           [1, 1, 1, 1, 1],
           [2, 0, 0, 3, 1],
           [1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 1, dir: 1 },
-        availableBlocks: ['forward', 'repeat']
+        availableBlocks: ['forward'],
+        designatedBlocks: [
+          { type: 'repeat', count: 3, locked: true, children: [] }
+        ]
       },
-      // ステージ 6（中国）： パンダ 🐼
-      {
-        id: 5,
-        country: "🇨🇳 中国",
-        theme: "china",
-        title: "🇨🇳 ステージ 6: 中国（パンダ）",
-        desc: "「くりかえす」と「まがる」をくみあわせて、パンダ🐼に会いに行こう！",
-        badge: "🐼 パンダに会おう",
-        gridWidth: 4,
-        gridHeight: 4,
-        goalIcon: "🐼",
-        goalName: "パンダ",
-        map: [
-          [2, 0, 1, 1],
-          [1, 0, 0, 1],
-          [1, 1, 3, 1],
-          [1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
-      },
-      // ステージ 7（エジプト）： ピラミッド 🔺
-      {
-        id: 6,
-        country: "🇪🇬 エジプト",
-        theme: "egypt",
-        title: "🇪🇬 ステージ 7: エジプト（ピラミッド）",
-        desc: "かいだんの道をトントンと登って、ピラミッド🔺をめざそう！",
-        badge: "🔺 ピラミッドへ",
-        gridWidth: 5,
-        gridHeight: 4,
-        goalIcon: "🔺",
-        goalName: "ピラミッド",
-        map: [
-          [2, 0, 1, 1, 1],
-          [1, 0, 0, 1, 1],
-          [1, 1, 0, 3, 1],
-          [1, 1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
-      },
-      // ステージ 8（オーストラリア）： コアラ 🐨
-      {
-        id: 7,
-        country: "🇦🇺 オーストラリア",
-        theme: "australia",
-        title: "🇦🇺 ステージ 8: オーストラリア（コアラ）",
-        desc: "ジグザグに進んで、ユーカリの木の上にいるコアラ🐨をめざそう！",
-        badge: "🐨 コアラの木へ",
-        gridWidth: 5,
-        gridHeight: 5,
-        goalIcon: "🐨",
-        goalName: "コアラ",
-        map: [
-          [2, 0, 1, 1, 1],
-          [1, 0, 0, 1, 1],
-          [1, 1, 0, 0, 1],
-          [1, 1, 1, 3, 1],
-          [1, 1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
-      },
-      // ステージ 9（ブラジル）： サッカーボール ⚽
-      {
-        id: 8,
-        country: "🇧🇷 ブラジル",
-        theme: "brazil",
-        title: "🇧🇷 ステージ 9: ブラジル（サッカーボール）",
-        desc: "広いスタジアムを駆けぬけて、サッカーボール⚽にシュート！",
-        badge: "⚽ サッカーボールへ",
-        gridWidth: 5,
-        gridHeight: 4,
-        goalIcon: "⚽",
-        goalName: "サッカーボール",
-        map: [
-          [2, 0, 0, 0, 1],
-          [1, 1, 1, 0, 1],
-          [1, 3, 0, 0, 1],
-          [1, 1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
-      },
-      // ステージ 10（カナダ）： カエデの葉っぱ 🍁
-      {
-        id: 9,
-        country: "🇨🇦 カナダ",
-        theme: "canada",
-        title: "🇨🇦 ステージ 10: カナダ（カエデの葉っぱ）",
-        desc: "もみじの森の小道を進んで、きれいなカエデの葉っぱ🍁を見つけよう！",
-        badge: "🍁 カエデの森へ",
-        gridWidth: 5,
-        gridHeight: 5,
-        goalIcon: "🍁",
-        goalName: "カエデの葉っぱ",
-        map: [
-          [2, 0, 0, 1, 1],
-          [1, 1, 0, 1, 1],
-          [1, 1, 0, 0, 1],
-          [1, 1, 1, 3, 1],
-          [1, 1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat']
-      },
-      // ステージ 11（インド）： カレー 🍛
-      {
-        id: 10,
-        country: "🇮🇳 インド",
-        theme: "india",
-        title: "🇮🇳 ステージ 11: インド（カレー）",
-        desc: "「❓ もし まえがカベなら」登場！「🔄 くりかえす」と組み合わせてカレー🍛へ！",
-        badge: "🍛 カレーをめざそう",
-        gridWidth: 4,
-        gridHeight: 4,
-        goalIcon: "🍛",
-        goalName: "カレー",
-        map: [
-          [2, 0, 1, 1],
-          [1, 0, 1, 1],
-          [1, 3, 1, 1],
-          [1, 1, 1, 1]
-        ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'repeat', 'while', 'if']
-      },
-      // ステージ 12（ドイツ）： ソーセージ 🌭
+      // ステージ 12（ブラジル）： サッカー ⚽
       {
         id: 11,
-        country: "🇩🇪 ドイツ",
-        theme: "germany",
-        title: "🇩🇪 ステージ 12: ドイツ（ソーセージ）",
-        desc: "カベにぶつかる前に曲がって、おいしいソーセージ🌭をめざそう！",
-        badge: "🌭 ソーセージへ",
-        gridWidth: 5,
-        gridHeight: 4,
-        goalIcon: "🌭",
-        goalName: "ソーセージ",
+        country: "🇧🇷 ブラジル",
+        theme: "brazil",
+        title: "🇧🇷 ステージ 12: ブラジル（サッカー）",
+        desc: "今度はくりかえす回数を自分で変えてみよう！ゴールまで何歩かな？",
+        badge: "⚽ サッカー場へ",
+        hint: "ゴールまで5マスあるよ。くりかえしブロックの数字を「5」に変えて「すすむ」を入れよう！",
+        gridWidth: 7,
+        gridHeight: 3,
+        goalIcon: "⚽",
+        goalName: "サッカーボール",
+        minBlocks: 2,
         map: [
-          [2, 0, 0, 1, 1],
-          [1, 1, 0, 1, 1],
-          [1, 1, 0, 3, 1],
-          [1, 1, 1, 1, 1]
+          [1, 1, 1, 1, 1, 1, 1],
+          [2, 0, 0, 0, 0, 3, 1],
+          [1, 1, 1, 1, 1, 1, 1]
         ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'while', 'if']
+        start: { x: 0, y: 1, dir: 1 },
+        availableBlocks: ['forward'],
+        designatedBlocks: [
+          { type: 'repeat', count: 2, locked: false, children: [] }
+        ]
       },
-      // ステージ 13（スイス）： チーズ 🧀
+      // ステージ 13（ロシア）： マトリョーシカ 🪆
       {
         id: 12,
-        country: "🇨🇭 スイス",
-        theme: "switzerland",
-        title: "🇨🇭 ステージ 13: スイス（チーズ）",
-        desc: "アルプスの山道。「もし まえが道なら」を活用してチーズ🧀をめざそう！",
-        badge: "🧀 スイスチーズへ",
-        gridWidth: 5,
+        country: "🇷🇺 ロシア",
+        theme: "russia",
+        title: "🇷🇺 ステージ 13: ロシア（マトリョーシカ）",
+        desc: "「すすむ・すすむ・みぎをむく」のパターンを3回くりかえしてゴールへ！",
+        badge: "🪆 マトリョーシカへ",
+        hint: "指定のくりかえしブロックの中に、「すすむ」「すすむ」「みぎをむく」の3つを入れよう！",
+        gridWidth: 4,
         gridHeight: 4,
-        goalIcon: "🧀",
-        goalName: "チーズ",
+        goalIcon: "🪆",
+        goalName: "マトリョーシカ",
+        minBlocks: 4,
         map: [
-          [2, 0, 1, 1, 1],
-          [1, 0, 0, 1, 1],
-          [1, 1, 0, 3, 1],
-          [1, 1, 1, 1, 1]
+          [2, 0, 0, 1],
+          [1, 1, 0, 1],
+          [3, 0, 0, 1],
+          [1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'while', 'if']
+        availableBlocks: ['forward', 'turn_right'],
+        designatedBlocks: [
+          { type: 'repeat', count: 3, locked: true, children: [] }
+        ]
       },
       // ステージ 14（メキシコ）： タコス 🌮
       {
@@ -1886,43 +2151,53 @@
         country: "🇲🇽 メキシコ",
         theme: "mexico",
         title: "🇲🇽 ステージ 14: メキシコ（タコス）",
-        desc: "カベをうまくよけながら進んで、タコス🌮へゴールしよう！",
-        badge: "🌮 タコスへダッシュ",
+        desc: "階段パターンを2回くりかえして、タコス🌮を食べに行こう！",
+        badge: "🌮 タコスの広場へ",
+        hint: "指定のくりかえしブロックの中に、「すすむ → みぎ → すすむ → ひだり」の階段パターンを入れよう！",
         gridWidth: 5,
-        gridHeight: 5,
+        gridHeight: 4,
         goalIcon: "🌮",
         goalName: "タコス",
+        minBlocks: 5,
         map: [
-          [2, 0, 0, 0, 1],
-          [1, 1, 1, 0, 1],
-          [1, 1, 1, 0, 1],
-          [1, 3, 0, 0, 1],
+          [2, 0, 1, 1, 1],
+          [1, 0, 0, 1, 1],
+          [1, 1, 0, 3, 1],
           [1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'while', 'if']
+        availableBlocks: ['forward', 'turn_right', 'turn_left'],
+        designatedBlocks: [
+          { type: 'repeat', count: 2, locked: true, children: [] }
+        ]
       },
-      // ステージ 15（ロシア）： マトリョーシカ 🪆
+      // ステージ 15（スイス）： アルプスのホルン 📯
       {
         id: 14,
-        country: "🇷🇺 ロシア",
-        theme: "russia",
-        title: "🇷🇺 ステージ 15: ロシア（マトリョーシカ）",
-        desc: "ぐるぐる回るうずまき迷路のまん中にあるマトリョーシカ🪆をめざそう！",
-        badge: "🪆 マトリョーシカへ",
-        gridWidth: 5,
-        gridHeight: 5,
-        goalIcon: "🪆",
-        goalName: "マトリョーシカ",
+        country: "🇨🇭 スイス",
+        theme: "switzerland",
+        title: "🇨🇭 ステージ 15: スイス（アルプスのホルン）",
+        desc: "4段のアルプスの階段！くりかえし回数を合わせてホルン📯へ！",
+        badge: "📯 アルプスのホルンへ",
+        hint: "階段が4回続くよ。くりかえし回数を「4」にして、階段パターン（すすむ・みぎ・すすむ・ひだり）を入れよう！",
+        gridWidth: 6,
+        gridHeight: 6,
+        goalIcon: "📯",
+        goalName: "アルプスのホルン",
+        minBlocks: 5,
         map: [
-          [2, 0, 0, 0, 0],
-          [1, 1, 1, 1, 0],
-          [1, 0, 3, 1, 0],
-          [1, 0, 0, 0, 0],
-          [1, 1, 1, 1, 1]
+          [2, 0, 1, 1, 1, 1],
+          [1, 0, 0, 1, 1, 1],
+          [1, 1, 0, 0, 1, 1],
+          [1, 1, 1, 0, 0, 1],
+          [1, 1, 1, 1, 0, 3],
+          [1, 1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'while', 'if']
+        availableBlocks: ['forward', 'turn_right', 'turn_left'],
+        designatedBlocks: [
+          { type: 'repeat', count: 2, locked: false, children: [] }
+        ]
       },
       // ステージ 16（オランダ）： チューリップ 🌷
       {
@@ -1932,38 +2207,55 @@
         title: "🇳🇱 ステージ 16: オランダ（チューリップ）",
         desc: "「🔄 ゴールするまで くりかえす」の登場！チューリップ畑🌷へ一気に進もう！",
         badge: "🌷 チューリップ畑へ",
-        gridWidth: 6,
+        hint: "「ゴールするまで くりかえす」の中に「1マスすすむ」を入れるだけで、自動で進むよ！",
+        gridWidth: 7,
         gridHeight: 3,
         goalIcon: "🌷",
         goalName: "チューリップ",
+        minBlocks: 2,
         map: [
-          [1, 1, 1, 1, 1, 1],
-          [2, 0, 0, 0, 3, 1],
-          [1, 1, 1, 1, 1, 1]
+          [1, 1, 1, 1, 1, 1, 1],
+          [2, 0, 0, 0, 0, 3, 1],
+          [1, 1, 1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 1, dir: 1 },
-        availableBlocks: ['forward', 'while']
+        availableBlocks: ['forward'],
+        designatedBlocks: [
+          { type: 'while', condition: 'not_goal', locked: true, children: [] }
+        ]
       },
-      // ステージ 17（スペイン）： 闘牛（牛） 🐂
+      // ステージ 17（スペイン）： 闘牛 🐂
       {
         id: 16,
         country: "🇪🇸 スペイン",
         theme: "spain",
         title: "🇪🇸 ステージ 17: スペイン（闘牛）",
-        desc: "「ゴールするまで」のあいだ、カベを曲がって牛🐂のところへ行こう！",
+        desc: "カベにぶつかったら左へ！「もし」を組み合わせ闘牛🐂のところへ！",
         badge: "🐂 闘牛の広場へ",
-        gridWidth: 5,
+        hint: "「もし まえがカベなら」の中に「ひだりをむく」を入れ、その下に「1マスすすむ」を置こう！",
+        gridWidth: 4,
         gridHeight: 4,
         goalIcon: "🐂",
         goalName: "闘牛",
+        minBlocks: 4,
         map: [
-          [2, 0, 0, 1, 1],
-          [1, 1, 0, 1, 1],
-          [1, 1, 3, 1, 1],
-          [1, 1, 1, 1, 1]
+          [1, 1, 1, 1],
+          [1, 3, 1, 1],
+          [2, 0, 1, 1],
+          [1, 1, 1, 1]
         ],
-        start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'while', 'if']
+        start: { x: 0, y: 2, dir: 1 },
+        availableBlocks: ['forward', 'turn_left'],
+        designatedBlocks: [
+          {
+            type: 'while',
+            condition: 'not_goal',
+            locked: true,
+            children: [
+              { type: 'if', condition: 'wall_ahead', locked: true, children: [] }
+            ]
+          }
+        ]
       },
       // ステージ 18（南極/アイスランド）： ペンギン 🐧
       {
@@ -1971,21 +2263,33 @@
         country: "🇦🇶 南極/アイスランド",
         theme: "antarctica",
         title: "🇦🇶 ステージ 18: 南極/アイスランド（ペンギン）",
-        desc: "こおりの海をすいすいぬけて、ペンギン🐧に会いに行こう！",
+        desc: "時計回りのうずまき迷路！条件を正しくえらんでペンギン🐧に会おう！",
         badge: "🐧 ペンギンの氷原へ",
+        hint: "くりかえしを「ゴールするまで」、もしを「まえがカベ」にして、「みぎをむく」と「すすむ」を入れよう！",
         gridWidth: 5,
         gridHeight: 5,
         goalIcon: "🐧",
         goalName: "ペンギン",
+        minBlocks: 4,
         map: [
-          [2, 0, 0, 0, 1],
-          [1, 1, 1, 0, 1],
-          [1, 0, 0, 0, 1],
-          [1, 0, 1, 1, 1],
-          [1, 3, 1, 1, 1]
+          [2, 0, 0, 0, 0],
+          [1, 1, 1, 1, 0],
+          [1, 3, 0, 1, 0],
+          [1, 1, 0, 0, 0],
+          [1, 1, 1, 1, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'while', 'if']
+        availableBlocks: ['forward', 'turn_right'],
+        designatedBlocks: [
+          {
+            type: 'while',
+            condition: 'path_ahead',
+            locked: false,
+            children: [
+              { type: 'if', condition: 'path_ahead', locked: false, children: [] }
+            ]
+          }
+        ]
       },
       // ステージ 19（ギリシャ）： 神殿の柱 🏛️
       {
@@ -1993,12 +2297,14 @@
         country: "🇬🇷 ギリシャ",
         theme: "greece",
         title: "🇬🇷 ステージ 19: ギリシャ（神殿の柱）",
-        desc: "古代ギリシャの神殿の柱🏛️がならぶ迷路をぬけて、ゴールをめざそう！",
+        desc: "神殿の柱がならぶ迷路！右折とUターン（右2回）で進もう！",
         badge: "🏛️ 神殿の柱へ",
+        hint: "最初のもしカベに「みぎをむく」、内側のもしカベに「みぎをむく」を2つ、最後に「すすむ」を置こう！",
         gridWidth: 5,
         gridHeight: 5,
         goalIcon: "🏛️",
         goalName: "神殿の柱",
+        minBlocks: 7,
         map: [
           [2, 0, 1, 0, 1],
           [1, 0, 1, 0, 1],
@@ -2007,7 +2313,24 @@
           [1, 3, 0, 0, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'while', 'if']
+        availableBlocks: ['forward', 'turn_right'],
+        designatedBlocks: [
+          {
+            type: 'while',
+            condition: 'not_goal',
+            locked: true,
+            children: [
+              {
+                type: 'if',
+                condition: 'wall_ahead',
+                locked: true,
+                children: [
+                  { type: 'if', condition: 'wall_ahead', locked: true, children: [] }
+                ]
+              }
+            ]
+          }
+        ]
       },
       // ステージ 20（宇宙/月）： ロケット 🚀
       {
@@ -2015,21 +2338,23 @@
         country: "🚀 宇宙/月",
         theme: "space",
         title: "🚀 ステージ 20: 宇宙/月（ロケット）",
-        desc: "大冒険のフィナーレ！すべてのブロックを使いこなしてロケット🚀へ乗りこもう！",
+        desc: "大冒険のフィナーレ！ステージ19の右手法アルゴリズムを自分でゼロから組み立てよう！",
         badge: "🚀 ロケットへ出発！",
+        hint: "指定ブロックなし！ステージ19で完成させた「右手法アルゴリズム」を思い出して組み立ててみよう！",
         gridWidth: 5,
         gridHeight: 5,
         goalIcon: "🚀",
         goalName: "ロケット",
+        minBlocks: 7,
         map: [
-          [2, 0, 0, 0, 1],
+          [2, 0, 1, 0, 1],
+          [1, 0, 0, 0, 1],
           [1, 1, 1, 0, 1],
           [1, 0, 0, 0, 1],
-          [1, 0, 1, 1, 1],
-          [1, 0, 0, 3, 1]
+          [1, 3, 1, 0, 1]
         ],
         start: { x: 0, y: 0, dir: 1 },
-        availableBlocks: ['forward', 'turn_right', 'turn_left', 'repeat', 'if', 'while']
+        availableBlocks: ['forward', 'turn_right', 'while', 'if']
       }
     ];
 
@@ -2126,10 +2451,50 @@
     const btnSoundToggle = document.getElementById('btn-sound-toggle');
     const btnViewCode = document.getElementById('btn-view-code');
     const goalModal = document.getElementById('goal-modal');
+    const clearBadgeContainer = document.getElementById('clear-badge-container');
     const codeModal = document.getElementById('code-modal');
     const btnCloseCode = document.getElementById('btn-close-code');
     const btnModalNext = document.getElementById('btn-modal-next');
     const btnModalReplay = document.getElementById('btn-modal-replay');
+
+    // 新規UI要素
+    const courseBadgeEl = document.getElementById('course-badge');
+    const btnViewMedals = document.getElementById('btn-view-medals');
+    const medalsLabel = document.getElementById('medals-label');
+    const btnViewHint = document.getElementById('btn-view-hint');
+    const hintModal = document.getElementById('hint-modal');
+    const btnCloseHint = document.getElementById('btn-close-hint');
+    const hintModalTitle = document.getElementById('hint-modal-title');
+    const hintModalDesc = document.getElementById('hint-modal-desc');
+    const medalsModal = document.getElementById('medals-modal');
+    const btnCloseMedals = document.getElementById('btn-close-medals');
+    const medalsGrid = document.getElementById('medals-grid');
+    const courseUnlockModal = document.getElementById('course-unlock-modal');
+    const btnStartMaster = document.getElementById('btn-start-master');
+
+    // コース・進捗・指定ブロック状態
+    let currentCourse = 'standard'; // 'standard' | 'master'
+    let isMasterUnlocked = (localStorage.getItem('agy_master_unlocked') === 'true');
+    let hasDeletedDesignated = false;
+    let stage10LeafPos = null;
+    let stage10LeavesCollected = 0;
+
+    let gameProgress = {
+      standard: { cleared: {}, perfect: {} },
+      master: { cleared: {}, perfect: {} }
+    };
+    try {
+      const saved = localStorage.getItem('agy_progress_data_v2');
+      if (saved) gameProgress = JSON.parse(saved);
+      if (!gameProgress.standard) gameProgress.standard = { cleared: {}, perfect: {} };
+      if (!gameProgress.master) gameProgress.master = { cleared: {}, perfect: {} };
+    } catch (e) {}
+
+    function saveProgressData() {
+      try {
+        localStorage.setItem('agy_progress_data_v2', JSON.stringify(gameProgress));
+      } catch (e) {}
+    }
 
     /* ========================================================
        4. ゼルダ風2D見下ろし迷路システム (Maze2D)
@@ -2196,6 +2561,23 @@
             }
             this.gridEl.appendChild(cell);
           }
+        }
+
+        // ステージ10（カエデの森）の葉っぱランダム配置（内部3x3）
+        if (stage.isLeafCollectorStage) {
+          stage10LeavesCollected = 0;
+          const lx = Math.floor(Math.random() * 3) + 1;
+          const ly = Math.floor(Math.random() * 3) + 1;
+          stage10LeafPos = { x: lx, y: ly, collected: false };
+          const leafCell = this.gridEl.querySelector(`#cell-${lx}-${ly}`);
+          if (leafCell) {
+            leafCell.innerHTML = `
+              <img src="images/stages/canada_goal.png" class="map-item-leaf" id="field-leaf-item" alt="カエデの葉っぱ" title="カエデの葉っぱ">
+            `;
+          }
+        } else {
+          stage10LeafPos = null;
+          stage10LeavesCollected = 0;
         }
 
         // robotElをgridElの直下に再配置
@@ -2314,14 +2696,96 @@
     /* ========================================================
        5. 初期化とステージ読み込み
     ======================================================== */
+    function updateCourseUI() {
+      if (courseBadgeEl) {
+        if (currentCourse === 'master') {
+          courseBadgeEl.innerText = '🏆 マスターコース';
+          courseBadgeEl.classList.add('master-active');
+          courseBadgeEl.title = '全ブロック解禁！クリックでスタンダードコースへ';
+        } else {
+          courseBadgeEl.innerText = isMasterUnlocked ? '🗺️ スタンダード (切替可)' : '🗺️ スタンダード';
+          courseBadgeEl.classList.remove('master-active');
+          courseBadgeEl.title = isMasterUnlocked ? 'クリックでマスターコースへ' : 'ステージ20をクリアするとマスターコース解禁！';
+        }
+      }
+    }
+
     function initStageSelectOptions() {
       stageSelect.innerHTML = '';
+      const progress = gameProgress[currentCourse] || { cleared: {}, perfect: {} };
       STAGES.forEach((stage, idx) => {
         const opt = document.createElement('option');
         opt.value = idx;
-        opt.innerText = stage.title;
+        let prefix = '';
+        if (progress.perfect && progress.perfect[idx]) {
+          prefix = '👑 ';
+        } else if (progress.cleared && progress.cleared[idx]) {
+          prefix = '✅ ';
+        }
+        opt.innerText = `${prefix}${stage.title}`;
         stageSelect.appendChild(opt);
       });
+      stageSelect.value = currentStageIndex;
+    }
+
+    function createDesignatedBlock(def) {
+      const block = createBlockDOM(def.type);
+      block.classList.add('designated-block');
+      block.dataset.isDesignated = 'true';
+
+      // 視覚的バッジ「📌 指定ブロック」
+      const header = block.querySelector('.c-header') || block;
+      header.style.position = 'relative';
+      const tag = document.createElement('span');
+      tag.className = 'designated-tag';
+      tag.innerText = '📌 指定ブロック';
+      header.appendChild(tag);
+
+      // 条件・数値の設定とロック
+      if (def.type === 'repeat') {
+        const select = block.querySelector('.repeat-count');
+        if (select && def.count) {
+          select.value = String(def.count);
+        }
+        if (def.locked && select) {
+          select.disabled = true;
+          select.classList.add('designated-locked-select');
+          select.title = 'この回数は固定されています';
+        }
+      } else if (def.type === 'if') {
+        const select = block.querySelector('.if-cond');
+        if (select && def.condition) {
+          select.value = def.condition;
+        }
+        if (def.locked && select) {
+          select.disabled = true;
+          select.classList.add('designated-locked-select');
+          select.title = 'この条件は固定されています';
+        }
+      } else if (def.type === 'while') {
+        const select = block.querySelector('.while-cond');
+        if (select && def.condition) {
+          select.value = def.condition;
+        }
+        if (def.locked && select) {
+          select.disabled = true;
+          select.classList.add('designated-locked-select');
+          select.title = 'この条件は固定されています';
+        }
+      }
+
+      // 入れ子の子ブロック
+      if (def.children && def.children.length > 0) {
+        const body = block.querySelector('.c-body');
+        if (body) {
+          def.children.forEach(childDef => {
+            const childBlock = createDesignatedBlock(childDef);
+            body.appendChild(childBlock);
+          });
+        }
+      }
+
+      return block;
     }
 
     function loadStage(index, clearWorkspace = true) {
@@ -2332,15 +2796,36 @@
       stageBadgeEl.innerText = stage.badge;
       stageSelect.value = index;
 
+      hasDeletedDesignated = false;
+
       if (clearWorkspace) {
-        clearAllBlocks();
+        clearAllBlocks(false);
       }
 
-      updatePaletteBlocks(stage.availableBlocks);
-      Maze2D.buildStage(stage);
+      // パレットブロックの制御
+      if (currentCourse === 'master') {
+        // マスターコース: 全ブロック解禁！
+        updatePaletteBlocks(['forward', 'turn_right', 'turn_left', 'repeat', 'while', 'if']);
+      } else {
+        // スタンダードコース:
+        // 「くりかえすブロックと〜のあいだブロックのどちらかを使えるブロックにおく」
+        updatePaletteBlocks(stage.availableBlocks);
 
+        // 指定ブロックを作業スペースに自動配置
+        if (clearWorkspace && stage.designatedBlocks && stage.designatedBlocks.length > 0) {
+          stage.designatedBlocks.forEach(def => {
+            const dBlock = createDesignatedBlock(def);
+            mainStack.appendChild(dBlock);
+          });
+          checkEmptyHint();
+          hasDeletedDesignated = false;
+        }
+      }
+
+      Maze2D.buildStage(stage);
       resetRobot();
       updateStats();
+      updateCourseUI();
       setStatus('🌱 ブロックをならべて「うごかす！」をおしてね！');
     }
 
@@ -2369,8 +2854,15 @@
       statusBanner.innerText = text;
     }
 
-    function clearAllBlocks() {
+    function clearAllBlocks(trackDelete = true) {
       const blocks = Array.from(mainStack.children).filter(el => el !== emptyHint);
+      if (trackDelete) {
+        blocks.forEach(b => {
+          if (b.dataset.isDesignated === 'true' || b.querySelector('[data-is-designated="true"]')) {
+            hasDeletedDesignated = true;
+          }
+        });
+      }
       blocks.forEach(b => b.remove());
       checkEmptyHint();
       updateStats();
@@ -2579,6 +3071,10 @@
       el.querySelector('.btn-delete').addEventListener('click', (e) => {
         e.stopPropagation();
         Sound.click();
+        if (el.dataset.isDesignated === 'true' || el.querySelector('[data-is-designated="true"]')) {
+          hasDeletedDesignated = true;
+          setStatus('⚠️ 指定ブロックを削除したよ（パーフェクトクリアには指定ブロックが必要です）', 'error');
+        }
         el.remove();
         checkEmptyHint();
         updateStats();
@@ -2908,6 +3404,23 @@
       stepsCount++;
       Sound.move();
 
+      // ステージ10（カエデの森）の葉っぱ回収チェック
+      if (stage.isLeafCollectorStage && stage10LeafPos && !stage10LeafPos.collected) {
+        if (robotPos.x === stage10LeafPos.x && robotPos.y === stage10LeafPos.y) {
+          stage10LeafPos.collected = true;
+          stage10LeavesCollected++;
+          const leafEl = document.getElementById('field-leaf-item');
+          if (leafEl) {
+            leafEl.style.transition = 'all 0.4s ease';
+            leafEl.style.transform = 'scale(1.8) translateY(-20px)';
+            leafEl.style.opacity = '0';
+            setTimeout(() => leafEl.remove(), 400);
+          }
+          Sound.clear();
+          setStatus('🍁 まんなかの森でカエデの葉っぱをひろったよ！（1/2）', 'success');
+        }
+      }
+
       await Maze2D.moveKeyakki(nextX, nextY, robotPos.dir, speed);
       updateStats();
 
@@ -2919,11 +3432,52 @@
       const isAtGoal = (stage.map[robotPos.y][robotPos.x] === 3);
 
       if (isAtGoal) {
-        setStatus(`🎉 やったー！${stage.goalName}にゴールせいこう！！`, 'success');
+        // ステージ10の場合、森の葉っぱを拾っているか確認
+        if (stage.isLeafCollectorStage && stage10LeavesCollected < 1) {
+          setStatus('🍁 カエデの葉っぱがたりないよ！真ん中の森にある葉っぱをひろってからゴールしよう！', 'error');
+          return;
+        }
+        if (stage.isLeafCollectorStage) {
+          stage10LeavesCollected = 2; // ゴールの葉っぱと合わせて2つ獲得！
+        }
+
+        const totalBlocks = countTotalBlocks();
+        const isMinBlocks = (totalBlocks <= stage.minBlocks);
+        const isDesignatedKept = (stage.designatedBlocks ? !hasDeletedDesignated : true);
+        const isPerfect = isMinBlocks && isDesignatedKept;
+
+        // 進捗の保存
+        const progress = gameProgress[currentCourse];
+        progress.cleared[currentStageIndex] = true;
+        if (isPerfect) {
+          progress.perfect[currentStageIndex] = true;
+        }
+        saveProgressData();
+        initStageSelectOptions();
+        updateMedalsUI();
+
+        if (isPerfect) {
+          setStatus(`🌟 最短記録！${stage.goalName}にパーフェクトクリア！！`, 'success');
+        } else {
+          setStatus(`🎉 やったー！${stage.goalName}にゴールせいこう！！`, 'success');
+        }
         Sound.clear();
         Maze2D.robotEl.classList.add('keyakki-jump');
         triggerConfetti();
-        openGoalModal();
+        openGoalModal(isPerfect, isMinBlocks, isDesignatedKept);
+
+        // 最終ステージクリア時の解禁処理
+        if (currentStageIndex >= STAGES.length - 1) {
+          if (!isMasterUnlocked) {
+            isMasterUnlocked = true;
+            localStorage.setItem('agy_master_unlocked', 'true');
+            updateCourseUI();
+            setTimeout(() => {
+              goalModal.classList.remove('active');
+              courseUnlockModal.classList.add('active');
+            }, 1800);
+          }
+        }
       } else {
         setStatus('🤔 ゴールにとどかなかったよ。ブロックをふやしてみよう！', 'error');
       }
@@ -2995,19 +3549,122 @@
     }
 
     /* ========================================================
-       10. モーダル & UIイベント
+       10. モーダル & UIイベント & メダルシステム
     ======================================================== */
-    function openGoalModal() {
+    const MEDALS_DEF = [
+      {
+        id: 'bronze',
+        title: 'ブロンズメダル',
+        desc: 'スタンダードコース全20ステージをクリア！',
+        img: 'images/medals/medal_bronze.png',
+        isUnlocked: () => {
+          const p = gameProgress.standard?.cleared || {};
+          return STAGES.every((_, idx) => p[idx] === true);
+        }
+      },
+      {
+        id: 'silver',
+        title: 'シルバーメダル',
+        desc: 'スタンダードコース全20ステージをパーフェクトクリア！',
+        img: 'images/medals/medal_silver.png',
+        isUnlocked: () => {
+          const p = gameProgress.standard?.perfect || {};
+          return STAGES.every((_, idx) => p[idx] === true);
+        }
+      },
+      {
+        id: 'gold',
+        title: 'ゴールドメダル',
+        desc: 'マスターコース全20ステージをクリア！',
+        img: 'images/medals/medal_gold.png',
+        isUnlocked: () => {
+          const p = gameProgress.master?.cleared || {};
+          return STAGES.every((_, idx) => p[idx] === true);
+        }
+      },
+      {
+        id: 'platinum',
+        title: 'マスタープラチナメダル',
+        desc: 'マスターコース全20ステージをパーフェクトクリア！神域達成！',
+        img: 'images/medals/medal_platinum.png',
+        isUnlocked: () => {
+          const p = gameProgress.master?.perfect || {};
+          return STAGES.every((_, idx) => p[idx] === true);
+        }
+      }
+    ];
+
+    function updateMedalsUI() {
+      let highestMedal = null;
+      let count = 0;
+      MEDALS_DEF.forEach(m => {
+        if (m.isUnlocked()) {
+          highestMedal = m;
+          count++;
+        }
+      });
+
+      if (medalsLabel) {
+        if (highestMedal) {
+          medalsLabel.innerHTML = `<img src="${highestMedal.img}" style="width:20px; height:20px; vertical-align:middle; margin-right:4px;">メダル (${count}/4)`;
+        } else {
+          medalsLabel.innerText = `🏅 メダル (${count}/4)`;
+        }
+      }
+    }
+
+    function renderMedalsModal() {
+      if (!medalsGrid) return;
+      medalsGrid.innerHTML = '';
+      MEDALS_DEF.forEach(m => {
+        const unlocked = m.isUnlocked();
+        const card = document.createElement('div');
+        card.className = `medal-item ${unlocked ? 'unlocked' : 'locked'}`;
+        card.innerHTML = `
+          <img src="${m.img}" class="medal-icon-img" alt="${m.title}">
+          <div class="medal-name">${m.title}</div>
+          <div class="medal-cond">${m.desc}</div>
+          <div class="medal-status">${unlocked ? '✨ 獲得済み！' : '🔒 未獲得'}</div>
+        `;
+        medalsGrid.appendChild(card);
+      });
+    }
+
+    function openGoalModal(isPerfect, isMinBlocks, isDesignatedKept) {
       const stage = STAGES[currentStageIndex];
       const modalIcon = document.querySelector('#goal-modal .modal-icon');
       if (modalIcon) {
         modalIcon.innerHTML = `<img src="images/stages/${stage.theme}_goal.png" style="width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));" alt="${stage.goalName}">`;
       }
+      const modalTitle = document.getElementById('goal-modal-title');
+      const badgeContainer = document.getElementById('clear-badge-container');
       const modalDesc = document.getElementById('modal-desc');
-      modalDesc.innerHTML = `
-        <strong>${stage.title}</strong> をクリアしたよ！<br>
-        あるいた数: <strong>${stepsCount}</strong> 歩 ／ 使ったブロック: <strong>${countTotalBlocks()}</strong> 個
-      `;
+      const totalBlocks = countTotalBlocks();
+
+      if (isPerfect) {
+        modalTitle.innerText = 'パーフェクトクリア！🌟';
+        badgeContainer.innerHTML = '<div class="clear-badge-pill perfect">👑 パーフェクトクリア！</div>';
+        modalDesc.innerHTML = `
+          <strong>${stage.title}</strong> を最短ブロック数でクリアしたよ！<br>
+          あるいた数: <strong>${stepsCount}</strong> 歩 ／ 使ったブロック: <strong>${totalBlocks}</strong> 個<br>
+          <span style="color:#d97706; font-weight:800; font-size:1.02rem; display:inline-block; margin-top:6px;">🎉 目標の最短 ${stage.minBlocks} 個をみごと達成！すばらしい！</span>
+        `;
+      } else {
+        modalTitle.innerText = 'ゴール おめでとう！🎉';
+        badgeContainer.innerHTML = '<div class="clear-badge-pill normal">✅ ステージクリア！</div>';
+        let advice = '';
+        if (!isDesignatedKept) {
+          advice = `<br><span style="color:#d97706; font-weight:800; display:inline-block; margin-top:6px;">💡 指定ブロックを消さずに最短 ${stage.minBlocks}個でクリアすると「パーフェクトクリア」になるよ！</span>`;
+        } else {
+          const diff = totalBlocks - stage.minBlocks;
+          advice = `<br><span style="color:#d97706; font-weight:800; display:inline-block; margin-top:6px;">💡 ブロックが <strong>${stage.minBlocks}個</strong>（あと${diff}個へらす）だとパーフェクトクリアになるよ！</span>`;
+        }
+        modalDesc.innerHTML = `
+          <strong>${stage.title}</strong> をクリアしたよ！<br>
+          あるいた数: <strong>${stepsCount}</strong> 歩 ／ 使ったブロック: <strong>${totalBlocks}</strong> 個
+          ${advice}
+        `;
+      }
 
       if (currentStageIndex >= STAGES.length - 1) {
         btnModalNext.innerText = '🎉 全ステージクリア！はじめから';
@@ -3074,6 +3731,63 @@
       codeModal.classList.remove('active');
     });
 
+    // ヒントモーダル開閉
+    if (btnViewHint) {
+      btnViewHint.addEventListener('click', () => {
+        Sound.click();
+        const stage = STAGES[currentStageIndex];
+        if (hintModalTitle) hintModalTitle.innerText = `💡 ${stage.title} のヒント`;
+        if (hintModalDesc) hintModalDesc.innerText = stage.hint || 'ブロックのならべ方を工夫してみてね！';
+        if (hintModal) hintModal.classList.add('active');
+      });
+    }
+    if (btnCloseHint) {
+      btnCloseHint.addEventListener('click', () => {
+        if (hintModal) hintModal.classList.remove('active');
+      });
+    }
+
+    // メダルモーダル開閉
+    if (btnViewMedals) {
+      btnViewMedals.addEventListener('click', () => {
+        Sound.click();
+        renderMedalsModal();
+        if (medalsModal) medalsModal.classList.add('active');
+      });
+    }
+    if (btnCloseMedals) {
+      btnCloseMedals.addEventListener('click', () => {
+        if (medalsModal) medalsModal.classList.remove('active');
+      });
+    }
+
+    // マスターコース解禁モーダルのボタン
+    if (btnStartMaster) {
+      btnStartMaster.addEventListener('click', () => {
+        if (courseUnlockModal) courseUnlockModal.classList.remove('active');
+        currentCourse = 'master';
+        updateCourseUI();
+        initStageSelectOptions();
+        loadStage(0, true);
+        setStatus('🚀 全ブロック解禁のマスターコースへようこそ！ステージ1から挑戦しよう！', 'success');
+      });
+    }
+
+    // コース切替バッジ
+    if (courseBadgeEl) {
+      courseBadgeEl.addEventListener('click', () => {
+        if (!isMasterUnlocked) {
+          alert('🔒 マスターコースはステージ20をクリアすると解禁されます！まずは全20ステージをクリアしてみてね！');
+          return;
+        }
+        currentCourse = (currentCourse === 'standard') ? 'master' : 'standard';
+        updateCourseUI();
+        initStageSelectOptions();
+        loadStage(currentStageIndex, true);
+        setStatus(currentCourse === 'master' ? '🏆 マスターコースに切り替えたよ！全ブロック解禁！' : '🗺️ スタンダードコースに切り替えたよ！');
+      });
+    }
+
     function generateJSFromAST(nodes, indent = '') {
       if (!nodes || nodes.length === 0) return indent + '// ブロックがありません\n';
       let code = '';
@@ -3106,9 +3820,13 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      updateCourseUI();
+      updateMedalsUI();
       initStageSelectOptions();
       loadStage(0, false);
-      addBlock('forward');
+      if (countTotalBlocks() === 0) {
+        addBlock('forward');
+      }
     });
 
     window.addEventListener('load', () => {
