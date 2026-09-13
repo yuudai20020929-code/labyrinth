@@ -128,7 +128,7 @@ function ensureSheets_() {
     config.appendRow(["teacherPassword", "sensei"]);
     config.appendRow(["allowedGrades", "1,2,3,4,5,6"]);
     config.appendRow(["maxStudentNo", "40"]);
-    config.appendRow(["maxClass", "6"]);
+    config.appendRow(["maxClass", "4"]);
   }
   return { ss: ss, progress: progress, config: config };
 }
@@ -275,7 +275,7 @@ function validateStudent_(grade, className, studentNo) {
   var cfg = getConfigMap_();
   var allowed = parseList_(cfg.allowedGrades || "1,2,3,4,5,6");
   var maxNo = Number(cfg.maxStudentNo || 40);
-  var maxClass = Number(cfg.maxClass || 6);
+  var maxClass = Number(cfg.maxClass || 4);
   grade = Number(grade);
   className = Number(className);
   studentNo = Number(studentNo);

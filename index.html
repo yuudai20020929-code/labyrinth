@@ -2044,13 +2044,13 @@
               <option value="2">2くみ</option>
               <option value="3">3くみ</option>
               <option value="4">4くみ</option>
-              <option value="5">5くみ</option>
-              <option value="6">6くみ</option>
             </select>
           </div>
           <div class="login-field">
             <label for="login-number">ばんごう</label>
-            <input id="login-number" type="number" min="1" max="40" step="1" placeholder="例: 12" inputmode="numeric">
+            <select id="login-number">
+              <option value="" selected disabled>えらぶ</option>
+            </select>
           </div>
         </div>
         <button type="button" class="btn-login" id="btn-login-start">はじめる！</button>
@@ -4816,6 +4816,16 @@
       const btnLoginGuest = document.getElementById('btn-login-guest');
       const loginHint = document.getElementById('login-config-hint');
       const btnStudentLogout = document.getElementById('btn-student-logout');
+      const loginNumber = document.getElementById('login-number');
+
+      if (loginNumber && loginNumber.options.length <= 1) {
+        for (let n = 1; n <= 40; n++) {
+          const opt = document.createElement('option');
+          opt.value = String(n);
+          opt.textContent = n + 'ばん';
+          loginNumber.appendChild(opt);
+        }
+      }
 
       if (loginHint) {
         if (!ClassroomAPI.isConfigured()) {
@@ -4891,7 +4901,7 @@
           const studentNo = Number(document.getElementById('login-number').value);
           loginError.textContent = '';
           if (!Number.isInteger(studentNo) || studentNo < 1 || studentNo > 40) {
-            loginError.textContent = 'しゅっせきばんごうを 1〜40で いれてね';
+            loginError.textContent = 'しゅっせきばんごうを えらんでね';
             return;
           }
           if (!ClassroomAPI.isConfigured()) {
