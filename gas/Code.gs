@@ -16,6 +16,9 @@
 
 var SPREADSHEET_ID = ""; // 空ならスクリプトに紐付いたスプレッドシートを使う
 var TEACHER_SESSION_HOURS = 8;
+var CACHE_TTL_ROW = 120;
+var CACHE_TTL_CONFIG = 300;
+var CACHE_TTL_LOGIN = 60;
 
 function doGet(e) {
   try {
@@ -131,6 +134,13 @@ function ensureSheets_() {
 }
 
 function getConfigMap_() {
+  var cache = CacheService.getScriptCache();
+  var cached = cache.get("cfg_v1");
+  if (cached) {
+    try {
+      return JSON.parse(cached);
+    } catch (e) {}
+  }
   var sheets = ensureSheets_();
   var values = sheets.config.getDataRange().getValues();
   var map = {};
@@ -138,7 +148,39 @@ function getConfigMap_() {
     var k = String(values[i][0] || "").trim();
     if (k) map[k] = String(values[i][1] == null ? "" : values[i][1]).trim();
   }
+  cache.put("cfg_v1", JSON.stringify(map), CACHE_TTL_CONFIG);
   return map;
+}
+
+function progressRowCacheKey_(grade, className, studentNo) {
+  return "prow_" + makeStudentKey_(grade, className, studentNo);
+}
+
+function progressLoginCacheKey_(studentKey) {
+  return "plog_" + studentKey;
+}
+
+function setProgressRowCache_(grade, className, studentNo, rowIndex) {
+  CacheService.getScriptCache().put(
+    progressRowCacheKey_(grade, className, studentNo),
+    String(rowIndex),
+    CACHE_TTL_ROW,
+  );
+}
+
+function invalidateProgressCache_(grade, className, studentNo) {
+  var cache = CacheService.getScriptCache();
+  var studentKey = makeStudentKey_(grade, className, studentNo);
+  cache.remove(progressRowCacheKey_(grade, className, studentNo));
+  cache.remove(progressLoginCacheKey_(studentKey));
+}
+
+function cacheLoginProgress_(studentKey, progressObj) {
+  CacheService.getScriptCache().put(
+    progressLoginCacheKey_(studentKey),
+    JSON.stringify(progressObj),
+    CACHE_TTL_LOGIN,
+  );
 }
 
 // 「3-1-11」のような形式はスプレッドシートが日付（2003/1/11）と誤認するため使わない
@@ -184,6 +226,22 @@ function findProgressRow_(sheet, grade, className, studentNo) {
   grade = Number(grade);
   className = Number(className);
   studentNo = Number(studentNo);
+  var cache = CacheService.getScriptCache();
+  var ck = progressRowCacheKey_(grade, className, studentNo);
+  var cached = cache.get(ck);
+  if (cached) {
+    var rowIndex = Number(cached);
+    if (rowIndex > 1) {
+      var probe = sheet.getRange(rowIndex, 2, 1, 3).getValues()[0];
+      if (
+        Number(probe[0]) === grade &&
+        Number(probe[1]) === className &&
+        Number(probe[2]) === studentNo
+      ) {
+        return rowIndex;
+      }
+    }
+  }
   var values = sheet.getDataRange().getValues();
   for (var i = 1; i < values.length; i++) {
     if (
@@ -191,6 +249,7 @@ function findProgressRow_(sheet, grade, className, studentNo) {
       Number(values[i][2]) === className &&
       Number(values[i][3]) === studentNo
     ) {
+      setProgressRowCache_(grade, className, studentNo, i + 1);
       return i + 1; // 1-based row
     }
   }
@@ -264,26 +323,38 @@ function studentLogin_(body) {
       "",
       now,
     ]);
-    writeKeyCell_(sheets.progress, sheets.progress.getLastRow(), key);
+    var newRow = sheets.progress.getLastRow();
+    writeKeyCell_(sheets.progress, newRow, key);
+    setProgressRowCache_(v.grade, v.className, v.studentNo, newRow);
+    var createdProgress = {
+      key: key,
+      grade: v.grade,
+      className: v.className,
+      studentNo: v.studentNo,
+      cleared: "",
+      perfect: "",
+      masterCleared: "",
+      masterPerfect: "",
+      medals: "",
+      updatedAt: now,
+    };
+    cacheLoginProgress_(key, createdProgress);
     return {
       ok: true,
       created: true,
-      progress: {
-        key: key,
-        grade: v.grade,
-        className: v.className,
-        studentNo: v.studentNo,
-        cleared: "",
-        perfect: "",
-        masterCleared: "",
-        masterPerfect: "",
-        medals: "",
-        updatedAt: now,
-      },
+      progress: createdProgress,
     };
   }
+  var loginCached = CacheService.getScriptCache().get(progressLoginCacheKey_(key));
+  if (loginCached) {
+    try {
+      return { ok: true, created: false, progress: JSON.parse(loginCached) };
+    } catch (e) {}
+  }
   var row = sheets.progress.getRange(rowIndex, 1, 1, 10).getValues()[0];
-  return { ok: true, created: false, progress: rowToProgress_(row) };
+  var progress = rowToProgress_(row);
+  cacheLoginProgress_(key, progress);
+  return { ok: true, created: false, progress: progress };
 }
 
 function saveProgress_(body) {
@@ -320,19 +391,23 @@ function saveProgress_(body) {
       incoming.medals,
       now,
     ]);
-    writeKeyCell_(sheets.progress, sheets.progress.getLastRow(), key);
+    var newRow = sheets.progress.getLastRow();
+    writeKeyCell_(sheets.progress, newRow, key);
+    setProgressRowCache_(v.grade, v.className, v.studentNo, newRow);
+    var createdSaveProgress = Object.assign(
+      {
+        key: key,
+        grade: v.grade,
+        className: v.className,
+        studentNo: v.studentNo,
+        updatedAt: now,
+      },
+      incoming,
+    );
+    cacheLoginProgress_(key, createdSaveProgress);
     return {
       ok: true,
-      progress: Object.assign(
-        {
-          key: key,
-          grade: v.grade,
-          className: v.className,
-          studentNo: v.studentNo,
-          updatedAt: now,
-        },
-        incoming,
-      ),
+      progress: createdSaveProgress,
     };
   }
 
@@ -366,20 +441,23 @@ function saveProgress_(body) {
         now,
       ],
     ]);
+  setProgressRowCache_(v.grade, v.className, v.studentNo, rowIndex);
+  var savedProgress = {
+    key: key,
+    grade: v.grade,
+    className: v.className,
+    studentNo: v.studentNo,
+    cleared: merged.cleared,
+    perfect: merged.perfect,
+    masterCleared: merged.masterCleared,
+    masterPerfect: merged.masterPerfect,
+    medals: merged.medals,
+    updatedAt: now,
+  };
+  cacheLoginProgress_(key, savedProgress);
   return {
     ok: true,
-    progress: {
-      key: key,
-      grade: v.grade,
-      className: v.className,
-      studentNo: v.studentNo,
-      cleared: merged.cleared,
-      perfect: merged.perfect,
-      masterCleared: merged.masterCleared,
-      masterPerfect: merged.masterPerfect,
-      medals: merged.medals,
-      updatedAt: now,
-    },
+    progress: savedProgress,
   };
 }
 

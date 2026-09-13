@@ -4,6 +4,17 @@
 (function (global) {
   const SESSION_KEY = 'agy_classroom_session';
   const TEACHER_TOKEN_KEY = 'agy_teacher_token';
+  const LOGIN_CACHE_KEY = 'agy_login_cache_v1';
+
+  const GET_ACTIONS = new Set(['studentLogin', 'saveProgress']);
+  const FETCH_TIMEOUT_MS = 30000;
+  const LOGIN_CACHE_TTL_MS = 5 * 60 * 1000;
+  const SAVE_DEBOUNCE_MS = 4000;
+
+  let saveQueue = Promise.resolve();
+  let saveDebounceTimer = null;
+  let pendingSaveArgs = null;
+  let lastSavedHash = '';
 
   function getConfig() {
     return global.LABYRINTH_CONFIG || {};
@@ -17,9 +28,9 @@
     return Boolean(getGasUrl());
   }
 
-  const GET_ACTIONS = new Set(['studentLogin', 'saveProgress']);
-  const FETCH_TIMEOUT_MS = 30000;
-  let saveQueue = Promise.resolve();
+  function makeSessionKey(grade, className, studentNo) {
+    return 'G' + grade + '-C' + className + '-N' + studentNo;
+  }
 
   function validateApiData(action, data) {
     if (action === 'studentLogin') {
@@ -126,7 +137,6 @@
     }
 
     try {
-      // 生徒ログイン・進捗保存は GET 優先（失敗時 POST にフォールバック）
       if (GET_ACTIONS.has(action)) {
         try {
           return await request('GET', buildGetUrl(baseUrl, payload));
@@ -198,6 +208,58 @@
     };
   }
 
+  function buildLoginResult(data, grade, className, studentNo) {
+    const session = {
+      grade: Number(grade),
+      className: Number(className),
+      studentNo: Number(studentNo),
+      key: data.progress.key
+    };
+    setStudentSession(session);
+    return {
+      session,
+      progress: progressFromSheet(data.progress),
+      created: data.created
+    };
+  }
+
+  function getLoginCache(grade, className, studentNo) {
+    try {
+      const raw = sessionStorage.getItem(LOGIN_CACHE_KEY);
+      if (!raw) return null;
+      const cached = JSON.parse(raw);
+      if (
+        Number(cached.grade) !== Number(grade) ||
+        Number(cached.className) !== Number(className) ||
+        Number(cached.studentNo) !== Number(studentNo)
+      ) {
+        return null;
+      }
+      if (Date.now() - cached.at > LOGIN_CACHE_TTL_MS) return null;
+      return cached.result;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function setLoginCache(grade, className, studentNo, result) {
+    try {
+      sessionStorage.setItem(LOGIN_CACHE_KEY, JSON.stringify({
+        grade: Number(grade),
+        className: Number(className),
+        studentNo: Number(studentNo),
+        at: Date.now(),
+        result
+      }));
+    } catch (e) {}
+  }
+
+  function clearLoginCache() {
+    try {
+      sessionStorage.removeItem(LOGIN_CACHE_KEY);
+    } catch (e) {}
+  }
+
   function getStudentSession() {
     try {
       const raw = sessionStorage.getItem(SESSION_KEY);
@@ -213,6 +275,8 @@
 
   function clearStudentSession() {
     sessionStorage.removeItem(SESSION_KEY);
+    clearLoginCache();
+    lastSavedHash = '';
   }
 
   function getTeacherToken() {
@@ -231,7 +295,13 @@
     sessionStorage.removeItem(TEACHER_TOKEN_KEY);
   }
 
-  async function studentLogin(grade, className, studentNo) {
+  async function studentLogin(grade, className, studentNo, options) {
+    const force = options && options.force;
+    if (!force) {
+      const cached = getLoginCache(grade, className, studentNo);
+      if (cached) return cached;
+    }
+
     const data = await callApi({
       action: 'studentLogin',
       grade: Number(grade),
@@ -239,38 +309,101 @@
       classNo: Number(className),
       studentNo: Number(studentNo)
     });
-    const session = {
-      grade: Number(grade),
-      className: Number(className),
-      studentNo: Number(studentNo),
-      key: data.progress.key
-    };
-    setStudentSession(session);
-    return {
-      session,
-      progress: progressFromSheet(data.progress),
-      created: data.created
-    };
+    const result = buildLoginResult(data, grade, className, studentNo);
+    setLoginCache(grade, className, studentNo, result);
+    return result;
   }
 
-  async function saveProgress(gameProgress, medalIds, options) {
+  function hashSavePayload(payload, reset) {
+    return JSON.stringify({
+      reset: Boolean(reset),
+      cleared: payload.cleared,
+      perfect: payload.perfect,
+      masterCleared: payload.masterCleared,
+      masterPerfect: payload.masterPerfect,
+      medals: payload.medals
+    });
+  }
+
+  async function runSaveProgress(gameProgress, medalIds, options) {
     const session = getStudentSession();
     if (!session) throw new Error('no_session');
-    const payload = sheetPayloadFromGameProgress(gameProgress, medalIds);
     const reset = options && options.reset;
-    const run = async () => {
-      const data = await callApi({
-        action: 'saveProgress',
-        grade: session.grade,
-        className: session.className,
-        classNo: session.className,
-        studentNo: session.studentNo,
-        ...payload,
-        ...(reset ? { reset: 'true' } : {})
-      });
-      return progressFromSheet(data.progress);
-    };
-    saveQueue = saveQueue.then(run, run);
+    const payload = sheetPayloadFromGameProgress(gameProgress, medalIds);
+    const hash = hashSavePayload(payload, reset);
+    if (!reset && hash === lastSavedHash) {
+      return null;
+    }
+
+    const data = await callApi({
+      action: 'saveProgress',
+      grade: session.grade,
+      className: session.className,
+      classNo: session.className,
+      studentNo: session.studentNo,
+      ...payload,
+      ...(reset ? { reset: 'true' } : {})
+    });
+    lastSavedHash = hash;
+    return progressFromSheet(data.progress);
+  }
+
+  function saveProgress(gameProgress, medalIds, options) {
+    const immediate = options && (options.reset || options.immediate);
+    pendingSaveArgs = { gameProgress, medalIds, options: options || {} };
+
+    if (immediate) {
+      if (saveDebounceTimer) {
+        clearTimeout(saveDebounceTimer);
+        saveDebounceTimer = null;
+      }
+      saveQueue = saveQueue.then(() => runSaveProgress(
+        pendingSaveArgs.gameProgress,
+        pendingSaveArgs.medalIds,
+        pendingSaveArgs.options
+      ), () => runSaveProgress(
+        pendingSaveArgs.gameProgress,
+        pendingSaveArgs.medalIds,
+        pendingSaveArgs.options
+      ));
+      return saveQueue;
+    }
+
+    return new Promise((resolve, reject) => {
+      if (saveDebounceTimer) clearTimeout(saveDebounceTimer);
+      saveDebounceTimer = setTimeout(() => {
+        saveDebounceTimer = null;
+        saveQueue = saveQueue.then(() => {
+          if (!pendingSaveArgs) return null;
+          return runSaveProgress(
+            pendingSaveArgs.gameProgress,
+            pendingSaveArgs.medalIds,
+            pendingSaveArgs.options
+          );
+        }, () => {
+          if (!pendingSaveArgs) return null;
+          return runSaveProgress(
+            pendingSaveArgs.gameProgress,
+            pendingSaveArgs.medalIds,
+            pendingSaveArgs.options
+          );
+        });
+        saveQueue.then(resolve).catch(reject);
+      }, SAVE_DEBOUNCE_MS);
+    });
+  }
+
+  function flushSaveProgress() {
+    if (!pendingSaveArgs) return Promise.resolve(null);
+    if (saveDebounceTimer) {
+      clearTimeout(saveDebounceTimer);
+      saveDebounceTimer = null;
+    }
+    const args = pendingSaveArgs;
+    saveQueue = saveQueue.then(
+      () => runSaveProgress(args.gameProgress, args.medalIds, Object.assign({}, args.options, { immediate: true })),
+      () => runSaveProgress(args.gameProgress, args.medalIds, Object.assign({}, args.options, { immediate: true }))
+    );
     return saveQueue;
   }
 
@@ -305,8 +438,10 @@
   global.ClassroomAPI = {
     isConfigured,
     getGasUrl,
+    makeSessionKey,
     studentLogin,
     saveProgress,
+    flushSaveProgress,
     teacherLogin,
     getClassProgress,
     getStudentSession,

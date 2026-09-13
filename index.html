@@ -3159,11 +3159,54 @@
       }
     }
 
+    function ensureSessionKey(session) {
+      if (!session.key) {
+        session.key = ClassroomAPI.makeSessionKey(session.grade, session.className, session.studentNo);
+        ClassroomAPI.setStudentSession(session);
+      }
+      return session.key;
+    }
+
+    function backgroundSyncStudentProgress(result) {
+      if (!result || !result.progress) return;
+      const sessionKey = result.session.key;
+      mergeProgressMaps(gameProgress, result.progress);
+      const stdCleared = gameProgress.standard.cleared || {};
+      isMasterUnlocked = isMasterUnlocked || Boolean(stdCleared[STAGES.length - 1]);
+      try {
+        localStorage.setItem('agy_progress_data_v2_' + sessionKey, JSON.stringify(gameProgress));
+        localStorage.setItem('agy_master_unlocked_' + sessionKey, isMasterUnlocked ? 'true' : 'false');
+      } catch (e) {}
+      initStageSelectOptions();
+      updateMedalsUI();
+      updateCourseUI();
+    }
+
+    function restoreStudentSessionFast(existing) {
+      const sessionKey = ensureSessionKey(existing);
+      loadLocalProgressForSession(sessionKey);
+      const stdCleared = gameProgress.standard.cleared || {};
+      isMasterUnlocked = isMasterUnlocked || Boolean(stdCleared[STAGES.length - 1]);
+      classroomReady = true;
+      updateSessionChrome();
+      unlockAppShell();
+      bootstrapGame();
+
+      ClassroomAPI.studentLogin(existing.grade, existing.className, existing.studentNo)
+        .then((result) => backgroundSyncStudentProgress(result))
+        .catch((err) => {
+          const code = err && err.code;
+          if (code === 'timeout') {
+            showSyncToast('クラウドとの せつぞくは あとで ためします', true);
+          }
+        });
+    }
+
     async function startStudentSession(grade, className, studentNo) {
       if (!ClassroomAPI.isConfigured()) {
         throw new Error('gas_url_missing');
       }
-      const result = await ClassroomAPI.studentLogin(grade, className, studentNo);
+      const result = await ClassroomAPI.studentLogin(grade, className, studentNo, { force: true });
       await beginStudentSessionAfterLogin(result);
     }
 
@@ -4376,12 +4419,16 @@
     }
 
     /* ========================================================
-       9. 紙吹雪演出 (Confetti)
+       9. 紙吹雪演出 (Confetti) — 軽量版
     ======================================================== */
     const canvas = document.getElementById('confetti-canvas');
     const ctx = canvas.getContext('2d');
     let confettiParticles = [];
     let confettiAnimationId = null;
+    let confettiFrameCount = 0;
+    const CONFETTI_MAX_FRAMES = 42;
+    const CONFETTI_PARTICLE_COUNT = 28;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -4390,53 +4437,58 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    function triggerConfetti() {
-      const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+    function stopConfetti() {
+      if (confettiAnimationId) {
+        cancelAnimationFrame(confettiAnimationId);
+        confettiAnimationId = null;
+      }
       confettiParticles = [];
-      for (let i = 0; i < 90; i++) {
+      confettiFrameCount = 0;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function triggerConfetti() {
+      if (prefersReducedMotion.matches) return;
+      const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+      stopConfetti();
+      const originX = canvas.width * 0.5;
+      const originY = canvas.height * 0.38;
+      for (let i = 0; i < CONFETTI_PARTICLE_COUNT; i++) {
         confettiParticles.push({
-          x: canvas.width / 2,
-          y: canvas.height / 2,
-          w: Math.random() * 9 + 5,
-          h: Math.random() * 7 + 4,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          vx: (Math.random() - 0.5) * 16,
-          vy: (Math.random() - 0.8) * 16,
-          rot: Math.random() * 360,
-          vRot: (Math.random() - 0.5) * 10,
-          opacity: 1
+          x: originX + (Math.random() - 0.5) * 48,
+          y: originY + (Math.random() - 0.5) * 24,
+          r: Math.random() * 3 + 2.5,
+          color: colors[(Math.random() * colors.length) | 0],
+          vx: (Math.random() - 0.5) * 10,
+          vy: Math.random() * -9 - 2,
+          life: 1
         });
       }
-      if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
       animateConfetti();
     }
 
     function animateConfetti() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confettiFrameCount += 1;
       let alive = false;
-      confettiParticles.forEach(p => {
+      for (let i = 0; i < confettiParticles.length; i++) {
+        const p = confettiParticles[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.35;
-        p.rot += p.vRot;
-        p.opacity -= 0.008;
-
-        if (p.opacity > 0) {
-          alive = true;
-          ctx.save();
-          ctx.globalAlpha = Math.max(0, p.opacity);
-          ctx.translate(p.x, p.y);
-          ctx.rotate((p.rot * Math.PI) / 180);
-          ctx.fillStyle = p.color;
-          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-          ctx.restore();
-        }
-      });
-
-      if (alive) {
+        p.vy += 0.45;
+        p.vx *= 0.98;
+        p.life -= 0.028;
+        if (p.life <= 0) continue;
+        alive = true;
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+      }
+      ctx.globalAlpha = 1;
+      if (alive && confettiFrameCount < CONFETTI_MAX_FRAMES) {
         confettiAnimationId = requestAnimationFrame(animateConfetti);
       } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stopConfetti();
       }
     }
 
@@ -4828,20 +4880,7 @@
 
       const existing = ClassroomAPI.getStudentSession();
       if (existing && ClassroomAPI.isConfigured()) {
-        loginError.textContent = 'よみこみ中…（30秒ほど かかることがあります）';
-        ClassroomAPI.studentLogin(existing.grade, existing.className, existing.studentNo)
-          .then((result) => beginStudentSessionAfterLogin(result))
-          .catch((err) => {
-            ClassroomAPI.clearStudentSession();
-            const code = err && err.code;
-            if (code === 'timeout') {
-              showLoginFormAgain('せつぞくが タイムアウトしました。もういちど ばんごうを いれてね');
-            } else if (code === 'gas_stale_deploy') {
-              showLoginFormAgain('GASが 古いままです。Code.gs を再デプロイして config.js の URL を更新してください');
-            } else {
-              showLoginFormAgain('ログインできませんでした。もういちど ばんごうを いれてね');
-            }
-          });
+        restoreStudentSessionFast(existing);
         return;
       }
 
@@ -4894,6 +4933,14 @@
 
     window.addEventListener('resize', () => {
       Maze2D.updateRobotPosition(false);
+    });
+
+    window.addEventListener('pagehide', () => {
+      if (classroomReady && window.ClassroomAPI && ClassroomAPI.getStudentSession()) {
+        try {
+          ClassroomAPI.flushSaveProgress();
+        } catch (e) {}
+      }
     });
   </script>
 </body>
