@@ -1010,6 +1010,7 @@
       border: none;
       box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
       cursor: pointer;
+      touch-action: none;
     }
 
     /* 前へすすむ、右を向く、左を向くのパレット幅を完全統一 */
@@ -1182,6 +1183,7 @@
       line-height: 1;
       padding: 0 8px;
       box-sizing: border-box;
+      touch-action: none;
     }
 
     .ws-block.executing, .c-block.executing > .c-header {
@@ -1199,6 +1201,7 @@
       display: inline-flex;
       align-items: center;
       line-height: 1;
+      touch-action: none;
     }
 
     .block-actions {
@@ -1242,6 +1245,7 @@
       min-width: 200px;
       position: relative;
       margin-bottom: 0px;
+      touch-action: none;
     }
 
     .c-header {
@@ -1258,6 +1262,7 @@
       border-bottom: 1.5px solid rgba(0, 0, 0, 0.15);
       line-height: 1;
       box-sizing: border-box;
+      touch-action: none;
     }
 
     .c-body {
@@ -1335,6 +1340,23 @@
 
     .dragging {
       opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .block-drag-ghost {
+      position: fixed;
+      margin: 0 !important;
+      pointer-events: none !important;
+      z-index: 10000;
+      opacity: 0.92;
+      transform: scale(1.04);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.28);
+    }
+
+    body.is-block-dragging {
+      cursor: grabbing;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     /* モーダル */
@@ -2977,13 +2999,20 @@
         btn.setAttribute('draggable', 'true');
 
         btn.addEventListener('click', () => {
+          if (suppressPaletteClick) {
+            suppressPaletteClick = false;
+            return;
+          }
           addBlock(def.name);
         });
 
         btn.addEventListener('dragstart', (e) => {
+          e.preventDefault();
           e.stopPropagation();
-          draggedSource = { mode: 'new', type: def.name };
-          e.dataTransfer.setData('text/plain', def.name);
+        });
+
+        btn.addEventListener('pointerdown', (e) => {
+          startPendingPointerDrag(e, btn, btn, { mode: 'new', type: def.name });
         });
 
         paletteBlocksEl.appendChild(btn);
@@ -2996,6 +3025,171 @@
     let draggedSource = null;
     let dropIndicator = document.createElement('div');
     dropIndicator.className = 'drop-indicator';
+    let pendingPointerDrag = null;
+    let activePointerDrag = null;
+    let dragGhost = null;
+    let suppressPaletteClick = false;
+    const POINTER_DRAG_THRESHOLD = 8;
+
+    function createDragGhost(fromEl, clientX, clientY) {
+      const rect = fromEl.getBoundingClientRect();
+      const ghost = fromEl.cloneNode(true);
+      ghost.classList.add('block-drag-ghost');
+      ghost.removeAttribute('id');
+      ghost.style.left = `${rect.left}px`;
+      ghost.style.top = `${rect.top}px`;
+      ghost.style.width = `${rect.width}px`;
+      document.body.appendChild(ghost);
+      return {
+        el: ghost,
+        offsetX: clientX - rect.left,
+        offsetY: clientY - rect.top
+      };
+    }
+
+    function moveDragGhost(clientX, clientY) {
+      if (!dragGhost) return;
+      dragGhost.el.style.left = `${clientX - dragGhost.offsetX}px`;
+      dragGhost.el.style.top = `${clientY - dragGhost.offsetY}px`;
+    }
+
+    function getStackAtPoint(x, y) {
+      const movingEl = draggedSource && draggedSource.mode === 'move' ? draggedSource.el : null;
+      const hitEls = document.elementsFromPoint(x, y);
+      for (const hit of hitEls) {
+        if (!hit || hit === dropIndicator || hit.classList.contains('block-drag-ghost')) continue;
+        const stack = hit.classList && hit.classList.contains('blocks-stack')
+          ? hit
+          : hit.closest && hit.closest('.blocks-stack');
+        if (!stack) continue;
+        if (movingEl && movingEl.contains(stack)) continue;
+        return stack;
+      }
+      const ws = workspaceArea.getBoundingClientRect();
+      if (x >= ws.left && x <= ws.right && y >= ws.top && y <= ws.bottom) {
+        if (movingEl && movingEl.contains(mainStack)) return null;
+        return mainStack;
+      }
+      return null;
+    }
+
+    function updateDropIndicatorAt(x, y) {
+      const stack = getStackAtPoint(x, y);
+      if (!stack) {
+        if (dropIndicator.parentNode) dropIndicator.remove();
+        return;
+      }
+      const afterElement = getDragAfterElement(stack, y);
+      if (afterElement == null) {
+        stack.appendChild(dropIndicator);
+      } else {
+        stack.insertBefore(dropIndicator, afterElement);
+      }
+    }
+
+    function commitDropAtIndicator() {
+      if (!dropIndicator.parentNode) return;
+      let nodeToInsert = null;
+      if (draggedSource && draggedSource.mode === 'new') {
+        nodeToInsert = createBlockDOM(draggedSource.type);
+        Sound.click();
+      } else if (draggedSource && draggedSource.mode === 'move') {
+        nodeToInsert = draggedSource.el;
+        Sound.click();
+      }
+      if (nodeToInsert) {
+        if (nodeToInsert.contains && nodeToInsert.contains(dropIndicator.parentNode)) {
+          dropIndicator.remove();
+          return;
+        }
+        dropIndicator.parentNode.insertBefore(nodeToInsert, dropIndicator);
+      }
+      dropIndicator.remove();
+      checkEmptyHint();
+      updateStats();
+    }
+
+    function cleanupPointerDrag() {
+      if (dragGhost) {
+        dragGhost.el.remove();
+        dragGhost = null;
+      }
+      if (draggedSource && draggedSource.mode === 'move' && draggedSource.el) {
+        draggedSource.el.classList.remove('dragging');
+      }
+      if (dropIndicator.parentNode) dropIndicator.remove();
+      document.body.classList.remove('is-block-dragging');
+      pendingPointerDrag = null;
+      activePointerDrag = null;
+      draggedSource = null;
+    }
+
+    function startPendingPointerDrag(e, originEl, previewEl, source) {
+      if (typeof e.button === 'number' && e.button !== 0) return;
+      if (pendingPointerDrag || activePointerDrag) return;
+      pendingPointerDrag = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        originEl,
+        previewEl,
+        source
+      };
+    }
+
+    function onPointerDragMove(e) {
+      const pending = pendingPointerDrag;
+      const active = activePointerDrag;
+      if (pending && e.pointerId === pending.pointerId) {
+        const dist = Math.hypot(e.clientX - pending.startX, e.clientY - pending.startY);
+        if (dist < POINTER_DRAG_THRESHOLD) return;
+        e.preventDefault();
+        draggedSource = pending.source;
+        dragGhost = createDragGhost(pending.previewEl, pending.startX, pending.startY);
+        if (draggedSource.mode === 'move' && draggedSource.el) {
+          draggedSource.el.classList.add('dragging');
+        }
+        try {
+          pending.originEl.setPointerCapture(e.pointerId);
+        } catch (_) { /* ignore */ }
+        activePointerDrag = pending;
+        pendingPointerDrag = null;
+        document.body.classList.add('is-block-dragging');
+        moveDragGhost(e.clientX, e.clientY);
+        updateDropIndicatorAt(e.clientX, e.clientY);
+        return;
+      }
+
+      if (active && e.pointerId === active.pointerId) {
+        e.preventDefault();
+        moveDragGhost(e.clientX, e.clientY);
+        updateDropIndicatorAt(e.clientX, e.clientY);
+      }
+    }
+
+    function onPointerDragEnd(e) {
+      if (pendingPointerDrag && e.pointerId === pendingPointerDrag.pointerId) {
+        pendingPointerDrag = null;
+        return;
+      }
+      if (!activePointerDrag || e.pointerId !== activePointerDrag.pointerId) return;
+      if (activePointerDrag.source && activePointerDrag.source.mode === 'new') {
+        suppressPaletteClick = true;
+        setTimeout(() => { suppressPaletteClick = false; }, 400);
+      }
+      commitDropAtIndicator();
+      try {
+        activePointerDrag.originEl.releasePointerCapture(e.pointerId);
+      } catch (_) { /* ignore */ }
+      cleanupPointerDrag();
+    }
+
+    document.addEventListener('pointermove', onPointerDragMove, { passive: false });
+    document.addEventListener('pointerup', onPointerDragEnd);
+    document.addEventListener('pointercancel', onPointerDragEnd);
+    document.addEventListener('contextmenu', (e) => {
+      if (activePointerDrag) e.preventDefault();
+    });
 
     function createBlockDOM(type) {
       if (type === 'repeat') {
@@ -3153,18 +3347,15 @@
       });
 
       el.addEventListener('dragstart', (e) => {
+        e.preventDefault();
         e.stopPropagation();
-        draggedSource = { mode: 'move', el: el };
-        el.classList.add('dragging');
-        e.dataTransfer.setData('text/plain', 'block');
       });
 
-      el.addEventListener('dragend', (e) => {
-        e.stopPropagation();
-        el.classList.remove('dragging');
-        if (dropIndicator.parentNode) dropIndicator.remove();
-        checkEmptyHint();
-        updateStats();
+      el.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('button, select, input, textarea, a')) return;
+        const innerBlock = e.target.closest('.ws-block, .c-block');
+        if (innerBlock && innerBlock !== el) return;
+        startPendingPointerDrag(e, el, el, { mode: 'move', el });
       });
 
       const cBody = el.querySelector('.c-body');
@@ -3215,6 +3406,12 @@
           }
 
           if (nodeToInsert) {
+            if (nodeToInsert.contains(dropIndicator.parentNode)) {
+              dropIndicator.remove();
+              checkEmptyHint();
+              updateStats();
+              return;
+            }
             dropIndicator.parentNode.insertBefore(nodeToInsert, dropIndicator);
           }
           dropIndicator.remove();
