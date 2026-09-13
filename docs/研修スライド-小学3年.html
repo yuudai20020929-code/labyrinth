@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>研修スライド｜プログラミングでワールドツアー！（小学3年）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ecfeff;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --primary: #0284c7;
+      --accent: #059669;
+      --warn: #b45309;
+      --line: #bae6fd;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: "M PLUS Rounded 1c", sans-serif;
+      color: var(--ink);
+      background: #0f172a;
+      overflow: hidden;
+    }
+    .deck {
+      height: 100%;
+      position: relative;
+    }
+    .slide {
+      display: none;
+      height: 100%;
+      padding: clamp(28px, 4vw, 56px);
+      background:
+        radial-gradient(ellipse at 12% 0%, rgba(56, 189, 248, 0.28), transparent 45%),
+        radial-gradient(ellipse at 90% 100%, rgba(16, 185, 129, 0.2), transparent 40%),
+        linear-gradient(160deg, #ecfeff, #f0fdf4 55%, #e0f2fe);
+    }
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .slide.center { text-align: center; align-items: center; }
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(2rem, 4.2vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.25;
+      color: #0c4a6e;
+    }
+    h2 {
+      margin: 0 0 22px;
+      font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+      font-weight: 900;
+      color: #0c4a6e;
+      line-height: 1.3;
+    }
+    h3 {
+      margin: 0 0 10px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #0369a1;
+    }
+    p, li {
+      font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+      line-height: 1.65;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .lead {
+      font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+      color: var(--ink);
+      max-width: 920px;
+    }
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #075985;
+      font-weight: 900;
+      font-size: 0.9rem;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      width: min(1100px, 100%);
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      width: min(1100px, 100%);
+    }
+    .card {
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      text-align: left;
+    }
+    .card strong {
+      color: var(--ink);
+      font-weight: 900;
+    }
+    .card p, .card li { font-size: 1.05rem; margin: 0; }
+    .card ul { margin: 8px 0 0; padding-left: 1.2em; }
+    .big-num {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+    .ok { color: var(--accent); font-weight: 900; }
+    .ng { color: #dc2626; font-weight: 900; }
+    .warn { color: var(--warn); font-weight: 900; }
+    .timeline {
+      width: min(980px, 100%);
+      display: grid;
+      gap: 10px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .time {
+      background: #0284c7;
+      color: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.05rem;
+    }
+    .time-body {
+      background: white;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 800;
+      color: var(--ink);
+      font-size: 1.1rem;
+    }
+    .checklist li { margin-bottom: 8px; }
+    .footer-note {
+      margin-top: 18px;
+      font-size: 0.95rem;
+      color: #64748b;
+      font-weight: 700;
+    }
+    .nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: rgba(15, 23, 42, 0.88);
+      color: white;
+      z-index: 20;
+      font-weight: 800;
+    }
+    .nav button {
+      border: none;
+      background: #0284c7;
+      color: white;
+      font-family: inherit;
+      font-weight: 900;
+      border-radius: 10px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .nav button:disabled { opacity: 0.4; cursor: default; }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: #0284c7;
+      z-index: 30;
+    }
+    .tag {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 8px;
+      padding: 2px 8px;
+      font-weight: 900;
+      font-size: 0.9rem;
+    }
+    .tag.warn-tag {
+      background: #ffedd5;
+      color: #9a3412;
+    }
+    .url {
+      font-family: ui-monospace, monospace;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f172a;
+      word-break: break-all;
+    }
+    @media (max-width: 860px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 90px 1fr; }
+      .slide { padding-bottom: 72px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="deck" id="deck">
+
+    <!-- 1 -->
+    <section class="slide center active">
+      <span class="eyebrow">先生方向け研修</span>
+      <h1>プログラミングで<br>ワールドツアー！</h1>
+      <p class="lead">小学3年生クラスでの使い方・1時間の進め方</p>
+      <p class="footer-note">ICT支援員1名サポートあり ／ パソコンが得意でなくても大丈夫</p>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide">
+      <span class="eyebrow">本日のゴール</span>
+      <h2>研修で持ち帰ること</h2>
+      <div class="grid-3">
+        <div class="card">
+          <div class="big-num">1</div>
+          <h3>ねらい</h3>
+          <p>小学3年生が身に付けるべき力（プログラミング的思考）がわかる</p>
+        </div>
+        <div class="card">
+          <div class="big-num">2</div>
+          <h3>進め方</h3>
+          <p>1時間の授業の流れと、先生・ICT支援員の役割がわかる</p>
+        </div>
+        <div class="card">
+          <div class="big-num">3</div>
+          <h3>操作</h3>
+          <p>ログインからクリアまでの最低限の操作ができる</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="slide">
+      <span class="eyebrow">小学校のプログラミング教育</span>
+      <h2>まず大事なこと</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="ok">やること</h3>
+          <ul>
+            <li>考えた手順を試す</li>
+            <li>うまくいかない理由を考える</li>
+            <li>直して、また試す</li>
+            <li>友だちと「こうすれば？」と話し合う</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="ng">やらなくてよいこと</h3>
+          <ul>
+            <li>難しい言葉を暗記する</li>
+            <li>プログラマーを育てる</li>
+            <li>英語のコードを書かせる</li>
+            <li>全員が同じ速さで進むこと</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-note">国のねらいも「プログラミング言語」ではなく「プログラミング的思考」です</p>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide">
+      <span class="eyebrow">学習指導要領の考え方</span>
+      <h2>プログラミング的思考とは？</h2>
+      <p class="lead" style="margin-bottom:18px;">
+        「こうすればゴールに届く」という手順を考え、<br>
+        うまくいかなければ組み合わせを直していく力です。
+      </p>
+      <div class="grid-3">
+        <div class="card"><strong>① 目的を決める</strong><p>ゴール（行き先）を知る</p></div>
+        <div class="card"><strong>② 手順に分ける</strong><p>「すすむ」「まがる」などの命令に分ける</p></div>
+        <div class="card"><strong>③ 試して直す</strong><p>動かして確かめ、よりよくする</p></div>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide">
+      <span class="eyebrow">小学3年生のねらい</span>
+      <h2>この学年で身に付けたい力</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>今日いちばん大事</h3>
+          <ul>
+            <li><strong>順番</strong> … 命令は上から下へ、書いた通りに動く</li>
+            <li><strong>予想</strong> … 「こう動くはず」を口に出す</li>
+            <li><strong>試行錯誤</strong> … 失敗しても「どこが違う？」と直す</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>できたらよいこと</h3>
+          <ul>
+            <li>友だちのプログラムを見て学ぶ</li>
+            <li>短い言葉で手順を説明する</li>
+            <li>「もっと短くできない？」と工夫する</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="slide">
+      <span class="eyebrow">小学3年の現実的な目標</span>
+      <h2>1時間でここまででOK</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3><span class="tag">到達目標</span></h3>
+          <ul>
+            <li>けやっきーをゴールまで動かせる</li>
+            <li>命令ブロックを並べて試せる</li>
+            <li>失敗したとき、自分で直そうとする</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="tag warn-tag">無理に求めない</span></h3>
+          <ul>
+            <li>くりかえし（for / while）の完全理解</li>
+            <li>条件分岐（もし〜）まで全員到達</li>
+            <li>全20ステージクリア</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-note">今日の授業では「ステージ1〜5くらい」を目安にします（個人差OK）</p>
+    </section>
+
+    <!-- 7 -->
+    <section class="slide">
+      <span class="eyebrow">教材の紹介</span>
+      <h2>プログラミングでワールドツアー！</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>どんなアプリ？</h3>
+          <ul>
+            <li>けやっきーが世界を旅する迷路ゲーム</li>
+            <li>スクラッチ風のブロックを並べる</li>
+            <li>「うごかす！」で結果がすぐわかる</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>学校向けの工夫</h3>
+          <ul>
+            <li>学年・組・出席番号でログイン</li>
+            <li>すすみはスプレッドシートに保存</li>
+            <li>先生は進捗表で確認できる</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 -->
+    <section class="slide">
+      <span class="eyebrow">授業前の準備</span>
+      <h2>URLと役割分担</h2>
+      <div class="card" style="margin-bottom:14px;">
+        <h3>児童用ページ</h3>
+        <div class="url">https://yuudai20020929-code.github.io/labyrinth/</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>先生の役割</h3>
+          <ul>
+            <li>ねらいの説明・声かけ</li>
+            <li>つまずきの見取り</li>
+            <li>学びの振り返り</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>ICT支援員の役割</h3>
+          <ul>
+            <li>ログイン・端末のサポート</li>
+            <li>操作トラブル対応</li>
+            <li>保存できているかの確認</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section class="slide">
+      <span class="eyebrow">1時間の流れ（45分想定）</span>
+      <h2>タイムテーブル</h2>
+      <div class="timeline">
+        <div class="row"><div class="time">0–5分</div><div class="time-body">導入：今日のねらい・画面の見方</div></div>
+        <div class="row"><div class="time">5–10分</div><div class="time-body">ログイン（学年・組・番号）※一斉にしない</div></div>
+        <div class="row"><div class="time">10–15分</div><div class="time-body">みんなでステージ1（日本）を体験</div></div>
+        <div class="row"><div class="time">15–35分</div><div class="time-body">個人活動：ステージ2〜5を進める</div></div>
+        <div class="row"><div class="time">35–40分</div><div class="time-body">共有：うまくいった工夫を発表</div></div>
+        <div class="row"><div class="time">40–45分</div><div class="time-body">振り返り・ログアウト／終了</div></div>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide">
+      <span class="eyebrow">導入で言うこと（例）</span>
+      <h2>子どもに伝えるねらい</h2>
+      <div class="card">
+        <p style="font-size:1.35rem;color:#0f172a;font-weight:900;margin:0 0 12px;">
+          「コンピュータは、わたしたちが並べた命令を、<br>
+          上から順番に、そのまま実行します。」
+        </p>
+        <ul>
+          <li>まちがえても大丈夫。直して試すことが勉強です</li>
+          <li>ゴールまでいけたらクリア。短くできたらとてもよい</li>
+          <li>友だちと相談してOK（答えを写すのではなく、考え方を話す）</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="slide">
+      <span class="eyebrow">操作①</span>
+      <h2>ログインのしかた</h2>
+      <div class="grid-3">
+        <div class="card"><div class="big-num">1</div><p>学年を選ぶ</p></div>
+        <div class="card"><div class="big-num">2</div><p>組を選ぶ</p></div>
+        <div class="card"><div class="big-num">3</div><p>出席番号を入れて「はじめる！」</p></div>
+      </div>
+      <div class="card" style="margin-top:14px;">
+        <h3 class="warn">ポイント</h3>
+        <ul>
+          <li>全員いっせいに押すと、つながりが重くなることがあります</li>
+          <li>「前から5人ずつ」「班ごと」など、少しずらしてログイン</li>
+          <li>「まえのすすみがあります」と出たら、基本は「つづきから」</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section class="slide">
+      <span class="eyebrow">操作②</span>
+      <h2>画面の見方（3つの場所）</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>① めいろ</h3>
+          <p>けやっきーが動く場所。ゴールを目指します。</p>
+        </div>
+        <div class="card">
+          <h3>② つかえるブロック</h3>
+          <p>ここから命令をとります（すすむ・まがるなど）。</p>
+        </div>
+        <div class="card">
+          <h3>③ プログラム</h3>
+          <p>命令を並べる場所。「うごかす！」で実行。</p>
+        </div>
+      </div>
+      <p class="footer-note">先生は「どこに置く？」「どのボタン？」を具体的に指差しながら説明すると安心です</p>
+    </section>
+
+    <!-- 13 -->
+    <section class="slide">
+      <span class="eyebrow">操作③</span>
+      <h2>基本のくりかえし</h2>
+      <div class="timeline">
+        <div class="row"><div class="time">置く</div><div class="time-body">ブロックをプログラムのところに置く（クリック／ドラッグ）</div></div>
+        <div class="row"><div class="time">動かす</div><div class="time-body">「うごかす！」を押す</div></div>
+        <div class="row"><div class="time">見る</div><div class="time-body">思った通りに動いたか確かめる</div></div>
+        <div class="row"><div class="time">直す</div><div class="time-body">ちがうところを直して、もう一度ためす</div></div>
+      </div>
+      <p class="footer-note">この「置く→動かす→見る→直す」が、今日いちばん大切な学習活動です</p>
+    </section>
+
+    <!-- 14 -->
+    <section class="slide">
+      <span class="eyebrow">小学3年の到達目安</span>
+      <h2>ステージの進め方</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>まずここ（全員）</h3>
+          <ul>
+            <li>① 日本（すすむ1回）</li>
+            <li>② アメリカ（すすむを並べる）</li>
+            <li>③ フランス（すすむを3つ）</li>
+          </ul>
+          <p style="margin-top:10px;"><strong>ねらい：順番に実行されることがわかる</strong></p>
+        </div>
+        <div class="card">
+          <h3>いけたらここ</h3>
+          <ul>
+            <li>④ イギリス（みぎをむく）</li>
+            <li>⑤ イタリア（ひだりをむく）</li>
+          </ul>
+          <p style="margin-top:10px;"><strong>ねらい：向きを変えて進む工夫</strong></p>
+        </div>
+      </div>
+      <p class="footer-note">ステージ6以降は余力のある子の発展。無理に進めなくてOKです</p>
+    </section>
+
+    <!-- 15 -->
+    <section class="slide">
+      <span class="eyebrow">先生の声かけ例</span>
+      <h2>つまずいたときの言葉</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>答えを言わない</h3>
+          <ul>
+            <li>「いま、どこまでいく予定？」</li>
+            <li>「1番目の命令はなに？」</li>
+            <li>「まがる前に、すすむは足りる？」</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>できた子への声かけ</h3>
+          <ul>
+            <li>「どうやって考えた？」</li>
+            <li>「もっと短くできる？」</li>
+            <li>「友だちに説明してみて」</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 -->
+    <section class="slide">
+      <span class="eyebrow">見取り（評価）</span>
+      <h2>何を見ればよいか</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>知識・技能</h3>
+          <p>ブロックを並べて実行できる。失敗したら直せる。</p>
+        </div>
+        <div class="card">
+          <h3>思考・判断・表現</h3>
+          <p>手順を予想し、うまくいく組み合わせを考えられる。</p>
+        </div>
+        <div class="card">
+          <h3>態度</h3>
+          <p>あきらめずに試す。友だちと相談して進める。</p>
+        </div>
+      </div>
+      <p class="footer-note">クリア数そのものより、「直して再挑戦しているか」を大切に</p>
+    </section>
+
+    <!-- 17 -->
+    <section class="slide">
+      <span class="eyebrow">よくある困りごと</span>
+      <h2>トラブル対応メモ</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>ログインできない</h3>
+          <ul>
+            <li>番号のまちがいを確認</li>
+            <li>少し待ってから再挑戦</li>
+            <li>ICT支援員に相談</li>
+            <li>急ぎなら「まずはためす」でも可</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>保存されない感じ</h3>
+          <ul>
+            <li>クリア後、少し待つ</li>
+            <li>番号をまちがえていないか確認</li>
+            <li>教師画面で進捗を確認</li>
+            <li>端末の再読み込みは最後の手段</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18 -->
+    <section class="slide">
+      <span class="eyebrow">教師用ページ</span>
+      <h2>先生ができること</h2>
+      <div class="card" style="margin-bottom:14px;">
+        <h3>教師ダッシュボード</h3>
+        <div class="url">https://yuudai20020929-code.github.io/labyrinth/teacher.html</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>できること</h3>
+          <ul>
+            <li>クラスの進捗を表で見る</li>
+            <li>テストプレイで先に体験</li>
+            <li>スプレッドシートを開く</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>授業中の使い方</h3>
+          <ul>
+            <li>巡回の合間に「どこで止まっているか」確認</li>
+            <li>声かけが必要な子を見つける</li>
+            <li>細部の操作はICT支援員に任せてOK</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 -->
+    <section class="slide">
+      <span class="eyebrow">役割の分担（当日）</span>
+      <h2>先生 × ICT支援員</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>先生</h3>
+          <ul>
+            <li>導入・ねらい</li>
+            <li>学習の見取りと声かけ</li>
+            <li>共有・振り返り</li>
+            <li>学習規律（相談の仕方）</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>ICT支援員</h3>
+          <ul>
+            <li>端末・ブラウザ準備</li>
+            <li>ログイン補助</li>
+            <li>操作トラブル対応</li>
+            <li>進捗保存の確認</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-note">先生は「学習」、支援員は「環境」。役割を分けると安心です</p>
+    </section>
+
+    <!-- 20 -->
+    <section class="slide">
+      <span class="eyebrow">研修の実技</span>
+      <h2>いまから体験してみましょう</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>やること（10分）</h3>
+          <ul class="checklist">
+            <li>ページを開く</li>
+            <li>自分の番号でログイン</li>
+            <li>ステージ1〜3をクリア</li>
+            <li>時間があればステージ4</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>見てほしいこと</h3>
+          <ul>
+            <li>子どもがどこで止まりそうか</li>
+            <li>どの声かけが必要か</li>
+            <li>「置く→動かす→直す」が回るか</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 21 -->
+    <section class="slide">
+      <span class="eyebrow">授業前チェック</span>
+      <h2>当日の確認リスト</h2>
+      <div class="card">
+        <ul class="checklist">
+          <li>児童用URLを電子黒板／掲示に出す</li>
+          <li>自分で1回ログインして動くか確認</li>
+          <li>ICT支援員と役割を確認</li>
+          <li>ログインは班ごと等でずらすと決める</li>
+          <li>到達目安は「ステージ1〜5」と子どもに伝える</li>
+          <li>振り返りの問いを1つ決める（例：「失敗したあと、どう直した？」）</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 22 -->
+    <section class="slide center">
+      <span class="eyebrow">まとめ</span>
+      <h2>今日おさえる3つ</h2>
+      <div class="grid-3" style="text-align:left;">
+        <div class="card"><div class="big-num">1</div><p><strong>ねらいは思考</strong><br>言語習得ではなく、手順を考えて直す力</p></div>
+        <div class="card"><div class="big-num">2</div><p><strong>活動の核</strong><br>置く→動かす→見る→直す</p></div>
+        <div class="card"><div class="big-num">3</div><p><strong>1時間の目安</strong><br>ステージ1〜5、個人差OK</p></div>
+      </div>
+      <p class="lead" style="margin-top:24px;">完璧な操作より、<br>子どもが考えて試せる授業をつくりましょう。</p>
+    </section>
+
+    <!-- 23 -->
+    <section class="slide center">
+      <h1>ご質問・相談タイム</h1>
+      <p class="lead">操作・授業・評価など、何でもどうぞ</p>
+      <div class="card" style="margin-top:18px; text-align:left; max-width:720px;">
+        <h3>参考URL</h3>
+        <p>児童用：https://yuudai20020929-code.github.io/labyrinth/</p>
+        <p>教師用：https://yuudai20020929-code.github.io/labyrinth/teacher.html</p>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="nav">
+    <button id="prevBtn" type="button">← 前へ</button>
+    <div id="pageLabel">1 / 1</div>
+    <button id="nextBtn" type="button">次へ →</button>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const pageLabel = document.getElementById('pageLabel');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const progress = document.getElementById('progress');
+    let index = 0;
+
+    function show(i) {
+      index = Math.max(0, Math.min(slides.length - 1, i));
+      slides.forEach((s, n) => s.classList.toggle('active', n === index));
+      pageLabel.textContent = (index + 1) + ' / ' + slides.length;
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === slides.length - 1;
+      progress.style.width = ((index + 1) / slides.length * 100) + '%';
+    }
+
+    prevBtn.addEventListener('click', () => show(index - 1));
+    nextBtn.addEventListener('click', () => show(index + 1));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault();
+        show(index + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        show(index - 1);
+      } else if (e.key === 'Home') {
+        show(0);
+      } else if (e.key === 'End') {
+        show(slides.length - 1);
+      }
+    });
+
+    show(0);
+  </script>
+</body>
+</html>
