@@ -18,7 +18,37 @@
   }
 
   const GET_ACTIONS = new Set(['studentLogin', 'saveProgress']);
+  const FETCH_TIMEOUT_MS = 30000;
   let saveQueue = Promise.resolve();
+
+  function validateApiData(action, data) {
+    if (action === 'studentLogin') {
+      if (!data.progress || !data.progress.key) {
+        const err = new Error('invalid_student_login_response');
+        err.code = 'gas_stale_deploy';
+        throw err;
+      }
+    }
+    if (action === 'saveProgress') {
+      if (!data.progress || !data.progress.key) {
+        const err = new Error('invalid_save_response');
+        err.code = 'gas_stale_deploy';
+        throw err;
+      }
+    }
+  }
+
+  function buildGetUrl(baseUrl, payload) {
+    const params = new URLSearchParams();
+    Object.keys(payload).forEach((key) => {
+      const val = payload[key];
+      if (val !== undefined && val !== null && val !== '') {
+        params.set(key, String(val));
+      }
+    });
+    const sep = baseUrl.includes('?') ? '&' : '?';
+    return baseUrl + sep + params.toString();
+  }
 
   function parseApiResponse(text) {
     const trimmed = String(text || '').trim();
@@ -43,12 +73,26 @@
 
   async function fetchGas(method, url, bodyText) {
     const isOrgGasUrl = /\/a\/macros\//.test(url);
-    const options = { method, redirect: 'follow' };
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    const options = { method, redirect: 'follow', signal: controller.signal };
     if (method === 'POST') {
       options.headers = { 'Content-Type': 'text/plain' };
       options.body = bodyText;
     }
-    const res = await fetch(url, options);
+    let res;
+    try {
+      res = await fetch(url, options);
+    } catch (err) {
+      if (err && err.name === 'AbortError') {
+        const timeoutErr = new Error('timeout');
+        timeoutErr.code = 'timeout';
+        throw timeoutErr;
+      }
+      throw err;
+    } finally {
+      clearTimeout(timer);
+    }
     const text = await res.text();
     if (!res.ok) {
       const err = new Error('http_' + res.status);
@@ -73,20 +117,28 @@
       throw new Error('gas_url_missing');
     }
     const isOrgGasUrl = /\/a\/macros\//.test(baseUrl);
+    const action = payload.action;
+
+    async function request(method, url, bodyText) {
+      const data = await fetchGas(method, url, bodyText);
+      validateApiData(action, data);
+      return data;
+    }
+
     try {
-      // 生徒ログイン・進捗保存は GET（GAS POST リダイレクトで失敗しやすいため）
-      if (GET_ACTIONS.has(payload.action)) {
-        const params = new URLSearchParams();
-        Object.keys(payload).forEach((key) => {
-          const val = payload[key];
-          if (val !== undefined && val !== null && val !== '') {
-            params.set(key, String(val));
+      // 生徒ログイン・進捗保存は GET 優先（失敗時 POST にフォールバック）
+      if (GET_ACTIONS.has(action)) {
+        try {
+          return await request('GET', buildGetUrl(baseUrl, payload));
+        } catch (getErr) {
+          try {
+            return await request('POST', baseUrl, JSON.stringify(payload));
+          } catch (postErr) {
+            throw getErr.code ? getErr : postErr;
           }
-        });
-        const sep = baseUrl.includes('?') ? '&' : '?';
-        return await fetchGas('GET', baseUrl + sep + params.toString());
+        }
       }
-      return await fetchGas('POST', baseUrl, JSON.stringify(payload));
+      return await request('POST', baseUrl, JSON.stringify(payload));
     } catch (err) {
       if (err && err.name === 'TypeError' && isOrgGasUrl) {
         const hint = new Error('gas_org_only_cors');
@@ -184,6 +236,7 @@
       action: 'studentLogin',
       grade: Number(grade),
       className: Number(className),
+      classNo: Number(className),
       studentNo: Number(studentNo)
     });
     const session = {
@@ -209,6 +262,7 @@
         action: 'saveProgress',
         grade: session.grade,
         className: session.className,
+        classNo: session.className,
         studentNo: session.studentNo,
         ...payload
       });

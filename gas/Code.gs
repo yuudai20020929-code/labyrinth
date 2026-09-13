@@ -34,10 +34,14 @@ function doGet(e) {
 }
 
 function bodyFromParams_(p) {
+  var classNameRaw = p.className;
+  if ((classNameRaw === undefined || classNameRaw === '') && p.classNo !== undefined && p.classNo !== '') {
+    classNameRaw = p.classNo;
+  }
   return {
     action: p.action || '',
     grade: p.grade !== undefined && p.grade !== '' ? Number(p.grade) : undefined,
-    className: p.className !== undefined && p.className !== '' ? Number(p.className) : undefined,
+    className: classNameRaw !== undefined && classNameRaw !== '' ? Number(classNameRaw) : undefined,
     studentNo: p.studentNo !== undefined && p.studentNo !== '' ? Number(p.studentNo) : undefined,
     cleared: p.cleared || '',
     perfect: p.perfect || '',

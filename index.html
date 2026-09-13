@@ -4586,9 +4586,19 @@
         return;
       }
 
+      function showLoginFormAgain(message) {
+        document.body.classList.add('app-locked');
+        if (loginOverlay) loginOverlay.classList.remove('hidden');
+        if (loginError) loginError.textContent = message || '';
+        if (btnLoginStart) {
+          btnLoginStart.disabled = false;
+          btnLoginStart.textContent = 'はじめる！';
+        }
+      }
+
       const existing = ClassroomAPI.getStudentSession();
       if (existing && ClassroomAPI.isConfigured()) {
-        loginError.textContent = 'よみこみ中…';
+        loginError.textContent = 'よみこみ中…（30秒ほど かかることがあります）';
         ClassroomAPI.studentLogin(existing.grade, existing.className, existing.studentNo)
           .then((result) => {
             applyRemoteProgress(result.progress);
@@ -4599,13 +4609,16 @@
             unlockAppShell();
             bootstrapGame();
           })
-          .catch(() => {
-            loadLocalProgressForSession(existing.key);
-            classroomReady = true;
-            updateSessionChrome();
-            unlockAppShell();
-            bootstrapGame();
-            showSyncToast('ネットから よめなかったので、この端末の すすみを つかうよ', true);
+          .catch((err) => {
+            ClassroomAPI.clearStudentSession();
+            const code = err && err.code;
+            if (code === 'timeout') {
+              showLoginFormAgain('せつぞくが タイムアウトしました。もういちど ばんごうを いれてね');
+            } else if (code === 'gas_stale_deploy') {
+              showLoginFormAgain('GASが 古いままです。Code.gs を再デプロイして config.js の URL を更新してください');
+            } else {
+              showLoginFormAgain('ログインできませんでした。もういちど ばんごうを いれてね');
+            }
           });
         return;
       }
@@ -4626,11 +4639,16 @@
           }
           btnLoginStart.disabled = true;
           btnLoginStart.textContent = 'じゅんび中…';
+          loginError.textContent = 'せつぞく中…（30秒ほど かかることがあります）';
           try {
             await startStudentSession(grade, className, studentNo);
           } catch (err) {
             const code = err && err.code;
-            if (code === 'gas_org_only_cors' || code === 'gas_auth_required') {
+            if (code === 'timeout') {
+              loginError.textContent = 'せつぞくが タイムアウトしました。ネットワークを かくにんして もういちど ためしてね';
+            } else if (code === 'gas_stale_deploy') {
+              loginError.textContent = 'GASが 古いままです。Code.gs を再デプロイして config.js の URL を更新してください';
+            } else if (code === 'gas_org_only_cors' || code === 'gas_auth_required') {
               loginError.textContent = 'GASの設定が「組織内のみ」になっています。Apps Script を「全員（匿名含む）」で再デプロイし、新しい URL を config.js に貼ってください';
             } else if (code === 'invalid_grade' || code === 'invalid_class' || code === 'invalid_student_no') {
               loginError.textContent = 'にゅうりょくが ただしくないよ';
