@@ -17,34 +17,76 @@
     return Boolean(getGasUrl());
   }
 
+  const GET_ACTIONS = new Set(['studentLogin', 'saveProgress']);
+  let saveQueue = Promise.resolve();
+
+  function parseApiResponse(text) {
+    const trimmed = String(text || '').trim();
+    if (!trimmed) {
+      const err = new Error('empty_response');
+      err.code = 'empty_response';
+      throw err;
+    }
+    if (trimmed.charAt(0) === '<') {
+      const err = new Error('html_response');
+      err.code = 'html_response';
+      throw err;
+    }
+    try {
+      return JSON.parse(trimmed);
+    } catch (e) {
+      const err = new Error('invalid_json');
+      err.code = 'invalid_json';
+      throw err;
+    }
+  }
+
+  async function fetchGas(method, url, bodyText) {
+    const isOrgGasUrl = /\/a\/macros\//.test(url);
+    const options = { method, redirect: 'follow' };
+    if (method === 'POST') {
+      options.headers = { 'Content-Type': 'text/plain' };
+      options.body = bodyText;
+    }
+    const res = await fetch(url, options);
+    const text = await res.text();
+    if (!res.ok) {
+      const err = new Error('http_' + res.status);
+      err.code = (res.status === 401 || res.status === 403)
+        ? (isOrgGasUrl ? 'gas_org_only_cors' : 'gas_auth_required')
+        : undefined;
+      err.detail = text.slice(0, 120);
+      throw err;
+    }
+    const data = parseApiResponse(text);
+    if (!data || data.ok === false) {
+      const err = new Error((data && data.error) || 'api_error');
+      err.code = data && data.error;
+      throw err;
+    }
+    return data;
+  }
+
   async function callApi(payload) {
-    const url = getGasUrl();
-    if (!url) {
+    const baseUrl = getGasUrl();
+    if (!baseUrl) {
       throw new Error('gas_url_missing');
     }
-    const isOrgGasUrl = /\/a\/macros\//.test(url);
+    const isOrgGasUrl = /\/a\/macros\//.test(baseUrl);
     try {
-      // text/plain にして CORS プリフライトを避ける（GAS 定番パターン）
-      const res = await fetch(url, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        const err = new Error('http_' + res.status);
-        err.code = (res.status === 401 || res.status === 403)
-          ? (isOrgGasUrl ? 'gas_org_only_cors' : 'gas_auth_required')
-          : undefined;
-        throw err;
+      // 生徒ログイン・進捗保存は GET（GAS POST リダイレクトで失敗しやすいため）
+      if (GET_ACTIONS.has(payload.action)) {
+        const params = new URLSearchParams();
+        Object.keys(payload).forEach((key) => {
+          const val = payload[key];
+          if (val !== undefined && val !== null && val !== '') {
+            params.set(key, String(val));
+          }
+        });
+        const sep = baseUrl.includes('?') ? '&' : '?';
+        return await fetchGas('GET', baseUrl + sep + params.toString());
       }
-      const data = await res.json();
-      if (!data || data.ok === false) {
-        const err = new Error((data && data.error) || 'api_error');
-        err.code = data && data.error;
-        throw err;
-      }
-      return data;
+      return await fetchGas('POST', baseUrl, JSON.stringify(payload));
     } catch (err) {
       if (err && err.name === 'TypeError' && isOrgGasUrl) {
         const hint = new Error('gas_org_only_cors');
@@ -162,14 +204,18 @@
     const session = getStudentSession();
     if (!session) throw new Error('no_session');
     const payload = sheetPayloadFromGameProgress(gameProgress, medalIds);
-    const data = await callApi({
-      action: 'saveProgress',
-      grade: session.grade,
-      className: session.className,
-      studentNo: session.studentNo,
-      ...payload
-    });
-    return progressFromSheet(data.progress);
+    const run = async () => {
+      const data = await callApi({
+        action: 'saveProgress',
+        grade: session.grade,
+        className: session.className,
+        studentNo: session.studentNo,
+        ...payload
+      });
+      return progressFromSheet(data.progress);
+    };
+    saveQueue = saveQueue.then(run, run);
+    return saveQueue;
   }
 
   async function teacherLogin(password) {

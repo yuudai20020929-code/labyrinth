@@ -41,6 +41,18 @@ GitHub Pages（`github.io`）から次のようなエラーが出る場合:
 3. 新しい `/exec` URL を `config.js` に貼り、GitHub に push  
 4. 生徒ログインを再テスト  
 
+#### トラブルシュート: ログインはできるが進捗保存に失敗する
+
+**原因:** Google Apps Script の POST リダイレクトで、ブラウザからの保存リクエストが正しく届かないことがあります。
+
+**対処:**
+
+1. [`gas/Code.gs`](gas/Code.gs) を Apps Script エディタに反映（`doGet` で `saveProgress` を受け付ける版）  
+2. **新しいデプロイ**を作成し、`config.js` の URL を更新  
+3. ステージをクリアして、スプレッドシート `progress` シートに `cleared` が入るか確認  
+
+（フロント側は生徒のログイン・保存を GET リクエストで送るように変更済みです）
+
 学校方針で「全員」が使えない場合は、GitHub Pages ではなく学校ドメイン内（Google Sites 等）にゲームを置く必要があります。
 
 6. 初回 API 呼び出し時にシート `progress` と `config` が自動作成される  

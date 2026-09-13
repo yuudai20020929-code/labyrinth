@@ -18,7 +18,35 @@ var SPREADSHEET_ID = ''; // 空ならスクリプトに紐付いたスプレッ�
 var TEACHER_SESSION_HOURS = 8;
 
 function doGet(e) {
-  return json_({ ok: true, service: 'labyrinth-classroom', version: 1 });
+  try {
+    var p = (e && e.parameter) ? e.parameter : {};
+    var action = p.action || '';
+    if (!action) {
+      return json_({ ok: true, service: 'labyrinth-classroom', version: 1 });
+    }
+    var body = bodyFromParams_(p);
+    if (action === 'studentLogin') return json_(studentLogin_(body));
+    if (action === 'saveProgress') return json_(saveProgress_(body));
+    return json_({ ok: false, error: 'use_post_for_action' });
+  } catch (err) {
+    return json_({ ok: false, error: String(err && err.message ? err.message : err) });
+  }
+}
+
+function bodyFromParams_(p) {
+  return {
+    action: p.action || '',
+    grade: p.grade !== undefined && p.grade !== '' ? Number(p.grade) : undefined,
+    className: p.className !== undefined && p.className !== '' ? Number(p.className) : undefined,
+    studentNo: p.studentNo !== undefined && p.studentNo !== '' ? Number(p.studentNo) : undefined,
+    cleared: p.cleared || '',
+    perfect: p.perfect || '',
+    masterCleared: p.masterCleared || '',
+    masterPerfect: p.masterPerfect || '',
+    medals: p.medals || '',
+    password: p.password || '',
+    token: p.token || ''
+  };
 }
 
 function doPost(e) {

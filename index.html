@@ -2883,8 +2883,15 @@
       if (isTeacherPlayMode || !classroomReady) return;
       if (!window.ClassroomAPI || !ClassroomAPI.isConfigured() || !ClassroomAPI.getStudentSession()) return;
 
-      ClassroomAPI.saveProgress(gameProgress, getUnlockedMedalIds()).catch(() => {
-        showSyncToast('すすみの ほぞんに しっぱいしたよ（あとでまたためしてね）', true);
+      ClassroomAPI.saveProgress(gameProgress, getUnlockedMedalIds()).catch((err) => {
+        const code = err && err.code;
+        if (code === 'html_response' || code === 'invalid_json' || code === 'empty_response') {
+          showSyncToast('GASを最新Code.gsで再デプロイしてから、もう一度ためしてね', true);
+        } else if (code) {
+          showSyncToast('すすみの ほぞんに しっぱい: ' + code, true);
+        } else {
+          showSyncToast('すすみの ほぞんに しっぱいしたよ（あとでまたためしてね）', true);
+        }
       });
     }
 
