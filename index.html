@@ -2767,17 +2767,20 @@
       } else if (condType === 'not_goal') {
         const atGoal = (stage.map[robotPos.y][robotPos.x] === 3);
         scanResult = {
-          text: atGoal ? '🏁 ゴール！' : (isWall ? 'カベ！' : '道OK！'),
-          isMatch: !atGoal
+          text: atGoal ? 'ゴール〇' : 'ゴール✖',
+          isMatch: atGoal
         };
       } else {
         scanResult = {
-          text: isWall ? 'カベ！' : '道OK！',
-          isMatch: !isWall
+          text: isWall ? 'カベ〇' : '道〇',
+          isMatch: true
         };
       }
 
-      await Maze2D.triggerSensorScan(nx, ny, robotPos.dir, scanResult);
+      const scanX = (condType === 'not_goal') ? robotPos.x : nx;
+      const scanY = (condType === 'not_goal') ? robotPos.y : ny;
+
+      await Maze2D.triggerSensorScan(scanX, scanY, robotPos.dir, scanResult);
 
       if (condType === 'wall_ahead') return isWall;
       if (condType === 'path_ahead') return !isWall;
