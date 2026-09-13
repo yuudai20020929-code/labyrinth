@@ -1351,15 +1351,42 @@
     }
 
     .modal-card {
+      position: relative;
       background: white;
       border-radius: 20px;
       padding: 24px;
       max-width: 420px;
+      max-height: 90vh;
+      overflow-y: auto;
       width: 90%;
       text-align: center;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
       transform: scale(0.9);
       transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: none;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+    .modal-close-btn:hover {
+      background: #e2e8f0;
+      color: #1e293b;
     }
 
     .modal-overlay.active .modal-card {
@@ -1546,7 +1573,7 @@
     .medals-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 10px;
       margin: 14px 0;
       text-align: left;
     }
@@ -1554,11 +1581,12 @@
       background: #f8fafc;
       border: 1.5px solid #e2e8f0;
       border-radius: 12px;
-      padding: 10px;
+      padding: 8px 10px;
       display: flex;
       align-items: center;
       gap: 10px;
       transition: all 0.2s ease;
+      min-width: 0;
     }
     .medal-item.unlocked {
       background: #fffbeb;
@@ -1569,36 +1597,52 @@
       opacity: 0.45;
       filter: grayscale(1);
     }
-    .medal-thumb {
-      width: 52px;
-      height: 52px;
+    .medal-item img,
+    .medal-thumb,
+    .medal-icon-img {
+      width: 48px !important;
+      height: 48px !important;
+      max-width: 48px !important;
+      max-height: 48px !important;
       object-fit: contain;
       flex-shrink: 0;
     }
-    .medal-info-title {
-      font-size: 0.82rem;
+    .medal-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .medal-info-title,
+    .medal-name {
+      font-size: 0.84rem;
       font-weight: 800;
       color: #1e293b;
       margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .medal-info-desc {
-      font-size: 0.68rem;
+    .medal-info-desc,
+    .medal-cond {
+      font-size: 0.70rem;
       color: #64748b;
       line-height: 1.3;
     }
-    .medal-status-tag {
-      font-size: 0.62rem;
+    .medal-status-tag,
+    .medal-status {
+      font-size: 0.64rem;
       font-weight: 800;
-      padding: 1px 5px;
+      padding: 1px 6px;
       border-radius: 4px;
       display: inline-block;
       margin-top: 3px;
     }
-    .medal-status-tag.unlocked {
+    .medal-status-tag.unlocked,
+    .medal-status.unlocked {
       background: #dcfce7;
       color: #15803d;
     }
-    .medal-status-tag.locked {
+    .medal-status-tag.locked,
+    .medal-status.locked {
       background: #f1f5f9;
       color: #94a3b8;
     }
@@ -1633,12 +1677,12 @@
 
     <div class="header-controls">
       <div class="stage-selector-wrap">
-        <span class="course-badge" id="course-badge" title="コース切替">🗺️ スタンダード</span>
+        <span class="course-badge" id="course-badge" title="コースをきりかえる">🗺️ スタンダード</span>
         <span>ステージ:</span>
         <select id="stage-select"></select>
       </div>
 
-      <button id="btn-view-medals" class="btn-icon" title="かくとくメダルをみる">
+      <button id="btn-view-medals" class="btn-icon" title="メダルをみる">
         🏅 <span id="medals-label">メダル</span>
       </button>
 
@@ -1646,7 +1690,7 @@
         🔊 <span>おと: ON</span>
       </button>
 
-      <button id="btn-view-code" class="btn-icon" title="JavaScriptコードをみる">
+      <button id="btn-view-code" class="btn-icon" title="コードをみる">
         💻 <span>コード</span>
       </button>
     </div>
@@ -1661,11 +1705,11 @@
           <div class="stage-title" id="stage-title">🇯🇵 ステージ 1: 日本（富士山）</div>
           <div style="display: flex; gap: 6px; align-items: center;">
             <button id="btn-view-hint" class="btn-hint" title="ヒントをみる">💡 ヒント</button>
-            <div class="stage-goal-badge" id="stage-badge">🗻 富士山をめざそう</div>
+            <div class="stage-goal-badge" id="stage-badge">🗻 富士山</div>
           </div>
         </div>
         <div class="stage-desc" id="stage-desc">
-          「1マスすすむ」ブロックをおいて、富士山🗻をめざそう！
+          「すすむ」をおいて 富士山🗻へ いこう！
         </div>
       </div>
 
@@ -1693,12 +1737,12 @@
 
         <div class="maze-stats">
           <div class="stat-item">
-            <span>あるいた数:</span>
+            <span>歩いたかず:</span>
             <span class="stat-val" id="stat-steps">0</span> 歩
           </div>
           <div class="stat-item">
-            <span>ブロック数:</span>
-            <span class="stat-val" id="stat-blocks">0</span> 個
+            <span>ブロックのかず:</span>
+            <span class="stat-val" id="stat-blocks">0</span> こ
           </div>
         </div>
       </div>
@@ -1710,7 +1754,7 @@
       <div class="palette-card">
         <div class="section-title">
           <span>🧩 つかえるブロック</span>
-          <span class="hint-small">クリックかドラッグで追加</span>
+          <span class="hint-small">クリックか ひっぱっておく</span>
         </div>
         <div class="palette-blocks" id="palette-blocks"></div>
       </div>
@@ -1737,7 +1781,7 @@
             <button id="btn-reset" class="btn-action btn-reset">
               ⏹️ もどす
             </button>
-            <button id="btn-clear" class="btn-action btn-clear" title="ぜんぶ消す">
+            <button id="btn-clear" class="btn-action btn-clear" title="ぜんぶけす">
               🗑️ ぜんぶけす
             </button>
           </div>
@@ -1748,7 +1792,7 @@
           <div class="blocks-stack" id="main-stack">
             <div class="workspace-empty-hint" id="empty-hint">
               <div class="empty-icon">👆</div>
-              <div>ブロックをクリックするかドラッグして<br>プログラムを作ってみよう！</div>
+              <div>ブロックを おいて プログラムをつくろう！</div>
             </div>
           </div>
         </div>
@@ -1767,7 +1811,7 @@
         <!-- 「クリア」または「パーフェクトクリア」のバッジ -->
       </div>
       <p class="modal-desc" id="modal-desc">
-        やったー！けやっきーがゴールできたよ！
+        やったー！ゴールできたよ！
       </p>
       <div class="modal-btn-row">
         <button class="btn-modal btn-modal-secondary" id="btn-modal-replay">もういちど</button>
@@ -1779,6 +1823,7 @@
   <!-- ヒントモーダル -->
   <div class="modal-overlay" id="hint-modal">
     <div class="modal-card" style="max-width: 440px;">
+      <button class="modal-close-btn" id="btn-close-hint-x" title="とじる">✕</button>
       <div class="modal-icon" style="font-size: 2.5rem;">💡</div>
       <h2 class="modal-title" id="hint-modal-title">ヒント</h2>
       <div id="hint-modal-desc" style="font-size: 0.95rem; line-height: 1.6; margin: 14px 0; text-align: left; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 14px; color: #92400e;"></div>
@@ -1790,11 +1835,12 @@
 
   <!-- あつめたメダルモーダル -->
   <div class="modal-overlay" id="medals-modal">
-    <div class="modal-card" style="max-width: 520px;">
+    <div class="modal-card" style="max-width: 480px;">
+      <button class="modal-close-btn" id="btn-close-medals-x" title="とじる">✕</button>
       <div class="modal-icon" style="font-size: 2.5rem;">🏅</div>
       <h2 class="modal-title">あつめたメダル</h2>
       <p class="modal-desc" style="margin-bottom: 6px;">
-        ステージをクリアして特別なメダルを手に入れよう！
+        ステージをクリアして メダルをあつめよう！
       </p>
       <div class="medals-grid" id="medals-grid"></div>
       <div class="modal-btn-row">
@@ -1806,16 +1852,16 @@
   <!-- 2周目マスターコース解禁モーダル -->
   <div class="modal-overlay" id="course-unlock-modal">
     <div class="modal-card" style="max-width: 460px;">
+      <button class="modal-close-btn" id="btn-close-master-x" title="とじる">✕</button>
       <div class="modal-icon" style="font-size: 3rem;">🏆</div>
-      <h2 class="modal-title">全ブロック解禁！<br>マスターコース登場！</h2>
+      <h2 class="modal-title">マスターコースが あいたよ！</h2>
       <p class="modal-desc" style="line-height: 1.6; margin: 12px 0;">
-        ステージ20クリアおめでとう！🎉<br>
-        <strong>すべてのブロックが自由につかえる「マスターコース」</strong>が解禁されたよ！<br>
-        指定ブロックなし、くりかえし・あいだブロックも使い放題！<br>
-        ステージ1から新しい最短記録に挑戦しよう！
+        ステージ20 クリアおめでとう！🎉<br>
+        <strong>ぜんぶのブロックがつかえる「マスターコース」</strong>があいたよ！<br>
+        もっとすくないブロックで ゴールできるか チャレンジしよう！
       </p>
       <div class="modal-btn-row">
-        <button class="btn-modal btn-modal-primary" id="btn-start-master">マスターコースへ進む！ 🚀</button>
+        <button class="btn-modal btn-modal-primary" id="btn-start-master">マスターコースへ！ 🚀</button>
       </div>
     </div>
   </div>
@@ -1823,10 +1869,11 @@
   <!-- コード表示モーダル -->
   <div class="modal-overlay" id="code-modal">
     <div class="modal-card" style="max-width: 500px;">
+      <button class="modal-close-btn" id="btn-close-code-x" title="とじる">✕</button>
       <div class="modal-icon">💻</div>
-      <h2 class="modal-title">JavaScriptコード</h2>
+      <h2 class="modal-title">プログラムのコード</h2>
       <p class="modal-desc" style="margin-bottom: 8px;">
-        並べたブロックは、本物のプログラミング言語ではこう書かれています！
+        ならべたブロックを プログラムのことばにすると こうなるよ！
       </p>
       <div class="code-view-box" id="code-view-text">// ここにコードが表示されます</div>
       <div class="modal-btn-row">
@@ -1848,9 +1895,9 @@
         country: "🇯🇵 日本",
         theme: "japan",
         title: "🇯🇵 ステージ 1: 日本（富士山）",
-        desc: "「1マスすすむ」ブロックをおいて、富士山🗻をめざそう！",
-        badge: "🗻 富士山をめざそう",
-        hint: "「1マスすすむ」を1つ置いて、うごかす！を押してみてね！",
+        desc: "「すすむ」をおいて 富士山🗻へ いこう！",
+        badge: "🗻 富士山",
+        hint: "「1マスすすむ」を 1こ おいて、「うごかす！」をおそう！",
         gridWidth: 3,
         gridHeight: 3,
         goalIcon: "🗻",
@@ -1870,9 +1917,9 @@
         country: "🇺🇸 アメリカ",
         theme: "usa",
         title: "🇺🇸 ステージ 2: アメリカ（自由の女神）",
-        desc: "「1マスすすむ」を2つつなげて、自由の女神🗽へ行こう！",
-        badge: "🗽 自由の女神へ",
-        hint: "「1マスすすむ」を縦に2つつなげてみよう！",
+        desc: "「すすむ」を 2つつなげて 自由の女神🗽へ いこう！",
+        badge: "🗽 自由の女神",
+        hint: "「1マスすすむ」を 2こ つなげてみよう！",
         gridWidth: 4,
         gridHeight: 3,
         goalIcon: "🗽",
@@ -1892,9 +1939,9 @@
         country: "🇫🇷 フランス",
         theme: "france",
         title: "🇫🇷 ステージ 3: フランス（エッフェル塔）",
-        desc: "「1マスすすむ」を3つつなげて、エッフェル塔🗼へ行こう！",
-        badge: "🗼 エッフェル塔へ",
-        hint: "ゴールまであと3マス！「1マスすすむ」を3つつなげてみよう！",
+        desc: "「すすむ」を 3つつなげて エッフェル塔🗼へ いこう！",
+        badge: "🗼 エッフェル塔",
+        hint: "「1マスすすむ」を 3こ つなげてみよう！",
         gridWidth: 5,
         gridHeight: 3,
         goalIcon: "🗼",
@@ -1914,9 +1961,9 @@
         country: "🇬🇧 イギリス",
         theme: "uk",
         title: "🇬🇧 ステージ 4: イギリス（ビッグベン）",
-        desc: "すすんでから右をむいて、ビッグベン🕰️をめざそう！",
-        badge: "🕰️ ビッグベンへ",
-        hint: "すすむ → みぎをむく → すすむ の順番でブロックをつなごう！",
+        desc: "すすんで 右をむいて ビッグベン🕰️へ いこう！",
+        badge: "🕰️ ビッグベン",
+        hint: "すすむ → みぎをむく → すすむ の じゅんばんにおこう！",
         gridWidth: 3,
         gridHeight: 3,
         goalIcon: "🕰️",
@@ -1936,9 +1983,9 @@
         country: "🇮🇹 イタリア",
         theme: "italy",
         title: "🇮🇹 ステージ 5: イタリア（ピザ）",
-        desc: "すすんでから左をむいて、おいしいピザ🍕を食べに行こう！",
-        badge: "🍕 ピザの広場へ",
-        hint: "すすむ → ひだりをむく → すすむ の順番で上に向かおう！",
+        desc: "すすんで 左をむいて ピザ🍕を食べにいこう！",
+        badge: "🍕 ピザ",
+        hint: "すすむ → ひだりをむく → すすむ の じゅんばんにおこう！",
         gridWidth: 3,
         gridHeight: 3,
         goalIcon: "🍕",
@@ -1957,19 +2004,19 @@
         id: 5,
         country: "🇩🇪 ドイツ",
         theme: "germany",
-        title: "🇩🇪 ステージ 6: ドイツ（ノイシュヴァンシュタイン城）",
-        desc: "右に2回曲がってUターン！お城🏰へ行こう！",
-        badge: "🏰 ノイシュヴァンシュタイン城へ",
-        hint: "すすむ → みぎをむく → すすむ → みぎをむく → すすむ でくるっとUターンしよう！",
+        title: "🇩🇪 ステージ 6: ドイツ（お城）",
+        desc: "2歩あるいて右をむく！お城🏰をめざそう！",
+        badge: "🏰 お城",
+        hint: "すすむ2こ → みぎ → すすむ2こ → みぎ → すすむ2こ でゴールできるよ！",
         gridWidth: 3,
         gridHeight: 3,
         goalIcon: "🏰",
-        goalName: "ノイシュヴァンシュタイン城",
-        minBlocks: 5,
+        goalName: "お城",
+        minBlocks: 8,
         map: [
-          [2, 0, 1],
-          [3, 0, 1],
-          [1, 1, 1]
+          [2, 0, 0],
+          [1, 1, 0],
+          [3, 0, 0]
         ],
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right']
@@ -1980,9 +2027,9 @@
         country: "🇨🇳 中国",
         theme: "china",
         title: "🇨🇳 ステージ 7: 中国（パンダ）",
-        desc: "右と左を組み合わせて、かわいいパンダ🐼に会いに行こう！",
-        badge: "🐼 パンダの庭へ",
-        hint: "すすむ → みぎをむく → すすむ → ひだりをむく → すすむ で階段のように進もう！",
+        desc: "右と左をまがって パンダ🐼に あいにいこう！",
+        badge: "🐼 パンダ",
+        hint: "かいだんのように 右と左をまがりながら すすもう！",
         gridWidth: 4,
         gridHeight: 3,
         goalIcon: "🐼",
@@ -2002,9 +2049,9 @@
         country: "🇮🇳 インド",
         theme: "india",
         title: "🇮🇳 ステージ 8: インド（カレー）",
-        desc: "ジグザグの道をリズミカルに進んで、カレー🍛を食べに行こう！",
-        badge: "🍛 カレーの屋台へ",
-        hint: "「みぎ・ひだり」のジグザグパターンを2回くりかえす形になっているよ！",
+        desc: "ジグザグに進んで カレー🍛を食べにいこう！",
+        badge: "🍛 カレー",
+        hint: "みぎと ひだりを こうごに まがって すすもう！",
         gridWidth: 5,
         gridHeight: 4,
         goalIcon: "🍛",
@@ -2025,9 +2072,9 @@
         country: "🇪🇬 エジプト",
         theme: "egypt",
         title: "🇪🇬 ステージ 9: エジプト（ピラミッド）",
-        desc: "砂漠の長い曲がり角を乗りこえて、ピラミッド🔺をめざそう！",
-        badge: "🔺 ピラミッドへ",
-        hint: "すすむ4回 → みぎ → すすむ2回 → みぎ → すすむ2回 → ひだり → すすむ2回 だよ！",
+        desc: "ながい道をすすんで ピラミッド🔺へ いこう！",
+        badge: "🔺 ピラミッド",
+        hint: "カベにぶつかったら まがりながら すすもう！",
         gridWidth: 6,
         gridHeight: 6,
         goalIcon: "🔺",
@@ -2050,9 +2097,9 @@
         country: "🇨🇦 カナダ",
         theme: "canada",
         title: "🇨🇦 ステージ 10: カナダ（カエデの森）",
-        desc: "まんなかの森でカエデの葉っぱ🍁を1つひろい、ゴールの葉っぱと合わせて2つ集めよう！",
-        badge: "🍁 カエデの森へ",
-        hint: "広い広場！まんなか3×3のどこかにある葉っぱ🍁をひろってから、右下のゴール🍁へ向かおう（最短11ブロック）！",
+        desc: "もりの 葉っぱ🍁を ひろってから ゴールしよう！",
+        badge: "🍁 カエデの森",
+        hint: "まんなかの もりにある 葉っぱ🍁を ひろってから、ゴールの葉っぱへ いこう！",
         gridWidth: 5,
         gridHeight: 5,
         goalIcon: "🍁",
@@ -2075,9 +2122,9 @@
         country: "🇦🇺 オーストラリア",
         theme: "australia",
         title: "🇦🇺 ステージ 11: オーストラリア（カンガルー）",
-        desc: "「🔁 くりかえす」の登場！指定ブロックの中に「すすむ」を入れてみよう！",
-        badge: "🦘 カンガルーの草原へ",
-        hint: "最初から置いてある「3かい くりかえす」の中に「1マスすすむ」を入れると、一気に3マス進めるよ！",
+        desc: "「くりかえす」のなかに「すすむ」を いれてみよう！",
+        badge: "🦘 カンガルー",
+        hint: "「3かい くりかえす」の なかに「1マスすすむ」を いれると 3歩すすむよ！",
         gridWidth: 5,
         gridHeight: 3,
         goalIcon: "🦘",
@@ -2100,9 +2147,9 @@
         country: "🇧🇷 ブラジル",
         theme: "brazil",
         title: "🇧🇷 ステージ 12: ブラジル（サッカー）",
-        desc: "今度はくりかえす回数を自分で変えてみよう！ゴールまで何歩かな？",
-        badge: "⚽ サッカー場へ",
-        hint: "ゴールまで5マスあるよ。くりかえしブロックの数字を「5」に変えて「すすむ」を入れよう！",
+        desc: "くりかえす かずを かえて サッカーボール⚽へ！",
+        badge: "⚽ サッカー",
+        hint: "くりかえしの すうじを「5」にして「すすむ」を いれよう！",
         gridWidth: 7,
         gridHeight: 3,
         goalIcon: "⚽",
@@ -2125,9 +2172,9 @@
         country: "🇷🇺 ロシア",
         theme: "russia",
         title: "🇷🇺 ステージ 13: ロシア（マトリョーシカ）",
-        desc: "「すすむ・すすむ・みぎをむく」のパターンを3回くりかえしてゴールへ！",
-        badge: "🪆 マトリョーシカへ",
-        hint: "指定のくりかえしブロックの中に、「すすむ」「すすむ」「みぎをむく」の3つを入れよう！",
+        desc: "「すすむ・すすむ・みぎ」を 3回くりかえそう！",
+        badge: "🪆 マトリョーシカ",
+        hint: "くりかえすの なかに「すすむ」「すすむ」「みぎをむく」の 3つを いれよう！",
         gridWidth: 4,
         gridHeight: 4,
         goalIcon: "🪆",
@@ -2151,19 +2198,18 @@
         country: "🇲🇽 メキシコ",
         theme: "mexico",
         title: "🇲🇽 ステージ 14: メキシコ（タコス）",
-        desc: "階段パターンを2回くりかえして、タコス🌮を食べに行こう！",
-        badge: "🌮 タコスの広場へ",
-        hint: "指定のくりかえしブロックの中に、「すすむ → みぎ → すすむ → ひだり」の階段パターンを入れよう！",
-        gridWidth: 5,
-        gridHeight: 4,
+        desc: "かいだんを 2回のぼって タコス🌮をたべよう！",
+        badge: "🌮 タコス",
+        hint: "くりかえすの なかに「すすむ → みぎ → すすむ → ひだり」を いれよう！",
+        gridWidth: 3,
+        gridHeight: 3,
         goalIcon: "🌮",
         goalName: "タコス",
         minBlocks: 5,
         map: [
-          [2, 0, 1, 1, 1],
-          [1, 0, 0, 1, 1],
-          [1, 1, 0, 3, 1],
-          [1, 1, 1, 1, 1]
+          [2, 0, 1],
+          [1, 0, 0],
+          [1, 1, 3]
         ],
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right', 'turn_left'],
@@ -2176,22 +2222,21 @@
         id: 14,
         country: "🇨🇭 スイス",
         theme: "switzerland",
-        title: "🇨🇭 ステージ 15: スイス（アルプスのホルン）",
-        desc: "4段のアルプスの階段！くりかえし回数を合わせてホルン📯へ！",
-        badge: "📯 アルプスのホルンへ",
-        hint: "階段が4回続くよ。くりかえし回数を「4」にして、階段パターン（すすむ・みぎ・すすむ・ひだり）を入れよう！",
-        gridWidth: 6,
-        gridHeight: 6,
+        title: "🇨🇭 ステージ 15: スイス（ホルン）",
+        desc: "かいだんを 4回のぼって ホルン📯をならそう！",
+        badge: "📯 ホルン",
+        hint: "くりかえしのかずを「4」にして、「すすむ → みぎ → すすむ → ひだり」を いれよう！",
+        gridWidth: 5,
+        gridHeight: 5,
         goalIcon: "📯",
-        goalName: "アルプスのホルン",
+        goalName: "ホルン",
         minBlocks: 5,
         map: [
-          [2, 0, 1, 1, 1, 1],
-          [1, 0, 0, 1, 1, 1],
-          [1, 1, 0, 0, 1, 1],
-          [1, 1, 1, 0, 0, 1],
-          [1, 1, 1, 1, 0, 3],
-          [1, 1, 1, 1, 1, 1]
+          [2, 0, 1, 1, 1],
+          [1, 0, 0, 1, 1],
+          [1, 1, 0, 0, 1],
+          [1, 1, 1, 0, 0],
+          [1, 1, 1, 1, 3]
         ],
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right', 'turn_left'],
@@ -2205,9 +2250,9 @@
         country: "🇳🇱 オランダ",
         theme: "netherlands",
         title: "🇳🇱 ステージ 16: オランダ（チューリップ）",
-        desc: "「🔄 ゴールするまで くりかえす」の登場！チューリップ畑🌷へ一気に進もう！",
-        badge: "🌷 チューリップ畑へ",
-        hint: "「ゴールするまで くりかえす」の中に「1マスすすむ」を入れるだけで、自動で進むよ！",
+        desc: "「ゴールするまで」で チューリップ🌷へ！",
+        badge: "🌷 チューリップ",
+        hint: "「ゴールするまで」の なかに「1マスすすむ」を いれるだけで ずっとすすむよ！",
         gridWidth: 7,
         gridHeight: 3,
         goalIcon: "🌷",
@@ -2230,19 +2275,20 @@
         country: "🇪🇸 スペイン",
         theme: "spain",
         title: "🇪🇸 ステージ 17: スペイン（闘牛）",
-        desc: "カベにぶつかったら左へ！「もし」を組み合わせ闘牛🐂のところへ！",
-        badge: "🐂 闘牛の広場へ",
-        hint: "「もし まえがカベなら」の中に「ひだりをむく」を入れ、その下に「1マスすすむ」を置こう！",
-        gridWidth: 4,
-        gridHeight: 4,
+        desc: "カベにぶつかったら左へ！闘牛🐂をめざそう！",
+        badge: "🐂 闘牛",
+        hint: "「もし まえがカベなら」に「ひだりをむく」をいれて、そのしたに「1マスすすむ」をおこう！",
+        gridWidth: 5,
+        gridHeight: 5,
         goalIcon: "🐂",
         goalName: "闘牛",
         minBlocks: 4,
         map: [
-          [1, 1, 1, 1],
-          [1, 3, 1, 1],
-          [2, 0, 1, 1],
-          [1, 1, 1, 1]
+          [1, 1, 1, 3, 1],
+          [1, 1, 1, 0, 1],
+          [2, 0, 0, 0, 1],
+          [1, 1, 1, 0, 1],
+          [1, 1, 1, 0, 1]
         ],
         start: { x: 0, y: 2, dir: 1 },
         availableBlocks: ['forward', 'turn_left'],
@@ -2260,12 +2306,12 @@
       // ステージ 18（南極/アイスランド）： ペンギン 🐧
       {
         id: 17,
-        country: "🇦🇶 南極/アイスランド",
+        country: "🇦🇶 南極",
         theme: "antarctica",
-        title: "🇦🇶 ステージ 18: 南極/アイスランド（ペンギン）",
-        desc: "時計回りのうずまき迷路！条件を正しくえらんでペンギン🐧に会おう！",
-        badge: "🐧 ペンギンの氷原へ",
-        hint: "くりかえしを「ゴールするまで」、もしを「まえがカベ」にして、「みぎをむく」と「すすむ」を入れよう！",
+        title: "🇦🇶 ステージ 18: 南極（ペンギン）",
+        desc: "カベにぶつかったら右へ！ぐるぐる進もう！",
+        badge: "🐧 ペンギン",
+        hint: "くりかえしを「ゴールするまで」、もしを「まえがカベ」にして、「みぎをむく」と「すすむ」をおこう！",
         gridWidth: 5,
         gridHeight: 5,
         goalIcon: "🐧",
@@ -2274,9 +2320,9 @@
         map: [
           [2, 0, 0, 0, 0],
           [1, 1, 1, 1, 0],
-          [1, 3, 0, 1, 0],
-          [1, 1, 0, 0, 0],
-          [1, 1, 1, 1, 1]
+          [1, 0, 3, 1, 0],
+          [1, 0, 1, 1, 0],
+          [1, 0, 0, 0, 0]
         ],
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right'],
@@ -2296,14 +2342,14 @@
         id: 18,
         country: "🇬🇷 ギリシャ",
         theme: "greece",
-        title: "🇬🇷 ステージ 19: ギリシャ（神殿の柱）",
-        desc: "神殿の柱がならぶ迷路！右折とUターン（右2回）で進もう！",
-        badge: "🏛️ 神殿の柱へ",
-        hint: "最初のもしカベに「みぎをむく」、内側のもしカベに「みぎをむく」を2つ、最後に「すすむ」を置こう！",
+        title: "🇬🇷 ステージ 19: ギリシャ（神殿）",
+        desc: "右折とUターン！神殿🏛️へいこう！",
+        badge: "🏛️ 神殿",
+        hint: "外側の「もし」に「みぎをむく」、内側の「もし」に「みぎをむく」を2こ、さいごに「すすむ」をおこう！",
         gridWidth: 5,
         gridHeight: 5,
         goalIcon: "🏛️",
-        goalName: "神殿の柱",
+        goalName: "神殿",
         minBlocks: 7,
         map: [
           [2, 0, 1, 0, 1],
@@ -2335,23 +2381,23 @@
       // ステージ 20（宇宙/月）： ロケット 🚀
       {
         id: 19,
-        country: "🚀 宇宙/月",
+        country: "🚀 宇宙",
         theme: "space",
-        title: "🚀 ステージ 20: 宇宙/月（ロケット）",
-        desc: "大冒険のフィナーレ！ステージ19の右手法アルゴリズムを自分でゼロから組み立てよう！",
-        badge: "🚀 ロケットへ出発！",
-        hint: "指定ブロックなし！ステージ19で完成させた「右手法アルゴリズム」を思い出して組み立ててみよう！",
+        title: "🚀 ステージ 20: 宇宙（ロケット）",
+        desc: "さいごのステージ！ぜんぶ自分でくみたてよう！",
+        badge: "🚀 ロケット",
+        hint: "ステージ19とおなじように、もしのなかに「みぎをむく」ともうひとつの「もし」をいれてみよう！",
         gridWidth: 5,
         gridHeight: 5,
         goalIcon: "🚀",
         goalName: "ロケット",
         minBlocks: 7,
         map: [
-          [2, 0, 1, 0, 1],
-          [1, 0, 0, 0, 1],
+          [2, 0, 0, 0, 1],
           [1, 1, 1, 0, 1],
           [1, 0, 0, 0, 1],
-          [1, 3, 1, 0, 1]
+          [1, 0, 1, 1, 1],
+          [1, 0, 0, 0, 3]
         ],
         start: { x: 0, y: 0, dir: 1 },
         availableBlocks: ['forward', 'turn_right', 'while', 'if']
@@ -2699,13 +2745,13 @@
     function updateCourseUI() {
       if (courseBadgeEl) {
         if (currentCourse === 'master') {
-          courseBadgeEl.innerText = '🏆 マスターコース';
+          courseBadgeEl.innerText = '🏆 マスター';
           courseBadgeEl.classList.add('master-active');
-          courseBadgeEl.title = '全ブロック解禁！クリックでスタンダードコースへ';
+          courseBadgeEl.title = 'ぜんぶのブロックがつかえるよ！クリックでもどる';
         } else {
-          courseBadgeEl.innerText = isMasterUnlocked ? '🗺️ スタンダード (切替可)' : '🗺️ スタンダード';
+          courseBadgeEl.innerText = isMasterUnlocked ? '🗺️ スタンダード (えらべる)' : '🗺️ スタンダード';
           courseBadgeEl.classList.remove('master-active');
-          courseBadgeEl.title = isMasterUnlocked ? 'クリックでマスターコースへ' : 'ステージ20をクリアするとマスターコース解禁！';
+          courseBadgeEl.title = isMasterUnlocked ? 'クリックでマスターコースへ' : 'ステージ20をクリアするとマスターコースがあくよ！';
         }
       }
     }
@@ -2733,12 +2779,12 @@
       block.classList.add('designated-block');
       block.dataset.isDesignated = 'true';
 
-      // 視覚的バッジ「📌 指定ブロック」
+      // 視覚的バッジ「📌 してブロック」
       const header = block.querySelector('.c-header') || block;
       header.style.position = 'relative';
       const tag = document.createElement('span');
       tag.className = 'designated-tag';
-      tag.innerText = '📌 指定ブロック';
+      tag.innerText = '📌 してブロック';
       header.appendChild(tag);
 
       // 条件・数値の設定とロック
@@ -2750,7 +2796,7 @@
         if (def.locked && select) {
           select.disabled = true;
           select.classList.add('designated-locked-select');
-          select.title = 'この回数は固定されています';
+          select.title = 'このかずは かえられないよ';
         }
       } else if (def.type === 'if') {
         const select = block.querySelector('.if-cond');
@@ -2760,7 +2806,7 @@
         if (def.locked && select) {
           select.disabled = true;
           select.classList.add('designated-locked-select');
-          select.title = 'この条件は固定されています';
+          select.title = 'これは かえられないよ';
         }
       } else if (def.type === 'while') {
         const select = block.querySelector('.while-cond');
@@ -2770,7 +2816,7 @@
         if (def.locked && select) {
           select.disabled = true;
           select.classList.add('designated-locked-select');
-          select.title = 'この条件は固定されています';
+          select.title = 'これは かえられないよ';
         }
       }
 
@@ -2967,9 +3013,9 @@
               <span>かい くりかえす</span>
             </div>
             <div class="block-actions">
-              <button class="btn-block-ctrl btn-up" title="上へ">▲</button>
-              <button class="btn-block-ctrl btn-down" title="下へ">▼</button>
-              <button class="btn-block-ctrl btn-delete" title="削除">✕</button>
+              <button class="btn-block-ctrl btn-up" title="うえへ">▲</button>
+              <button class="btn-block-ctrl btn-down" title="したへ">▼</button>
+              <button class="btn-block-ctrl btn-delete" title="けす">✕</button>
             </div>
           </div>
           <div class="c-body blocks-stack"></div>
@@ -2997,9 +3043,9 @@
               <span>なら</span>
             </div>
             <div class="block-actions">
-              <button class="btn-block-ctrl btn-up" title="上へ">▲</button>
-              <button class="btn-block-ctrl btn-down" title="下へ">▼</button>
-              <button class="btn-block-ctrl btn-delete" title="削除">✕</button>
+              <button class="btn-block-ctrl btn-up" title="うえへ">▲</button>
+              <button class="btn-block-ctrl btn-down" title="したへ">▼</button>
+              <button class="btn-block-ctrl btn-delete" title="けす">✕</button>
             </div>
           </div>
           <div class="c-body blocks-stack"></div>
@@ -3027,9 +3073,9 @@
               <span>くりかえす</span>
             </div>
             <div class="block-actions">
-              <button class="btn-block-ctrl btn-up" title="上へ">▲</button>
-              <button class="btn-block-ctrl btn-down" title="下へ">▼</button>
-              <button class="btn-block-ctrl btn-delete" title="削除">✕</button>
+              <button class="btn-block-ctrl btn-up" title="うえへ">▲</button>
+              <button class="btn-block-ctrl btn-down" title="したへ">▼</button>
+              <button class="btn-block-ctrl btn-delete" title="けす">✕</button>
             </div>
           </div>
           <div class="c-body blocks-stack"></div>
@@ -3057,9 +3103,9 @@
           <span style="margin-left:4px;">${label}</span>
         </div>
         <div class="block-actions">
-          <button class="btn-block-ctrl btn-up" title="上へ">▲</button>
-          <button class="btn-block-ctrl btn-down" title="下へ">▼</button>
-          <button class="btn-block-ctrl btn-delete" title="削除">✕</button>
+          <button class="btn-block-ctrl btn-up" title="うえへ">▲</button>
+          <button class="btn-block-ctrl btn-down" title="したへ">▼</button>
+          <button class="btn-block-ctrl btn-delete" title="けす">✕</button>
         </div>
       `;
 
@@ -3073,7 +3119,7 @@
         Sound.click();
         if (el.dataset.isDesignated === 'true' || el.querySelector('[data-is-designated="true"]')) {
           hasDeletedDesignated = true;
-          setStatus('⚠️ 指定ブロックを削除したよ（パーフェクトクリアには指定ブロックが必要です）', 'error');
+          setStatus('⚠️ してブロックを けしたよ（パーフェクトには してブロックをつかおう）', 'error');
         }
         el.remove();
         checkEmptyHint();
@@ -3292,7 +3338,7 @@
 
         totalExecutionSteps++;
         if (totalExecutionSteps > MAX_STEPS) {
-          throw new Error('うごきすぎちゃった！（無限ループ）ブロックを見直してみよう！');
+          throw new Error('うごきすぎちゃった！ブロックを みなおしてみよう！');
         }
 
         await highlightBlock(node.el);
@@ -3327,7 +3373,7 @@
             if (shouldStop) return;
             totalExecutionSteps++;
             if (totalExecutionSteps > MAX_STEPS) {
-              throw new Error('ループが止まらなくなっちゃった！（無限ループ）');
+              throw new Error('ずっと ぐるぐる まわっているよ！');
             }
             await highlightBlock(node.el);
             await executeNodes(node.children, speed);
@@ -3342,7 +3388,7 @@
 
       const ast = parseStackToAST(mainStack);
       if (ast.length === 0) {
-        setStatus('⚠️ ブロックがまだ並んでいないよ！ブロックを追加してね。', 'error');
+        setStatus('⚠️ ブロックが おいてないよ！ブロックをおいてね。', 'error');
         return;
       }
 
@@ -3350,7 +3396,7 @@
       shouldStop = false;
       btnRun.disabled = true;
       totalExecutionSteps = 0;
-      setStatus('🏃 けやっきーが動いているよ...', 'running');
+      setStatus('🏃 けやっきーが うごいているよ...', 'running');
 
       resetRobot();
       await sleep(150);
@@ -3369,7 +3415,7 @@
       isRunning = false;
 
       if (shouldStop) {
-        setStatus('⏹️ うごくのをストップしたよ。');
+        setStatus('⏹️ うごくのを とめたよ。');
         return;
       }
 
@@ -3390,13 +3436,13 @@
       if (nextX < 0 || nextX >= stage.gridWidth || nextY < 0 || nextY >= stage.gridHeight) {
         Sound.bump();
         await Maze2D.bumpAnimation();
-        return { success: false, message: '迷路の外にとびだしちゃった！' };
+        return { success: false, message: 'めいろの そとに でちゃった！' };
       }
 
       if (stage.map[nextY][nextX] === 1) {
         Sound.bump();
         await Maze2D.bumpAnimation();
-        return { success: false, message: '壁（🧱）にぶつかっちゃった！もう一度ためしてみよう！' };
+        return { success: false, message: 'カベ（🧱）に ぶつかっちゃった！' };
       }
 
       robotPos.x = nextX;
@@ -3417,7 +3463,7 @@
             setTimeout(() => leafEl.remove(), 400);
           }
           Sound.clear();
-          setStatus('🍁 まんなかの森でカエデの葉っぱをひろったよ！（1/2）', 'success');
+          setStatus('🍁 カエデの はっぱを ひろったよ！（1/2）', 'success');
         }
       }
 
@@ -3434,7 +3480,7 @@
       if (isAtGoal) {
         // ステージ10の場合、森の葉っぱを拾っているか確認
         if (stage.isLeafCollectorStage && stage10LeavesCollected < 1) {
-          setStatus('🍁 カエデの葉っぱがたりないよ！真ん中の森にある葉っぱをひろってからゴールしよう！', 'error');
+          setStatus('🍁 はっぱが たりないよ！まんなかのはっぱを ひろってから ゴールしよう！', 'error');
           return;
         }
         if (stage.isLeafCollectorStage) {
@@ -3457,9 +3503,9 @@
         updateMedalsUI();
 
         if (isPerfect) {
-          setStatus(`🌟 最短記録！${stage.goalName}にパーフェクトクリア！！`, 'success');
+          setStatus(`🌟 ぴったり！${stage.goalName}に パーフェクトクリア！！`, 'success');
         } else {
-          setStatus(`🎉 やったー！${stage.goalName}にゴールせいこう！！`, 'success');
+          setStatus(`🎉 やったー！${stage.goalName}に ゴールせいこう！！`, 'success');
         }
         Sound.clear();
         Maze2D.robotEl.classList.add('keyakki-jump');
@@ -3479,7 +3525,7 @@
           }
         }
       } else {
-        setStatus('🤔 ゴールにとどかなかったよ。ブロックをふやしてみよう！', 'error');
+        setStatus('🤔 ゴールにとどかなかったよ。ブロックを ふやしてみよう！', 'error');
       }
     }
 
@@ -3554,8 +3600,8 @@
     const MEDALS_DEF = [
       {
         id: 'bronze',
-        title: 'ブロンズメダル',
-        desc: 'スタンダードコース全20ステージをクリア！',
+        title: 'ブロンズメダル 🥉',
+        desc: 'スタンダードの 20ステージを ぜんぶクリア！',
         img: 'images/medals/medal_bronze.png',
         isUnlocked: () => {
           const p = gameProgress.standard?.cleared || {};
@@ -3564,8 +3610,8 @@
       },
       {
         id: 'silver',
-        title: 'シルバーメダル',
-        desc: 'スタンダードコース全20ステージをパーフェクトクリア！',
+        title: 'シルバーメダル 🥈',
+        desc: 'スタンダードの 20ステージを パーフェクトクリア！',
         img: 'images/medals/medal_silver.png',
         isUnlocked: () => {
           const p = gameProgress.standard?.perfect || {};
@@ -3574,8 +3620,8 @@
       },
       {
         id: 'gold',
-        title: 'ゴールドメダル',
-        desc: 'マスターコース全20ステージをクリア！',
+        title: 'ゴールドメダル 🥇',
+        desc: 'マスターの 20ステージを ぜんぶクリア！',
         img: 'images/medals/medal_gold.png',
         isUnlocked: () => {
           const p = gameProgress.master?.cleared || {};
@@ -3584,8 +3630,8 @@
       },
       {
         id: 'platinum',
-        title: 'マスタープラチナメダル',
-        desc: 'マスターコース全20ステージをパーフェクトクリア！神域達成！',
+        title: 'プラチナメダル 👑',
+        desc: 'マスターの 20ステージを パーフェクトクリア！',
         img: 'images/medals/medal_platinum.png',
         isUnlocked: () => {
           const p = gameProgress.master?.perfect || {};
@@ -3622,9 +3668,11 @@
         card.className = `medal-item ${unlocked ? 'unlocked' : 'locked'}`;
         card.innerHTML = `
           <img src="${m.img}" class="medal-icon-img" alt="${m.title}">
-          <div class="medal-name">${m.title}</div>
-          <div class="medal-cond">${m.desc}</div>
-          <div class="medal-status">${unlocked ? '✨ 獲得済み！' : '🔒 未獲得'}</div>
+          <div class="medal-info">
+            <div class="medal-name">${m.title}</div>
+            <div class="medal-cond">${m.desc}</div>
+            <div class="medal-status ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? '✨ もっている！' : '🔒 まだ'}</div>
+          </div>
         `;
         medalsGrid.appendChild(card);
       });
@@ -3643,31 +3691,31 @@
 
       if (isPerfect) {
         modalTitle.innerText = 'パーフェクトクリア！🌟';
-        badgeContainer.innerHTML = '<div class="clear-badge-pill perfect">👑 パーフェクトクリア！</div>';
+        badgeContainer.innerHTML = '<div class="clear-badge-pill perfect">👑 パーフェクト！</div>';
         modalDesc.innerHTML = `
-          <strong>${stage.title}</strong> を最短ブロック数でクリアしたよ！<br>
-          あるいた数: <strong>${stepsCount}</strong> 歩 ／ 使ったブロック: <strong>${totalBlocks}</strong> 個<br>
-          <span style="color:#d97706; font-weight:800; font-size:1.02rem; display:inline-block; margin-top:6px;">🎉 目標の最短 ${stage.minBlocks} 個をみごと達成！すばらしい！</span>
+          <strong>${stage.title}</strong> をクリアしたよ！<br>
+          歩いたかず: <strong>${stepsCount}</strong> 歩 ／ ブロック: <strong>${totalBlocks}</strong> こ<br>
+          <span style="color:#d97706; font-weight:800; font-size:1.02rem; display:inline-block; margin-top:6px;">🎉 いちばんすくない ${stage.minBlocks}こ でゴールできたね！</span>
         `;
       } else {
         modalTitle.innerText = 'ゴール おめでとう！🎉';
-        badgeContainer.innerHTML = '<div class="clear-badge-pill normal">✅ ステージクリア！</div>';
+        badgeContainer.innerHTML = '<div class="clear-badge-pill normal">✅ クリア！</div>';
         let advice = '';
         if (!isDesignatedKept) {
-          advice = `<br><span style="color:#d97706; font-weight:800; display:inline-block; margin-top:6px;">💡 指定ブロックを消さずに最短 ${stage.minBlocks}個でクリアすると「パーフェクトクリア」になるよ！</span>`;
+          advice = `<br><span style="color:#d97706; font-weight:800; display:inline-block; margin-top:6px;">💡 してブロックを けさずに ${stage.minBlocks}こ でクリアすると「パーフェクト」になるよ！</span>`;
         } else {
           const diff = totalBlocks - stage.minBlocks;
-          advice = `<br><span style="color:#d97706; font-weight:800; display:inline-block; margin-top:6px;">💡 ブロックが <strong>${stage.minBlocks}個</strong>（あと${diff}個へらす）だとパーフェクトクリアになるよ！</span>`;
+          advice = `<br><span style="color:#d97706; font-weight:800; display:inline-block; margin-top:6px;">💡 あと <strong>${diff}こ</strong> ブロックをへらすと パーフェクトになるよ！（めざせ ${stage.minBlocks}こ）</span>`;
         }
         modalDesc.innerHTML = `
           <strong>${stage.title}</strong> をクリアしたよ！<br>
-          あるいた数: <strong>${stepsCount}</strong> 歩 ／ 使ったブロック: <strong>${totalBlocks}</strong> 個
+          歩いたかず: <strong>${stepsCount}</strong> 歩 ／ ブロック: <strong>${totalBlocks}</strong> こ
           ${advice}
         `;
       }
 
       if (currentStageIndex >= STAGES.length - 1) {
-        btnModalNext.innerText = '🎉 全ステージクリア！はじめから';
+        btnModalNext.innerText = '🎉 ぜんぶクリア！はじめから';
       } else {
         btnModalNext.innerText = 'つぎのステージへ ➡️';
       }
@@ -3731,6 +3779,13 @@
       codeModal.classList.remove('active');
     });
 
+    const btnCloseCodeX = document.getElementById('btn-close-code-x');
+    if (btnCloseCodeX) {
+      btnCloseCodeX.addEventListener('click', () => {
+        codeModal.classList.remove('active');
+      });
+    }
+
     // ヒントモーダル開閉
     if (btnViewHint) {
       btnViewHint.addEventListener('click', () => {
@@ -3743,6 +3798,12 @@
     }
     if (btnCloseHint) {
       btnCloseHint.addEventListener('click', () => {
+        if (hintModal) hintModal.classList.remove('active');
+      });
+    }
+    const btnCloseHintX = document.getElementById('btn-close-hint-x');
+    if (btnCloseHintX) {
+      btnCloseHintX.addEventListener('click', () => {
         if (hintModal) hintModal.classList.remove('active');
       });
     }
@@ -3760,6 +3821,12 @@
         if (medalsModal) medalsModal.classList.remove('active');
       });
     }
+    const btnCloseMedalsX = document.getElementById('btn-close-medals-x');
+    if (btnCloseMedalsX) {
+      btnCloseMedalsX.addEventListener('click', () => {
+        if (medalsModal) medalsModal.classList.remove('active');
+      });
+    }
 
     // マスターコース解禁モーダルのボタン
     if (btnStartMaster) {
@@ -3769,22 +3836,44 @@
         updateCourseUI();
         initStageSelectOptions();
         loadStage(0, true);
-        setStatus('🚀 全ブロック解禁のマスターコースへようこそ！ステージ1から挑戦しよう！', 'success');
+        setStatus('🚀 マスターコースへようこそ！ステージ1から挑戦しよう！', 'success');
       });
     }
+    const btnCloseMasterX = document.getElementById('btn-close-master-x');
+    if (btnCloseMasterX) {
+      btnCloseMasterX.addEventListener('click', () => {
+        if (courseUnlockModal) courseUnlockModal.classList.remove('active');
+      });
+    }
+
+    // モーダルの背景クリックで閉じる
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('active');
+        }
+      });
+    });
+
+    // Escキーで開いているモーダルを閉じる
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+      }
+    });
 
     // コース切替バッジ
     if (courseBadgeEl) {
       courseBadgeEl.addEventListener('click', () => {
         if (!isMasterUnlocked) {
-          alert('🔒 マスターコースはステージ20をクリアすると解禁されます！まずは全20ステージをクリアしてみてね！');
+          alert('🔒 マスターコースは ステージ20を クリアすると あくよ！まずは 20ステージを クリアしよう！');
           return;
         }
         currentCourse = (currentCourse === 'standard') ? 'master' : 'standard';
         updateCourseUI();
         initStageSelectOptions();
         loadStage(currentStageIndex, true);
-        setStatus(currentCourse === 'master' ? '🏆 マスターコースに切り替えたよ！全ブロック解禁！' : '🗺️ スタンダードコースに切り替えたよ！');
+        setStatus(currentCourse === 'master' ? '🏆 マスターコースにしたよ！ぜんぶのブロックがつかえるよ！' : '🗺️ スタンダードコースにしたよ！');
       });
     }
 
