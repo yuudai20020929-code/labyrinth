@@ -2,5 +2,5 @@
 // セットアップ手順は README.md の「授業ログイン（Googleスプレッドシート連携）」を参照
 window.LABYRINTH_CONFIG = {
   gasUrl:
-    "https://script.google.com/macros/s/AKfycbwjuO241uY0OJCFa-j-2J_BY1u5mTXy4yJ9gJZafhjj7RwCZw4layQNrW2rrKv4mDSSkw/exec", // 例: 'https://script.google.com/macros/s/XXXX/exec'
+    "https://script.google.com/macros/s/AKfycbx7YFQ4r155O-imhK6Xzz1iJsVoIVnHs-005i-cA7091llifgLAxo6LKeibQhVEH1kWCw/exec", // 例: 'https://script.google.com/macros/s/XXXX/exec'
 };
