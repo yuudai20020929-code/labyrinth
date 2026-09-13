@@ -269,6 +269,7 @@
         </div>
         <div class="actions">
           <button type="button" class="btn" id="btn-reload">再読み込み</button>
+          <a class="btn btn-secondary hidden" id="btn-open-sheet" href="#" target="_blank" rel="noopener">スプレッドシートをひらく</a>
           <a class="btn btn-secondary" id="btn-test-play" href="index.html?mode=teacher" target="_blank" rel="noopener">ゲームをひらく（テストプレイ）</a>
         </div>
       </div>
@@ -438,6 +439,13 @@
     btnReload.addEventListener('click', () => reloadProgress());
 
     window.addEventListener('DOMContentLoaded', () => {
+      const sheetBtn = document.getElementById('btn-open-sheet');
+      const sheetUrl = (window.LABYRINTH_CONFIG && window.LABYRINTH_CONFIG.spreadsheetUrl || '').trim();
+      if (sheetBtn && sheetUrl) {
+        sheetBtn.href = sheetUrl;
+        sheetBtn.classList.remove('hidden');
+      }
+
       if (!ClassroomAPI.isConfigured()) {
         configWarn.classList.remove('hidden');
       }
