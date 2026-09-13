@@ -253,10 +253,11 @@
     };
   }
 
-  async function saveProgress(gameProgress, medalIds) {
+  async function saveProgress(gameProgress, medalIds, options) {
     const session = getStudentSession();
     if (!session) throw new Error('no_session');
     const payload = sheetPayloadFromGameProgress(gameProgress, medalIds);
+    const reset = options && options.reset;
     const run = async () => {
       const data = await callApi({
         action: 'saveProgress',
@@ -264,7 +265,8 @@
         className: session.className,
         classNo: session.className,
         studentNo: session.studentNo,
-        ...payload
+        ...payload,
+        ...(reset ? { reset: 'true' } : {})
       });
       return progressFromSheet(data.progress);
     };

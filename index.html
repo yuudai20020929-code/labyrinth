@@ -1831,6 +1831,38 @@
       line-height: 1.4;
     }
 
+    .login-form-panel.hidden,
+    .login-progress-choice.hidden {
+      display: none;
+    }
+
+    .login-progress-title {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    .login-progress-summary {
+      margin: 0 0 16px;
+      font-size: 0.9rem;
+      color: #0284c7;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .login-progress-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .btn-login-fresh {
+      background: white;
+      color: #64748b;
+      border: 2px solid #cbd5e1;
+      box-shadow: none;
+    }
+
     .teacher-play-badge {
       display: none;
       align-items: center;
@@ -1923,38 +1955,48 @@
     <div class="login-card">
       <img src="images/keyakki.png" alt="けやっきー" class="login-logo">
       <h2>じぶんの ばんごうで はじめる</h2>
-      <p class="login-sub">がくねん・くみ・しゅっせきばんごうを いれてね</p>
-      <div class="login-fields">
-        <div class="login-field">
-          <label for="login-grade">がくねん</label>
-          <select id="login-grade">
-            <option value="1">1ねん</option>
-            <option value="2">2ねん</option>
-            <option value="3" selected>3ねん</option>
-            <option value="4">4ねん</option>
-            <option value="5">5ねん</option>
-            <option value="6">6ねん</option>
-          </select>
+      <div id="login-form-panel" class="login-form-panel">
+        <p class="login-sub">がくねん・くみ・しゅっせきばんごうを いれてね</p>
+        <div class="login-fields">
+          <div class="login-field">
+            <label for="login-grade">がくねん</label>
+            <select id="login-grade">
+              <option value="1">1ねん</option>
+              <option value="2">2ねん</option>
+              <option value="3" selected>3ねん</option>
+              <option value="4">4ねん</option>
+              <option value="5">5ねん</option>
+              <option value="6">6ねん</option>
+            </select>
+          </div>
+          <div class="login-field">
+            <label for="login-class">くみ</label>
+            <select id="login-class">
+              <option value="1" selected>1くみ</option>
+              <option value="2">2くみ</option>
+              <option value="3">3くみ</option>
+              <option value="4">4くみ</option>
+              <option value="5">5くみ</option>
+              <option value="6">6くみ</option>
+            </select>
+          </div>
+          <div class="login-field">
+            <label for="login-number">ばんごう</label>
+            <input id="login-number" type="number" min="1" max="40" step="1" placeholder="例: 12" inputmode="numeric">
+          </div>
         </div>
-        <div class="login-field">
-          <label for="login-class">くみ</label>
-          <select id="login-class">
-            <option value="1" selected>1くみ</option>
-            <option value="2">2くみ</option>
-            <option value="3">3くみ</option>
-            <option value="4">4くみ</option>
-            <option value="5">5くみ</option>
-            <option value="6">6くみ</option>
-          </select>
-        </div>
-        <div class="login-field">
-          <label for="login-number">ばんごう</label>
-          <input id="login-number" type="number" min="1" max="40" step="1" placeholder="例: 12" inputmode="numeric">
+        <button type="button" class="btn-login" id="btn-login-start">はじめる！</button>
+        <button type="button" class="btn-login btn-login-guest" id="btn-login-guest">まずはためす（ほぞんなし）</button>
+      </div>
+      <div class="login-progress-choice hidden" id="login-progress-choice">
+        <p class="login-progress-title" id="login-progress-title">まえの すすみが あります！</p>
+        <p class="login-progress-summary" id="login-progress-summary"></p>
+        <div class="login-progress-actions">
+          <button type="button" class="btn-login" id="btn-login-continue">つづきから</button>
+          <button type="button" class="btn-login btn-login-fresh" id="btn-login-fresh">はじめから</button>
         </div>
       </div>
       <p class="login-error" id="login-error"></p>
-      <button type="button" class="btn-login" id="btn-login-start">はじめる！</button>
-      <button type="button" class="btn-login btn-login-guest" id="btn-login-guest">まずはためす（ほぞんなし）</button>
       <p class="login-hint" id="login-config-hint">
         ※ 先生が Googleスプレッドシート連携を設定すると、すすみが保存されます
       </p>
@@ -2826,6 +2868,7 @@
     let stage10LeavesCollected = 0;
     let isTeacherPlayMode = false;
     let classroomReady = false;
+    let pendingLoginResult = null;
 
     let gameProgress = {
       standard: { cleared: {}, perfect: {} },
@@ -2852,23 +2895,136 @@
       return ids;
     }
 
-    function applyRemoteProgress(remote) {
-      if (!remote) return;
-      gameProgress = {
+    function emptyGameProgress() {
+      return {
+        standard: { cleared: {}, perfect: {} },
+        master: { cleared: {}, perfect: {} }
+      };
+    }
+
+    function cloneProgressMaps(progress) {
+      return {
         standard: {
-          cleared: { ...(remote.standard && remote.standard.cleared) },
-          perfect: { ...(remote.standard && remote.standard.perfect) }
+          cleared: { ...(progress.standard?.cleared || {}) },
+          perfect: { ...(progress.standard?.perfect || {}) }
         },
         master: {
-          cleared: { ...(remote.master && remote.master.cleared) },
-          perfect: { ...(remote.master && remote.master.perfect) }
+          cleared: { ...(progress.master?.cleared || {}) },
+          perfect: { ...(progress.master?.perfect || {}) }
         }
       };
+    }
+
+    function mergeProgressMaps(base, extra) {
+      ['standard', 'master'].forEach((course) => {
+        ['cleared', 'perfect'].forEach((kind) => {
+          base[course][kind] = {
+            ...(base[course][kind] || {}),
+            ...((extra[course] && extra[course][kind]) || {})
+          };
+        });
+      });
+      return base;
+    }
+
+    function hasAnySavedProgress(progress) {
+      if (!progress) return false;
+      const stdCleared = progress.standard?.cleared || {};
+      const masterCleared = progress.master?.cleared || {};
+      return Object.values(stdCleared).some(Boolean) || Object.values(masterCleared).some(Boolean);
+    }
+
+    function getLocalProgressForKey(sessionKey) {
+      try {
+        const raw = localStorage.getItem('agy_progress_data_v2_' + sessionKey);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed && parsed.standard ? parsed : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function getMergedProgressForLogin(result) {
+      const merged = cloneProgressMaps(result.progress || emptyGameProgress());
+      const local = getLocalProgressForKey(result.session.key);
+      if (local) mergeProgressMaps(merged, local);
+      return merged;
+    }
+
+    function formatProgressSummary(progress) {
+      const stdCount = Object.keys(progress.standard?.cleared || {}).filter((k) => progress.standard.cleared[k]).length;
+      const masterCount = Object.keys(progress.master?.cleared || {}).filter((k) => progress.master.cleared[k]).length;
+      const parts = [];
+      if (stdCount > 0) parts.push(`スタンダード ${stdCount}コ`);
+      if (masterCount > 0) parts.push(`マスター ${masterCount}コ`);
+      if (!parts.length) return '';
+      return parts.join('・') + ' クリアずみ';
+    }
+
+    function showLoginProgressChoice(result) {
+      pendingLoginResult = result;
+      const formPanel = document.getElementById('login-form-panel');
+      const choicePanel = document.getElementById('login-progress-choice');
+      const summary = document.getElementById('login-progress-summary');
+      const title = document.getElementById('login-progress-title');
+      const loginError = document.getElementById('login-error');
+      const summaryText = formatProgressSummary(getMergedProgressForLogin(result));
+      if (title) title.textContent = 'まえの すすみが あります！';
+      if (summary) summary.textContent = summaryText || 'つづきから または はじめから えらんでね';
+      if (loginError) loginError.textContent = '';
+      if (formPanel) formPanel.classList.add('hidden');
+      if (choicePanel) choicePanel.classList.remove('hidden');
+    }
+
+    function hideLoginProgressChoice() {
+      pendingLoginResult = null;
+      const formPanel = document.getElementById('login-form-panel');
+      const choicePanel = document.getElementById('login-progress-choice');
+      if (formPanel) formPanel.classList.remove('hidden');
+      if (choicePanel) choicePanel.classList.add('hidden');
+    }
+
+    function applyRemoteProgress(remote) {
+      if (!remote) return;
+      gameProgress = cloneProgressMaps(remote);
       const stdCleared = gameProgress.standard.cleared || {};
       isMasterUnlocked = Boolean(stdCleared[STAGES.length - 1]);
     }
 
-    function saveProgressData() {
+    async function completeStudentSession(result, mode) {
+      const sessionKey = result.session.key;
+      if (mode === 'fresh') {
+        gameProgress = emptyGameProgress();
+        isMasterUnlocked = false;
+        try {
+          localStorage.removeItem('agy_progress_data_v2_' + sessionKey);
+          localStorage.removeItem('agy_master_unlocked_' + sessionKey);
+        } catch (e) {}
+      } else {
+        applyRemoteProgress(result.progress);
+        const local = getLocalProgressForKey(sessionKey);
+        if (local) mergeProgressMaps(gameProgress, local);
+        const stdCleared = gameProgress.standard.cleared || {};
+        isMasterUnlocked = isMasterUnlocked || Boolean(stdCleared[STAGES.length - 1]);
+      }
+      hideLoginProgressChoice();
+      classroomReady = true;
+      updateSessionChrome();
+      unlockAppShell();
+      bootstrapGame();
+      saveProgressData(mode === 'fresh' ? { reset: true } : undefined);
+    }
+
+    async function beginStudentSessionAfterLogin(result) {
+      if (hasAnySavedProgress(getMergedProgressForLogin(result))) {
+        showLoginProgressChoice(result);
+        return;
+      }
+      await completeStudentSession(result, 'continue');
+    }
+
+    function saveProgressData(options) {
       try {
         const session = window.ClassroomAPI && ClassroomAPI.getStudentSession();
         if (session) {
@@ -2883,7 +3039,7 @@
       if (isTeacherPlayMode || !classroomReady) return;
       if (!window.ClassroomAPI || !ClassroomAPI.isConfigured() || !ClassroomAPI.getStudentSession()) return;
 
-      ClassroomAPI.saveProgress(gameProgress, getUnlockedMedalIds()).catch((err) => {
+      ClassroomAPI.saveProgress(gameProgress, getUnlockedMedalIds(), options).catch((err) => {
         const code = err && err.code;
         if (code === 'html_response' || code === 'invalid_json' || code === 'empty_response') {
           showSyncToast('GASを最新Code.gsで再デプロイしてから、もう一度ためしてね', true);
@@ -2937,28 +3093,7 @@
         throw new Error('gas_url_missing');
       }
       const result = await ClassroomAPI.studentLogin(grade, className, studentNo);
-      applyRemoteProgress(result.progress);
-      // ローカルに新しい進行があればマージ（オフライン時の保険）
-      try {
-        const localRaw = localStorage.getItem('agy_progress_data_v2_' + result.session.key);
-        if (localRaw) {
-          const local = JSON.parse(localRaw);
-          ['standard', 'master'].forEach((course) => {
-            ['cleared', 'perfect'].forEach((kind) => {
-              const remoteMap = gameProgress[course][kind] || {};
-              const localMap = (local[course] && local[course][kind]) || {};
-              gameProgress[course][kind] = { ...remoteMap, ...localMap };
-            });
-          });
-        }
-      } catch (e) {}
-      const stdCleared = gameProgress.standard.cleared || {};
-      isMasterUnlocked = isMasterUnlocked || Boolean(stdCleared[STAGES.length - 1]);
-      classroomReady = true;
-      updateSessionChrome();
-      unlockAppShell();
-      bootstrapGame();
-      saveProgressData();
+      await beginStudentSessionAfterLogin(result);
     }
 
     function startGuestPlayMode() {
@@ -4589,6 +4724,7 @@
       function showLoginFormAgain(message) {
         document.body.classList.add('app-locked');
         if (loginOverlay) loginOverlay.classList.remove('hidden');
+        hideLoginProgressChoice();
         if (loginError) loginError.textContent = message || '';
         if (btnLoginStart) {
           btnLoginStart.disabled = false;
@@ -4596,19 +4732,34 @@
         }
       }
 
+      const btnLoginContinue = document.getElementById('btn-login-continue');
+      const btnLoginFresh = document.getElementById('btn-login-fresh');
+
+      async function handleProgressChoice(mode) {
+        if (!pendingLoginResult) return;
+        const buttons = [btnLoginContinue, btnLoginFresh].filter(Boolean);
+        buttons.forEach((btn) => { btn.disabled = true; });
+        if (loginError) loginError.textContent = 'じゅんび中…';
+        try {
+          await completeStudentSession(pendingLoginResult, mode);
+        } catch (err) {
+          if (loginError) loginError.textContent = 'せつぞくできなかったよ。もういちど ためしてね';
+          buttons.forEach((btn) => { btn.disabled = false; });
+        }
+      }
+
+      if (btnLoginContinue) {
+        btnLoginContinue.addEventListener('click', () => handleProgressChoice('continue'));
+      }
+      if (btnLoginFresh) {
+        btnLoginFresh.addEventListener('click', () => handleProgressChoice('fresh'));
+      }
+
       const existing = ClassroomAPI.getStudentSession();
       if (existing && ClassroomAPI.isConfigured()) {
         loginError.textContent = 'よみこみ中…（30秒ほど かかることがあります）';
         ClassroomAPI.studentLogin(existing.grade, existing.className, existing.studentNo)
-          .then((result) => {
-            applyRemoteProgress(result.progress);
-            const stdCleared = gameProgress.standard.cleared || {};
-            isMasterUnlocked = Boolean(stdCleared[STAGES.length - 1]);
-            classroomReady = true;
-            updateSessionChrome();
-            unlockAppShell();
-            bootstrapGame();
-          })
+          .then((result) => beginStudentSessionAfterLogin(result))
           .catch((err) => {
             ClassroomAPI.clearStudentSession();
             const code = err && err.code;
