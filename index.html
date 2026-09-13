@@ -54,14 +54,17 @@
       flex-direction: column;
     }
 
-    /* ヘッダー: 省スペース化（高さ44px固定） */
+    /* ヘッダー: 省スペース化（高さ44px固定・1行） */
     header {
       background: white;
-      padding: 4px 14px;
+      padding: 4px 10px;
       height: 44px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      overflow: hidden;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
       z-index: 50;
       flex-shrink: 0;
@@ -70,7 +73,10 @@
     .logo-area {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      min-width: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
     }
 
     .header-logo-img {
@@ -92,12 +98,19 @@
       display: inline-flex;
       align-items: center;
       line-height: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .header-controls {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      flex: 0 0 auto;
+      flex-wrap: nowrap;
+      min-width: 0;
     }
 
     .stage-selector-wrap {
@@ -126,6 +139,10 @@
 
     select:focus {
       border-color: var(--primary);
+    }
+
+    #stage-select {
+      max-width: 168px;
     }
 
     .btn-icon {
@@ -1884,14 +1901,15 @@
     .student-session-chip {
       display: none;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       background: #e0f2fe;
       color: #075985;
       border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 0.72rem;
+      padding: 3px 8px;
+      font-size: 0.68rem;
       font-weight: 900;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .student-session-chip.visible {
@@ -1900,14 +1918,64 @@
 
     .btn-logout-mini {
       border: none;
-      background: transparent;
+      background: rgba(255, 255, 255, 0.75);
       color: #0284c7;
       font-weight: 900;
-      font-size: 0.72rem;
+      font-size: 0.65rem;
+      line-height: 1;
       cursor: pointer;
       padding: 0;
-      text-decoration: underline;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       font-family: inherit;
+      flex-shrink: 0;
+    }
+
+    .btn-logout-mini:hover {
+      background: white;
+    }
+
+    /* 児童ログイン時はヘッダーをコンパクトに（1行維持） */
+    body.has-student-session .header-title {
+      font-size: 0.82rem;
+    }
+
+    body.has-student-session .stage-selector-label {
+      display: none;
+    }
+
+    body.has-student-session .btn-icon span {
+      display: none;
+    }
+
+    body.has-student-session .stage-selector-wrap {
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      gap: 4px;
+    }
+
+    body.has-student-session #stage-select {
+      max-width: 108px;
+      font-size: 0.75rem;
+      padding: 2px 4px;
+    }
+
+    body.has-student-session .course-badge {
+      padding: 2px 6px;
+      font-size: 0.66rem;
+    }
+
+    body.has-student-session .btn-icon {
+      padding: 4px 7px;
+      font-size: 0.78rem;
+    }
+
+    body.has-student-session .header-controls {
+      gap: 4px;
     }
 
     body.app-locked > header,
@@ -2016,11 +2084,11 @@
       <span class="teacher-play-badge" id="teacher-play-badge">🧪 テストプレイ中</span>
       <span class="student-session-chip" id="student-session-chip">
         <span id="student-session-label"></span>
-        <button type="button" class="btn-logout-mini" id="btn-student-logout">でなおす</button>
+        <button type="button" class="btn-logout-mini" id="btn-student-logout" title="番号を なおす" aria-label="番号を なおす">✕</button>
       </span>
       <div class="stage-selector-wrap">
         <span class="course-badge" id="course-badge" title="コースをきりかえる">🗺️ スタンダード</span>
-        <span>ステージ:</span>
+        <span class="stage-selector-label">ステージ:</span>
         <select id="stage-select"></select>
       </div>
 
@@ -3076,15 +3144,18 @@
       const label = document.getElementById('student-session-label');
       if (badge) badge.classList.toggle('visible', isTeacherPlayMode);
       if (isTeacherPlayMode) {
+        document.body.classList.remove('has-student-session');
         if (chip) chip.classList.remove('visible');
         return;
       }
       const session = ClassroomAPI.getStudentSession();
       if (session && chip && label) {
-        label.textContent = `${session.grade}年${session.className}組 ${session.studentNo}番`;
+        label.textContent = `${session.grade}年${session.className}組${session.studentNo}番`;
         chip.classList.add('visible');
-      } else if (chip) {
-        chip.classList.remove('visible');
+        document.body.classList.add('has-student-session');
+      } else {
+        document.body.classList.remove('has-student-session');
+        if (chip) chip.classList.remove('visible');
       }
     }
 
