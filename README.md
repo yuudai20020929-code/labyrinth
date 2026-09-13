@@ -20,8 +20,29 @@
 3. スクリプトをスプレッドシートに紐付けた状態なら `SPREADSHEET_ID` は空のままでOK  
 4. 「デプロイ」→「新しいデプロイ」→ 種類「ウェブアプリ」  
    - 実行するユーザー: **自分**  
-   - アクセスできるユーザー: **全員**  
+   - アクセスできるユーザー: **全員**（匿名ユーザーを含む）  
+   - ⚠️ **「組織内のユーザー」だけにすると GitHub Pages から接続できません**（CORS / 401 エラーになります）  
 5. 発行された Web アプリ URL を [`config.js`](config.js) の `gasUrl` に貼る  
+
+#### トラブルシュート: CORS / 401 エラー
+
+GitHub Pages（`github.io`）から次のようなエラーが出る場合:
+
+- `blocked by CORS policy`
+- `401 (Unauthorized)`
+- URL が `script.google.com/a/macros/学校ドメイン/...` 形式
+
+**原因:** GAS が「組織内のみ」でデプロイされているため、外部サイトから匿名アクセスできません。ブラウザで学校 Google にログインしていても、GitHub Pages からの fetch には認証は渡りません。
+
+**対処:**
+
+1. Apps Script →「デプロイ」→「新しいデプロイ」  
+2. アクセスできるユーザー: **全員** を選ぶ  
+3. 新しい `/exec` URL を `config.js` に貼り、GitHub に push  
+4. 生徒ログインを再テスト  
+
+学校方針で「全員」が使えない場合は、GitHub Pages ではなく学校ドメイン内（Google Sites 等）にゲームを置く必要があります。
+
 6. 初回 API 呼び出し時にシート `progress` と `config` が自動作成される  
 7. `config` シートで次を変更できる  
    - `teacherPassword` … 教師ログイン用（初期値 `sensei`）  

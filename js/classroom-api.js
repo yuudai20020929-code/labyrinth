@@ -22,23 +22,37 @@
     if (!url) {
       throw new Error('gas_url_missing');
     }
-    // text/plain にして CORS プリフライトを避ける（GAS 定番パターン）
-    const res = await fetch(url, {
-      method: 'POST',
-      redirect: 'follow',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) {
-      throw new Error('http_' + res.status);
-    }
-    const data = await res.json();
-    if (!data || data.ok === false) {
-      const err = new Error((data && data.error) || 'api_error');
-      err.code = data && data.error;
+    const isOrgGasUrl = /\/a\/macros\//.test(url);
+    try {
+      // text/plain にして CORS プリフライトを避ける（GAS 定番パターン）
+      const res = await fetch(url, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const err = new Error('http_' + res.status);
+        err.code = (res.status === 401 || res.status === 403)
+          ? (isOrgGasUrl ? 'gas_org_only_cors' : 'gas_auth_required')
+          : undefined;
+        throw err;
+      }
+      const data = await res.json();
+      if (!data || data.ok === false) {
+        const err = new Error((data && data.error) || 'api_error');
+        err.code = data && data.error;
+        throw err;
+      }
+      return data;
+    } catch (err) {
+      if (err && err.name === 'TypeError' && isOrgGasUrl) {
+        const hint = new Error('gas_org_only_cors');
+        hint.code = 'gas_org_only_cors';
+        throw hint;
+      }
       throw err;
     }
-    return data;
   }
 
   function csvToIndexMap(csv) {

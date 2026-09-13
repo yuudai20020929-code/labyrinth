@@ -414,7 +414,9 @@
         showDashboard();
         await reloadProgress();
       } catch (err) {
-        if (err && err.code === 'bad_password') {
+        if (err && (err.code === 'gas_org_only_cors' || err.code === 'gas_auth_required')) {
+          loginError.textContent = 'GASが「組織内のみ」です。Apps Script を「全員（匿名含む）」で再デプロイし、config.js の gasUrl を更新してください';
+        } else if (err && err.code === 'bad_password') {
           loginError.textContent = 'パスワードが違います';
         } else {
           loginError.textContent = 'ログインできませんでした（接続を確認してください）';

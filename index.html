@@ -4623,7 +4623,9 @@
             await startStudentSession(grade, className, studentNo);
           } catch (err) {
             const code = err && err.code;
-            if (code === 'invalid_grade' || code === 'invalid_class' || code === 'invalid_student_no') {
+            if (code === 'gas_org_only_cors' || code === 'gas_auth_required') {
+              loginError.textContent = 'GASの設定が「組織内のみ」になっています。Apps Script を「全員（匿名含む）」で再デプロイし、新しい URL を config.js に貼ってください';
+            } else if (code === 'invalid_grade' || code === 'invalid_class' || code === 'invalid_student_no') {
               loginError.textContent = 'にゅうりょくが ただしくないよ';
             } else if (err && err.message === 'gas_url_missing') {
               loginError.textContent = '先生の せってい（config.js）が まだだよ';
