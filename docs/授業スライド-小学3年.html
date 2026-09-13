@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>授業スライド｜はじめてのプログラミング（小学3年）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0f172a;
+      --sky: #e0f2fe;
+      --mint: #d1fae5;
+      --sun: #fef3c7;
+      --pink: #fce7f3;
+      --primary: #0284c7;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: "M PLUS Rounded 1c", sans-serif;
+      background: #0f172a;
+      color: var(--ink);
+    }
+    .progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 6px;
+      background: #38bdf8;
+      z-index: 40;
+      transition: width 0.2s ease;
+    }
+    .deck { height: 100%; }
+    .slide {
+      display: none;
+      height: 100%;
+      padding: clamp(24px, 5vw, 64px);
+      padding-bottom: 70px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.55), transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(255,255,255,0.35), transparent 42%),
+        var(--bg, var(--sky));
+    }
+    .slide.active { display: flex; }
+    .slide.bg-sky { --bg: linear-gradient(160deg, #e0f2fe, #f0f9ff 50%, #dbeafe); }
+    .slide.bg-mint { --bg: linear-gradient(160deg, #d1fae5, #ecfdf5 50%, #ccfbf1); }
+    .slide.bg-sun { --bg: linear-gradient(160deg, #fef3c7, #fffbeb 50%, #fde68a); }
+    .slide.bg-pink { --bg: linear-gradient(160deg, #fce7f3, #fdf2f8 50%, #fbcfe8); }
+    .slide.bg-lavender { --bg: linear-gradient(160deg, #ede9fe, #f5f3ff 50%, #ddd6fe); }
+    .emoji {
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      line-height: 1;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 6px 0 rgba(15,23,42,0.08));
+    }
+    .display {
+      margin: 0;
+      font-size: clamp(2.2rem, 6.5vw, 4.6rem);
+      font-weight: 900;
+      line-height: 1.25;
+      color: #0c4a6e;
+      text-wrap: balance;
+      max-width: 16ch;
+    }
+    .display.danger { color: #b91c1c; }
+    .display.ok { color: #047857; }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 28px;
+      max-width: 920px;
+    }
+    .chip {
+      background: white;
+      border: 3px solid #7dd3fc;
+      border-radius: 18px;
+      padding: 14px 22px;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      font-weight: 900;
+      color: #0369a1;
+      box-shadow: 0 4px 0 #bae6fd;
+    }
+    .chip.green { border-color: #6ee7b7; color: #047857; box-shadow: 0 4px 0 #a7f3d0; }
+    .chip.orange { border-color: #fcd34d; color: #b45309; box-shadow: 0 4px 0 #fde68a; }
+    .steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 28px;
+    }
+    .step {
+      background: white;
+      border-radius: 999px;
+      padding: 12px 20px;
+      font-size: clamp(1.2rem, 2.8vw, 1.9rem);
+      font-weight: 900;
+      color: #0f172a;
+      border: 3px solid #38bdf8;
+    }
+    .arrow {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #0284c7;
+    }
+    .note {
+      display: none;
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 58px;
+      background: rgba(15, 23, 42, 0.92);
+      color: white;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.5;
+      z-index: 25;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    body.show-notes .note.active-note { display: block; }
+    .nav {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      background: rgba(15, 23, 42, 0.9);
+      color: white;
+      z-index: 30;
+      font-weight: 800;
+    }
+    .nav button {
+      border: none;
+      background: #0284c7;
+      color: white;
+      font-family: inherit;
+      font-weight: 900;
+      border-radius: 10px;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    .nav button:disabled { opacity: 0.35; cursor: default; }
+    .hint-key {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="deck" id="deck">
+
+    <section class="slide bg-sky active" data-note="きょうははじめてのプログラミング。『こうすればうまくいく』というじゅんばんを考える力を、いっしょにみがこう！">
+      <div class="emoji">🧠✨</div>
+      <p class="display">きょうは<br>じゅんばんを<br>かんがえるべんきょう</p>
+    </section>
+
+    <section class="slide bg-lavender" data-note="プログラミングって、きいたことある人？手をあげてみて。">
+      <div class="emoji">🤔</div>
+      <p class="display">プログラミングって<br>なに？</p>
+    </section>
+
+    <section class="slide bg-mint" data-note="じつはめずらしいものじゃないよ。みじかなところにたくさんあるんだ。">
+      <div class="emoji">👀</div>
+      <p class="display">じつは<br>あたりまえに<br>あるよ</p>
+    </section>
+
+    <section class="slide bg-sun" data-note="せんたくき・信号・ゲームも、じゅんばんで動くようにプログラムされているよ。">
+      <div class="emoji">🏠🚦🎮</div>
+      <p class="display">せんたくき<br>信号<br>ゲーム</p>
+    </section>
+
+    <section class="slide bg-pink" data-note="じゃあコンピュータは、なにでもできる魔法の箱？どう思う？">
+      <div class="emoji">🪄📦</div>
+      <p class="display">コンピュータは<br>魔法の箱？</p>
+    </section>
+
+    <section class="slide bg-mint" data-note="ちがうよ！コンピュータもAIも魔法じゃない。命令どおりに動いているだけなんだ。">
+      <div class="emoji">❌🪄</div>
+      <p class="display ok">ちがうよ！<br>魔法じゃない</p>
+    </section>
+
+    <section class="slide bg-sky" data-note="コンピュータに『めいろをだっしゅつして！』って言ったら、どうなると思う？">
+      <div class="emoji">🗣️💻</div>
+      <p class="display">「めいろを<br>だっしゅつして！」</p>
+    </section>
+
+    <section class="slide bg-sun" data-note="こまっちゃうんだ。『だっしゅつ』ってどうすればいいか、一歩ずつ教えてもらわないとわからないから。">
+      <div class="emoji">😵💦</div>
+      <p class="display danger">コンピュータ<br>こまっちゃう…</p>
+    </section>
+
+    <section class="slide bg-lavender" data-note="だから『1ぽすすむ』『みぎをむく』みたいな、ちいさくて具体的な命令が必要。">
+      <div class="emoji">🧩</div>
+      <p class="display">ちいさな命令が<br>ひつよう！</p>
+    </section>
+
+    <section class="slide bg-sky" data-note="きょう使う命令もこんな感じ。ひとつひとつはかんたん。並べかたが大事！">
+      <div class="emoji">🧱</div>
+      <div class="chips">
+        <span class="chip">1ぽすすむ</span>
+        <span class="chip orange">みぎをむく</span>
+        <span class="chip green">ひだりをむく</span>
+      </div>
+    </section>
+
+    <section class="slide bg-mint" data-note="ちいさな命令をじゅんばんに並べることが、プログラミングだよ！">
+      <div class="emoji">1️⃣2️⃣3️⃣</div>
+      <p class="display">命令を<br>じゅんばんに並べる<br>＝プログラミング！</p>
+    </section>
+
+    <section class="slide bg-sun" data-note="いちばん大切なルール。命令は上から順番に動くよ。1ばん目、2ばん目、3ばん目…">
+      <div class="emoji">⬇️</div>
+      <p class="display">大切なルール<br>うえから<br>じゅんばん！</p>
+    </section>
+
+    <section class="slide bg-pink" data-note="きょう使うアプリは『けやっきーのせかいりょこう迷路』！けやっきーをゴールまでとどけてあげよう。">
+      <div class="emoji">🌳🗻</div>
+      <p class="display">きょうのアプリ<br>けやっきーの<br>せかいりょこう迷路</p>
+    </section>
+
+    <section class="slide bg-sky" data-note="きょうのめあてはこれ。置く→うごかす→見る→直す。このくりかえしだよ。">
+      <div class="emoji">🎯</div>
+      <p class="display">きょうのめあて</p>
+      <div class="steps">
+        <span class="step">おく</span><span class="arrow">→</span>
+        <span class="step">うごかす</span><span class="arrow">→</span>
+        <span class="step">みる</span><span class="arrow">→</span>
+        <span class="step">なおす</span>
+      </div>
+    </section>
+
+    <section class="slide bg-mint" data-note="しっぱいはだめなことじゃない。『どこがちがうかな？』と考えるチャンス。あきらめないでなおそう！">
+      <div class="emoji">💪✨</div>
+      <p class="display ok">しっぱいしても<br>だいじょうぶ！</p>
+    </section>
+
+    <section class="slide bg-lavender" data-note="きょうのゴールは全部クリアすることじゃないよ。たくさんためして、なおすほうほうを考えることがゴール！">
+      <div class="emoji">🚫🏆</div>
+      <p class="display">ぜんぶクリア<br>しなくていいよ</p>
+    </section>
+
+    <section class="slide bg-sun" data-note="できた・できないより、『ためしたね』『なおしたね』『考えたね』を大切にします。">
+      <div class="emoji">🧠🔧👀</div>
+      <div class="chips">
+        <span class="chip">ためす！</span>
+        <span class="chip orange">なおす！</span>
+        <span class="chip green">かんがえる！</span>
+      </div>
+    </section>
+
+    <section class="slide bg-pink" data-note="準備はいいかな？まずはみんなでステージ1。けやっきーを富士山までとどけよう！スタート！">
+      <div class="emoji">🗻🚀</div>
+      <p class="display">さあ、みんなで<br>ステージ1！</p>
+    </section>
+
+  </div>
+
+  <div class="note" id="note"></div>
+
+  <div class="nav">
+    <button id="prevBtn" type="button">← まえ</button>
+    <div>
+      <span id="pageLabel">1 / 1</span>
+      <span class="hint-key">　N: 先生メモ　←→: ページ</span>
+    </div>
+    <button id="nextBtn" type="button">つぎ →</button>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const pageLabel = document.getElementById('pageLabel');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const progress = document.getElementById('progress');
+    const note = document.getElementById('note');
+    let index = 0;
+
+    function show(i) {
+      index = Math.max(0, Math.min(slides.length - 1, i));
+      slides.forEach((s, n) => s.classList.toggle('active', n === index));
+      pageLabel.textContent = (index + 1) + ' / ' + slides.length;
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === slides.length - 1;
+      progress.style.width = ((index + 1) / slides.length * 100) + '%';
+      note.textContent = '先生メモ: ' + (slides[index].dataset.note || '');
+      note.classList.add('active-note');
+    }
+
+    prevBtn.addEventListener('click', () => show(index - 1));
+    nextBtn.addEventListener('click', () => show(index + 1));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault();
+        show(index + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        show(index - 1);
+      } else if (e.key === 'n' || e.key === 'N') {
+        document.body.classList.toggle('show-notes');
+      } else if (e.key === 'Home') show(0);
+      else if (e.key === 'End') show(slides.length - 1);
+    });
+
+    show(0);
+  </script>
+</body>
+</html>
